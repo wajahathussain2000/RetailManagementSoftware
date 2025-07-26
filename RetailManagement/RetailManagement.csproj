@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F89AA89A-BE47-4FEB-9325-029CE9CC77FC}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>RetailManagement</RootNamespace>
+    <AssemblyName>RetailManagement</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Messaging" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Distributer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Distributer.Designer.cs">
+      <DependentUpon>Distributer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Login.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainScreen.Designer.cs">
+      <DependentUpon>MainScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserDashboard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserDashboard.Designer.cs">
+      <DependentUpon>UserDashboard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\Companies.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\Companies.Designer.cs">
+      <DependentUpon>Companies.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CreditBill.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CreditBill.Designer.cs">
+      <DependentUpon>CreditBill.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CustomerLedger.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerLedger.Designer.cs">
+      <DependentUpon>CustomerLedger.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CustomerPayment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerPayment.Designer.cs">
+      <DependentUpon>CustomerPayment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\EditBill.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\EditBill.Designer.cs">
+      <DependentUpon>EditBill.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\Items.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\Items.Designer.cs">
+      <DependentUpon>Items.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\NewBill.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\NewBill.Designer.cs">
+      <DependentUpon>NewBill.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\NewPurchase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\NewPurchase.Designer.cs">
+      <DependentUpon>NewPurchase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\PasswordForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\PasswordForm.Designer.cs">
+      <DependentUpon>PasswordForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ProfitAndLoss.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ProfitAndLoss.Designer.cs">
+      <DependentUpon>ProfitAndLoss.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\StockInHand.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\StockInHand.Designer.cs">
+      <DependentUpon>StockInHand.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserMainScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserMainScreen.Designer.cs">
+      <DependentUpon>UserMainScreen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainScreen.resx">
+      <DependentUpon>MainScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserDashboard.resx">
+      <DependentUpon>UserDashboard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\Companies.resx">
+      <DependentUpon>Companies.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\CreditBill.resx">
+      <DependentUpon>CreditBill.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\CustomerLedger.resx">
+      <DependentUpon>CustomerLedger.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\CustomerPayment.resx">
+      <DependentUpon>CustomerPayment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\Items.resx">
+      <DependentUpon>Items.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\NewBill.resx">
+      <DependentUpon>NewBill.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\NewPurchase.resx">
+      <DependentUpon>NewPurchase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\PasswordForm.resx">
+      <DependentUpon>PasswordForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\ProfitAndLoss.resx">
+      <DependentUpon>ProfitAndLoss.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserForms\StockInHand.resx">
+      <DependentUpon>StockInHand.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserMainScreen.resx">
+      <DependentUpon>UserMainScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\office-building.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\items.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bill.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\credit_bill.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\customer_balance.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\customer_ledger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\customer_payment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\edit_bill.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\purchase.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sale_return.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stock_in_hand.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
