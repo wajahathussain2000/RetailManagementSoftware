@@ -81,6 +81,24 @@ namespace RetailManagement
             stockInHand.Show();
         }
 
+        public void SaleReturnFormShow()
+        {
+            SaleReturn saleReturn = new SaleReturn();
+            saleReturn.Show();
+        }
+
+        public void CustomerBalanceFormShow()
+        {
+            CustomerBalance customerBalance = new CustomerBalance();
+            customerBalance.Show();
+        }
+
+        public void SalesReportFormShow()
+        {
+            SalesReport salesReport = new SalesReport();
+            salesReport.Show();
+        }
+
         #endregion
 
         private void btnExit_Click(object sender, EventArgs e)
@@ -155,22 +173,22 @@ namespace RetailManagement
 
         private void btnSaleReturn_Click(object sender, EventArgs e)
         {
-
+            SaleReturnFormShow();
         }
 
         private void pbSaleReturn_Click(object sender, EventArgs e)
         {
-
+            SaleReturnFormShow();
         }
 
         private void btnCustomerBalance_Click(object sender, EventArgs e)
         {
-
+            CustomerBalanceFormShow();
         }
 
         private void pbCustomerBalance_Click(object sender, EventArgs e)
         {
-
+            CustomerBalanceFormShow();
         }
 
         private void btnCustomerLedger_Click(object sender, EventArgs e)
@@ -195,12 +213,12 @@ namespace RetailManagement
 
         private void btnSalesReport_Click(object sender, EventArgs e)
         {
-
+            SalesReportFormShow();
         }
 
         private void pbSalesReport_Click(object sender, EventArgs e)
         {
-
+            SalesReportFormShow();
         }
 
         private void btnStockInHand_Click(object sender, EventArgs e)

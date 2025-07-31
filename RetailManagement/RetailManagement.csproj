@@ -143,6 +143,24 @@
     <Compile Include="UserForms\StockInHand.Designer.cs">
       <DependentUpon>StockInHand.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserForms\SaleReturn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\SaleReturn.Designer.cs">
+      <DependentUpon>SaleReturn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CustomerBalance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerBalance.Designer.cs">
+      <DependentUpon>CustomerBalance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\SalesReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\SalesReport.Designer.cs">
+      <DependentUpon>SalesReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserMainScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -150,6 +168,10 @@
       <DependentUpon>UserMainScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Database\DatabaseConnection.cs" />
+    <Compile Include="Models\Item.cs" />
+    <Compile Include="Models\Customer.cs" />
+    <Compile Include="Models\Sale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
