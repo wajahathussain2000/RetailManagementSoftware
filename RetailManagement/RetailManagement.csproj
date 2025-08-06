@@ -239,6 +239,72 @@
     <Compile Include="UserForms\UserManagement.Designer.cs">
       <DependentUpon>UserManagement.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserForms\PurchaseReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\PurchaseReport.Designer.cs">
+      <DependentUpon>PurchaseReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ExpiryReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpiryReport.Designer.cs">
+      <DependentUpon>ExpiryReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CustomerPurchaseHistory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerPurchaseHistory.Designer.cs">
+      <DependentUpon>CustomerPurchaseHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\SalesReturnReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\SalesReturnReport.Designer.cs">
+      <DependentUpon>SalesReturnReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\PurchaseReturnReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\PurchaseReturnReport.Designer.cs">
+      <DependentUpon>PurchaseReturnReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CustomerOutstanding.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerOutstanding.Designer.cs">
+      <DependentUpon>CustomerOutstanding.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\DailySummaryReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\DailySummaryReport.Designer.cs">
+      <DependentUpon>DailySummaryReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\BarcodeLabelPrint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\BarcodeLabelPrint.Designer.cs">
+      <DependentUpon>BarcodeLabelPrint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ExpenseReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpenseReport.Designer.cs">
+      <DependentUpon>ExpenseReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\InventoryReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\InventoryReport.Designer.cs">
+      <DependentUpon>InventoryReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\LowStockAlertReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\LowStockAlertReport.Designer.cs">
+      <DependentUpon>LowStockAlertReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserMainScreen.cs">
       <SubType>Form</SubType>
     </Compile>

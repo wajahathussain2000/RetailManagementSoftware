@@ -323,5 +323,65 @@ namespace RetailManagement
             UserManagement userManagement = new UserManagement();
             userManagement.Show();
         }
+
+        public void PurchaseReportFormShow()
+        {
+            PurchaseReport purchaseReport = new PurchaseReport();
+            purchaseReport.Show();
+        }
+
+        public void ExpiryReportFormShow()
+        {
+            ExpiryReport expiryReport = new ExpiryReport();
+            expiryReport.Show();
+        }
+
+        public void CustomerPurchaseHistoryFormShow()
+        {
+            CustomerPurchaseHistory customerPurchaseHistory = new CustomerPurchaseHistory();
+            customerPurchaseHistory.Show();
+        }
+
+        public void SalesReturnReportFormShow()
+        {
+            SalesReturnReport salesReturnReport = new SalesReturnReport();
+            salesReturnReport.Show();
+        }
+
+        public void PurchaseReturnReportFormShow()
+        {
+            PurchaseReturnReport purchaseReturnReport = new PurchaseReturnReport();
+            purchaseReturnReport.Show();
+        }
+
+        public void CustomerOutstandingFormShow()
+        {
+            CustomerOutstanding customerOutstanding = new CustomerOutstanding();
+            customerOutstanding.Show();
+        }
+
+        public void DailySummaryReportFormShow()
+        {
+            DailySummaryReport dailySummaryReport = new DailySummaryReport();
+            dailySummaryReport.Show();
+        }
+
+        public void BarcodeLabelPrintFormShow()
+        {
+            BarcodeLabelPrint barcodeLabelPrint = new BarcodeLabelPrint();
+            barcodeLabelPrint.Show();
+        }
+
+        public void InventoryReportFormShow()
+        {
+            InventoryReport inventoryReport = new InventoryReport();
+            inventoryReport.Show();
+        }
+
+        public void LowStockAlertReportFormShow()
+        {
+            LowStockAlertReport lowStockAlertReport = new LowStockAlertReport();
+            lowStockAlertReport.Show();
+        }
     }
 }

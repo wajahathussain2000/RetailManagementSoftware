@@ -1,6 +1,6 @@
 namespace RetailManagement.UserForms
 {
-    partial class ExpenseReport
+    partial class LowStockAlertReport
     {
         /// <summary>
         /// Required designer variable.
@@ -32,19 +32,21 @@ namespace RetailManagement.UserForms
             this.lblTitle = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnFilter = new System.Windows.Forms.Button();
-            this.dtpToDate = new System.Windows.Forms.DateTimePicker();
-            this.dtpFromDate = new System.Windows.Forms.DateTimePicker();
+            this.cmbCompany = new System.Windows.Forms.ComboBox();
+            this.cmbCategory = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.dgvExpenseReport = new System.Windows.Forms.DataGridView();
+            this.dgvLowStockAlert = new System.Windows.Forms.DataGridView();
             this.panel3 = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
             this.btnPrint = new System.Windows.Forms.Button();
-            this.lblTotalExpenses = new System.Windows.Forms.Label();
+            this.lblTotalValue = new System.Windows.Forms.Label();
+            this.lblTotalShortage = new System.Windows.Forms.Label();
+            this.lblTotalItems = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvExpenseReport)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvLowStockAlert)).BeginInit();
             this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,7 +57,7 @@ namespace RetailManagement.UserForms
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1000, 60);
+            this.panel1.Size = new System.Drawing.Size(1200, 60);
             this.panel1.TabIndex = 0;
             // 
             // lblTitle
@@ -65,22 +67,22 @@ namespace RetailManagement.UserForms
             this.lblTitle.ForeColor = System.Drawing.Color.White;
             this.lblTitle.Location = new System.Drawing.Point(20, 15);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(180, 30);
+            this.lblTitle.Size = new System.Drawing.Size(200, 30);
             this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "Expense Report";
+            this.lblTitle.Text = "Low Stock Alert Report";
             // 
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.Color.White;
             this.panel2.Controls.Add(this.btnFilter);
-            this.panel2.Controls.Add(this.dtpToDate);
-            this.panel2.Controls.Add(this.dtpFromDate);
+            this.panel2.Controls.Add(this.cmbCompany);
+            this.panel2.Controls.Add(this.cmbCategory);
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.label1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(0, 60);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1000, 80);
+            this.panel2.Size = new System.Drawing.Size(1200, 80);
             this.panel2.TabIndex = 1;
             // 
             // btnFilter
@@ -89,7 +91,7 @@ namespace RetailManagement.UserForms
             this.btnFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnFilter.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.btnFilter.ForeColor = System.Drawing.Color.White;
-            this.btnFilter.Location = new System.Drawing.Point(400, 25);
+            this.btnFilter.Location = new System.Drawing.Point(500, 25);
             this.btnFilter.Name = "btnFilter";
             this.btnFilter.Size = new System.Drawing.Size(100, 30);
             this.btnFilter.TabIndex = 4;
@@ -97,33 +99,37 @@ namespace RetailManagement.UserForms
             this.btnFilter.UseVisualStyleBackColor = false;
             this.btnFilter.Click += new System.EventHandler(this.btnFilter_Click);
             // 
-            // dtpToDate
+            // cmbCompany
             // 
-            this.dtpToDate.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.dtpToDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpToDate.Location = new System.Drawing.Point(280, 30);
-            this.dtpToDate.Name = "dtpToDate";
-            this.dtpToDate.Size = new System.Drawing.Size(100, 23);
-            this.dtpToDate.TabIndex = 3;
+            this.cmbCompany.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCompany.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.cmbCompany.FormattingEnabled = true;
+            this.cmbCompany.Location = new System.Drawing.Point(350, 30);
+            this.cmbCompany.Name = "cmbCompany";
+            this.cmbCompany.Size = new System.Drawing.Size(130, 23);
+            this.cmbCompany.TabIndex = 3;
+            this.cmbCompany.SelectedIndexChanged += new System.EventHandler(this.cmbCompany_SelectedIndexChanged);
             // 
-            // dtpFromDate
+            // cmbCategory
             // 
-            this.dtpFromDate.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.dtpFromDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFromDate.Location = new System.Drawing.Point(100, 30);
-            this.dtpFromDate.Name = "dtpFromDate";
-            this.dtpFromDate.Size = new System.Drawing.Size(100, 23);
-            this.dtpFromDate.TabIndex = 2;
+            this.cmbCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCategory.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.cmbCategory.FormattingEnabled = true;
+            this.cmbCategory.Location = new System.Drawing.Point(100, 30);
+            this.cmbCategory.Name = "cmbCategory";
+            this.cmbCategory.Size = new System.Drawing.Size(130, 23);
+            this.cmbCategory.TabIndex = 2;
+            this.cmbCategory.SelectedIndexChanged += new System.EventHandler(this.cmbCategory_SelectedIndexChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label2.Location = new System.Drawing.Point(220, 33);
+            this.label2.Location = new System.Drawing.Point(290, 33);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(54, 15);
             this.label2.TabIndex = 1;
-            this.label2.Text = "To Date:";
+            this.label2.Text = "Company:";
             // 
             // label1
             // 
@@ -131,27 +137,27 @@ namespace RetailManagement.UserForms
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label1.Location = new System.Drawing.Point(30, 33);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 15);
+            this.label1.Size = new System.Drawing.Size(64, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "From Date:";
+            this.label1.Text = "Category:";
             // 
-            // dgvExpenseReport
+            // dgvLowStockAlert
             // 
-            this.dgvExpenseReport.AllowUserToAddRows = false;
-            this.dgvExpenseReport.AllowUserToDeleteRows = false;
-            this.dgvExpenseReport.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvExpenseReport.BackgroundColor = System.Drawing.Color.White;
-            this.dgvExpenseReport.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dgvExpenseReport.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvExpenseReport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvExpenseReport.GridColor = System.Drawing.Color.LightGray;
-            this.dgvExpenseReport.Location = new System.Drawing.Point(0, 140);
-            this.dgvExpenseReport.Name = "dgvExpenseReport";
-            this.dgvExpenseReport.ReadOnly = true;
-            this.dgvExpenseReport.RowTemplate.Height = 25;
-            this.dgvExpenseReport.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvExpenseReport.Size = new System.Drawing.Size(1000, 460);
-            this.dgvExpenseReport.TabIndex = 2;
+            this.dgvLowStockAlert.AllowUserToAddRows = false;
+            this.dgvLowStockAlert.AllowUserToDeleteRows = false;
+            this.dgvLowStockAlert.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvLowStockAlert.BackgroundColor = System.Drawing.Color.White;
+            this.dgvLowStockAlert.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dgvLowStockAlert.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvLowStockAlert.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvLowStockAlert.GridColor = System.Drawing.Color.LightGray;
+            this.dgvLowStockAlert.Location = new System.Drawing.Point(0, 140);
+            this.dgvLowStockAlert.Name = "dgvLowStockAlert";
+            this.dgvLowStockAlert.ReadOnly = true;
+            this.dgvLowStockAlert.RowTemplate.Height = 25;
+            this.dgvLowStockAlert.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvLowStockAlert.Size = new System.Drawing.Size(1200, 420);
+            this.dgvLowStockAlert.TabIndex = 2;
             // 
             // panel3
             // 
@@ -159,11 +165,13 @@ namespace RetailManagement.UserForms
             this.panel3.Controls.Add(this.btnClose);
             this.panel3.Controls.Add(this.btnExport);
             this.panel3.Controls.Add(this.btnPrint);
-            this.panel3.Controls.Add(this.lblTotalExpenses);
+            this.panel3.Controls.Add(this.lblTotalValue);
+            this.panel3.Controls.Add(this.lblTotalShortage);
+            this.panel3.Controls.Add(this.lblTotalItems);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(0, 600);
+            this.panel3.Location = new System.Drawing.Point(0, 560);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1000, 60);
+            this.panel3.Size = new System.Drawing.Size(1200, 60);
             this.panel3.TabIndex = 3;
             // 
             // btnClose
@@ -172,10 +180,10 @@ namespace RetailManagement.UserForms
             this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClose.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.btnClose.ForeColor = System.Drawing.Color.White;
-            this.btnClose.Location = new System.Drawing.Point(900, 15);
+            this.btnClose.Location = new System.Drawing.Point(1100, 15);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(80, 30);
-            this.btnClose.TabIndex = 3;
+            this.btnClose.TabIndex = 5;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = false;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
@@ -186,10 +194,10 @@ namespace RetailManagement.UserForms
             this.btnExport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExport.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.btnExport.ForeColor = System.Drawing.Color.White;
-            this.btnExport.Location = new System.Drawing.Point(810, 15);
+            this.btnExport.Location = new System.Drawing.Point(1010, 15);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(80, 30);
-            this.btnExport.TabIndex = 2;
+            this.btnExport.TabIndex = 4;
             this.btnExport.Text = "Export";
             this.btnExport.UseVisualStyleBackColor = false;
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
@@ -200,43 +208,63 @@ namespace RetailManagement.UserForms
             this.btnPrint.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPrint.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.btnPrint.ForeColor = System.Drawing.Color.White;
-            this.btnPrint.Location = new System.Drawing.Point(720, 15);
+            this.btnPrint.Location = new System.Drawing.Point(920, 15);
             this.btnPrint.Name = "btnPrint";
             this.btnPrint.Size = new System.Drawing.Size(80, 30);
-            this.btnPrint.TabIndex = 1;
+            this.btnPrint.TabIndex = 3;
             this.btnPrint.Text = "Print";
             this.btnPrint.UseVisualStyleBackColor = false;
             this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 
-            // lblTotalExpenses
+            // lblTotalValue
             // 
-            this.lblTotalExpenses.AutoSize = true;
-            this.lblTotalExpenses.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblTotalExpenses.Location = new System.Drawing.Point(20, 20);
-            this.lblTotalExpenses.Name = "lblTotalExpenses";
-            this.lblTotalExpenses.Size = new System.Drawing.Size(150, 21);
-            this.lblTotalExpenses.TabIndex = 0;
-            this.lblTotalExpenses.Text = "Total Expenses: ₹0";
+            this.lblTotalValue.AutoSize = true;
+            this.lblTotalValue.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lblTotalValue.Location = new System.Drawing.Point(400, 20);
+            this.lblTotalValue.Name = "lblTotalValue";
+            this.lblTotalValue.Size = new System.Drawing.Size(120, 19);
+            this.lblTotalValue.TabIndex = 2;
+            this.lblTotalValue.Text = "Total Value: ₹0";
             // 
-            // ExpenseReport
+            // lblTotalShortage
+            // 
+            this.lblTotalShortage.AutoSize = true;
+            this.lblTotalShortage.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lblTotalShortage.Location = new System.Drawing.Point(200, 20);
+            this.lblTotalShortage.Name = "lblTotalShortage";
+            this.lblTotalShortage.Size = new System.Drawing.Size(140, 19);
+            this.lblTotalShortage.TabIndex = 1;
+            this.lblTotalShortage.Text = "Total Shortage: 0";
+            // 
+            // lblTotalItems
+            // 
+            this.lblTotalItems.AutoSize = true;
+            this.lblTotalItems.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lblTotalItems.Location = new System.Drawing.Point(20, 20);
+            this.lblTotalItems.Name = "lblTotalItems";
+            this.lblTotalItems.Size = new System.Drawing.Size(100, 19);
+            this.lblTotalItems.TabIndex = 0;
+            this.lblTotalItems.Text = "Total Items: 0";
+            // 
+            // LowStockAlertReport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1000, 660);
-            this.Controls.Add(this.dgvExpenseReport);
+            this.ClientSize = new System.Drawing.Size(1200, 620);
+            this.Controls.Add(this.dgvLowStockAlert);
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
-            this.Name = "ExpenseReport";
+            this.Name = "LowStockAlertReport";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Expense Report";
+            this.Text = "Low Stock Alert Report";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvExpenseReport)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvLowStockAlert)).EndInit();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             this.ResumeLayout(false);
@@ -249,15 +277,17 @@ namespace RetailManagement.UserForms
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnFilter;
-        private System.Windows.Forms.DateTimePicker dtpToDate;
-        private System.Windows.Forms.DateTimePicker dtpFromDate;
+        private System.Windows.Forms.ComboBox cmbCompany;
+        private System.Windows.Forms.ComboBox cmbCategory;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.DataGridView dgvExpenseReport;
+        private System.Windows.Forms.DataGridView dgvLowStockAlert;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.Button btnPrint;
-        private System.Windows.Forms.Label lblTotalExpenses;
+        private System.Windows.Forms.Label lblTotalValue;
+        private System.Windows.Forms.Label lblTotalShortage;
+        private System.Windows.Forms.Label lblTotalItems;
     }
 } 
