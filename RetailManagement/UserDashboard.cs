@@ -99,6 +99,30 @@ namespace RetailManagement
             salesReport.Show();
         }
 
+        public void PurchaseReturnFormShow()
+        {
+            PurchaseReturn purchaseReturn = new PurchaseReturn();
+            purchaseReturn.Show();
+        }
+
+        public void ExpenseEntryFormShow()
+        {
+            ExpenseEntry expenseEntry = new ExpenseEntry();
+            expenseEntry.Show();
+        }
+
+        public void GSTSetupFormShow()
+        {
+            GSTSetup gstSetup = new GSTSetup();
+            gstSetup.Show();
+        }
+
+        public void ExpiryAlertFormShow()
+        {
+            ExpiryAlert expiryAlert = new ExpiryAlert();
+            expiryAlert.Show();
+        }
+
         #endregion
 
         private void btnExit_Click(object sender, EventArgs e)
@@ -244,6 +268,60 @@ namespace RetailManagement
         private void profitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PasswordFormShow();
+        }
+
+        public void ExpenseReportFormShow()
+        {
+            ExpenseReport expenseReport = new ExpenseReport();
+            expenseReport.Show();
+        }
+
+        public void SupplierLedgerFormShow()
+        {
+            SupplierLedger supplierLedger = new SupplierLedger();
+            supplierLedger.Show();
+        }
+
+        public void GSTReportFormShow()
+        {
+            GSTReport gstReport = new GSTReport();
+            gstReport.Show();
+        }
+
+        public void ExpiredStockReportFormShow()
+        {
+            ExpiredStockReport expiredStockReport = new ExpiredStockReport();
+            expiredStockReport.Show();
+        }
+
+        public void BarcodeGeneratorFormShow()
+        {
+            BarcodeGenerator barcodeGenerator = new BarcodeGenerator();
+            barcodeGenerator.Show();
+        }
+
+        public void BankTransactionsFormShow()
+        {
+            BankTransactions bankTransactions = new BankTransactions();
+            bankTransactions.Show();
+        }
+
+        public void TrialBalanceFormShow()
+        {
+            TrialBalance trialBalance = new TrialBalance();
+            trialBalance.Show();
+        }
+
+        public void CashFlowFormShow()
+        {
+            CashFlow cashFlow = new CashFlow();
+            cashFlow.Show();
+        }
+
+        public void UserManagementFormShow()
+        {
+            UserManagement userManagement = new UserManagement();
+            userManagement.Show();
         }
     }
 }

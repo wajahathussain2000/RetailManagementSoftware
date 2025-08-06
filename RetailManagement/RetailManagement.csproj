@@ -161,6 +161,84 @@
     <Compile Include="UserForms\SalesReport.Designer.cs">
       <DependentUpon>SalesReport.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserForms\PurchaseReturn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\PurchaseReturn.Designer.cs">
+      <DependentUpon>PurchaseReturn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ExpenseEntry.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpenseEntry.Designer.cs">
+      <DependentUpon>ExpenseEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\GSTSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\GSTSetup.Designer.cs">
+      <DependentUpon>GSTSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ExpiryAlert.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpiryAlert.Designer.cs">
+      <DependentUpon>ExpiryAlert.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ExpenseReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpenseReport.Designer.cs">
+      <DependentUpon>ExpenseReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\SupplierLedger.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\SupplierLedger.Designer.cs">
+      <DependentUpon>SupplierLedger.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\GSTReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\GSTReport.Designer.cs">
+      <DependentUpon>GSTReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ExpiredStockReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpiredStockReport.Designer.cs">
+      <DependentUpon>ExpiredStockReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\BarcodeGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\BarcodeGenerator.Designer.cs">
+      <DependentUpon>BarcodeGenerator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\BankTransactions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\BankTransactions.Designer.cs">
+      <DependentUpon>BankTransactions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\TrialBalance.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\TrialBalance.Designer.cs">
+      <DependentUpon>TrialBalance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CashFlow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CashFlow.Designer.cs">
+      <DependentUpon>CashFlow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\UserManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\UserManagement.Designer.cs">
+      <DependentUpon>UserManagement.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserMainScreen.cs">
       <SubType>Form</SubType>
     </Compile>
