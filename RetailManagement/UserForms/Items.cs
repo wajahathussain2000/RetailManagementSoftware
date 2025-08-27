@@ -227,29 +227,35 @@ namespace RetailManagement.UserForms
                 string query = "SELECT DISTINCT Category FROM Items WHERE IsActive = 1 AND Category IS NOT NULL ORDER BY Category";
                 DataTable categoryData = DatabaseConnection.ExecuteQuery(query);
                 
-                // Load categories into comboBox1 (Company dropdown)
-                comboBox1.Items.Clear();
-                comboBox1.Items.Add("All Companies");
+                // Load categories into comboBox1 (Company dropdown) using DataSource
+                DataTable comboBox1Data = new DataTable();
+                comboBox1Data.Columns.Add("Category", typeof(string));
+                comboBox1Data.Rows.Add("All Companies");
                 
                 foreach (DataRow row in categoryData.Rows)
                 {
-                    comboBox1.Items.Add(row["Category"].ToString());
+                    comboBox1Data.Rows.Add(row["Category"].ToString());
                 }
                 
+                comboBox1.DataSource = comboBox1Data;
+                comboBox1.DisplayMember = "Category";
                 comboBox1.SelectedIndex = 0;
 
-                // Load categories into category filter combo box
+                // Load categories into category filter combo box using DataSource
                 ComboBox comboBoxCategory = this.Controls.OfType<ComboBox>().FirstOrDefault(c => c.Location.X == 710);
                 if (comboBoxCategory != null)
                 {
-                    comboBoxCategory.Items.Clear();
-                    comboBoxCategory.Items.Add("All Categories");
+                    DataTable comboBoxCategoryData = new DataTable();
+                    comboBoxCategoryData.Columns.Add("Category", typeof(string));
+                    comboBoxCategoryData.Rows.Add("All Categories");
                     
                     foreach (DataRow row in categoryData.Rows)
                     {
-                        comboBoxCategory.Items.Add(row["Category"].ToString());
+                        comboBoxCategoryData.Rows.Add(row["Category"].ToString());
                     }
                     
+                    comboBoxCategory.DataSource = comboBoxCategoryData;
+                    comboBoxCategory.DisplayMember = "Category";
                     comboBoxCategory.SelectedIndex = 0;
                 }
             }
@@ -553,10 +559,14 @@ namespace RetailManagement.UserForms
                 ComboBox comboBoxCategory = this.Controls.OfType<ComboBox>().FirstOrDefault(c => c.Location.X == 710);
                 if (comboBoxCategory != null && comboBoxCategory.SelectedIndex > 0)
                 {
-                    string category = comboBoxCategory.SelectedItem.ToString();
-                    DataView dv = itemsData.DefaultView;
-                    dv.RowFilter = $"Category = '{category.Replace("'", "''")}'";
-                    gridViewProducts.DataSource = dv;
+                    DataRowView selectedRow = comboBoxCategory.SelectedItem as DataRowView;
+                    if (selectedRow != null)
+                    {
+                        string category = selectedRow["Category"].ToString();
+                        DataView dv = itemsData.DefaultView;
+                        dv.RowFilter = $"Category = '{category.Replace("'", "''")}'";
+                        gridViewProducts.DataSource = dv;
+                    }
                 }
                 else
                 {

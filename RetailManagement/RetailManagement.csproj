@@ -89,6 +89,7 @@
     <Compile Include="MainScreen.Designer.cs">
       <DependentUpon>MainScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\ComboBoxItem.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="UserDashboard.cs">
       <SubType>UserControl</SubType>

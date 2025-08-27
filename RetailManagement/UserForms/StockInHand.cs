@@ -189,14 +189,17 @@ namespace RetailManagement.UserForms
                 string query = "SELECT DISTINCT Category FROM Items WHERE IsActive = 1 AND Category IS NOT NULL ORDER BY Category";
                 DataTable categoryData = DatabaseConnection.ExecuteQuery(query);
                 
-                comboBox1.Items.Clear();
-                comboBox1.Items.Add("All Categories");
+                DataTable comboBox1Data = new DataTable();
+                comboBox1Data.Columns.Add("Category", typeof(string));
+                comboBox1Data.Rows.Add("All Categories");
                 
                 foreach (DataRow row in categoryData.Rows)
                 {
-                    comboBox1.Items.Add(row["Category"].ToString());
+                    comboBox1Data.Rows.Add(row["Category"].ToString());
                 }
                 
+                comboBox1.DataSource = comboBox1Data;
+                comboBox1.DisplayMember = "Category";
                 comboBox1.SelectedIndex = 0;
             }
             catch (Exception ex)

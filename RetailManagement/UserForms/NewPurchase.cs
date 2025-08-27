@@ -91,7 +91,24 @@ namespace RetailManagement.UserForms
             {
                 string query = "SELECT ItemID, ItemName, Price FROM Items WHERE IsActive = 1 ORDER BY ItemName";
                 DataTable dt = DatabaseConnection.ExecuteQuery(query);
-                // Note: comboItem doesn't exist in Designer, using textBox4 for item name input
+                
+                // Create a dropdown for item selection if it doesn't exist
+                ComboBox comboItem = this.Controls.OfType<ComboBox>().FirstOrDefault(c => c.Name == "comboItem");
+                if (comboItem == null)
+                {
+                    comboItem = new ComboBox
+                    {
+                        Name = "comboItem",
+                        Location = new Point(110, 80),
+                        Size = new Size(200, 20),
+                        DropDownStyle = ComboBoxStyle.DropDownList
+                    };
+                    this.Controls.Add(comboItem);
+                }
+                
+                comboItem.DataSource = dt;
+                comboItem.DisplayMember = "ItemName";
+                comboItem.ValueMember = "ItemID";
             }
             catch (Exception ex)
             {

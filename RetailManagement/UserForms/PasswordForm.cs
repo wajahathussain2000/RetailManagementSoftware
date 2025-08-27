@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RetailManagement.Database;
+using RetailManagement.Models;
 
 namespace RetailManagement.UserForms
 {
@@ -17,13 +18,7 @@ namespace RetailManagement.UserForms
         private int userId;
         private string username;
 
-        // Helper class for ComboBox items
-        private class ComboBoxItem
-        {
-            public string Text { get; set; }
-            public object Value { get; set; }
-            public override string ToString() => Text;
-        }
+        // Using shared ComboBoxItem from Models namespace
 
         public PasswordForm(int userId)
         {

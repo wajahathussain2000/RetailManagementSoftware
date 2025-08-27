@@ -1,11 +1,17 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
-using System.Windows.Forms;
-using System.IO;
-using RetailManagement.Database;
 using System.Drawing.Printing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using RetailManagement.Database;
+using RetailManagement.Models;
 
 namespace RetailManagement.UserForms
 {
@@ -457,18 +463,6 @@ namespace RetailManagement.UserForms
         private void cmbSupplier_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadSupplierLedger();
-        }
-    }
-
-    // Helper class for ComboBox items with value
-    public class ComboBoxItem
-    {
-        public string Text { get; set; }
-        public object Value { get; set; }
-
-        public override string ToString()
-        {
-            return Text;
         }
     }
 } 

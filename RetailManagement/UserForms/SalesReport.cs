@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RetailManagement.Database;
+using RetailManagement.Models;
 using Microsoft.Reporting.WinForms;
 
 namespace RetailManagement.UserForms
@@ -108,13 +109,13 @@ namespace RetailManagement.UserForms
                 DataTable customerData = DatabaseConnection.ExecuteQuery(customerQuery);
                 
                 cmbCustomer.Items.Clear();
-                cmbCustomer.Items.Add(new ComboBoxItem { ID = 0, Text = "All Customers" });
+                cmbCustomer.Items.Add(new ComboBoxItem { Value = 0, Text = "All Customers" });
                 
                 foreach (DataRow row in customerData.Rows)
                 {
                     cmbCustomer.Items.Add(new ComboBoxItem 
                     { 
-                        ID = Convert.ToInt32(row["CustomerID"]), 
+                        Value = Convert.ToInt32(row["CustomerID"]), 
                         Text = row["CustomerName"].ToString() 
                     });
                 }
@@ -187,10 +188,10 @@ namespace RetailManagement.UserForms
             };
 
                 // Add customer filter
-                if (cmbCustomer.SelectedItem is ComboBoxItem selectedCustomer && selectedCustomer.ID > 0)
+                if (cmbCustomer.SelectedItem is ComboBoxItem selectedCustomer && selectedCustomer.Value != null && (int)selectedCustomer.Value > 0)
                 {
                     query += " AND s.CustomerID = @CustomerID";
-                    parameters.Add(new SqlParameter("@CustomerID", selectedCustomer.ID));
+                    parameters.Add(new SqlParameter("@CustomerID", selectedCustomer.Value));
                 }
 
                 // Add payment method filter
@@ -356,16 +357,6 @@ namespace RetailManagement.UserForms
             // Optional: Add any date change logic here
         }
 
-        // Helper class for ComboBox items
-        private class ComboBoxItem
-        {
-            public int ID { get; set; }
-            public string Text { get; set; }
-
-            public override string ToString()
-            {
-                return Text;
-            }
-        }
+        // Using shared ComboBoxItem from Models namespace
     }
 } 
