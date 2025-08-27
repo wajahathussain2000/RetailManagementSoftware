@@ -4,216 +4,408 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RetailManagement.Database;
+using Microsoft.Reporting.WinForms;
 
 namespace RetailManagement.UserForms
 {
     public partial class StockInHand : Form
     {
         private DataTable reportData;
+        private ReportViewer reportViewer;
 
         public StockInHand()
         {
             InitializeComponent();
-            LoadDistributors();
-            LoadPrincipals();
-            InitializeForm();
+            InitializeRDLCControls();
+            LoadCategories();
+            SetDefaultReportType();
         }
 
-        private void InitializeForm()
+        private void InitializeRDLCControls()
         {
-            // Set default radio button
-            radioButton1.Checked = true;
+            // Remove old controls and replace with ReportViewer
+            this.Controls.Clear();
             
-            // Initialize report data table
-            reportData = new DataTable();
+            // Create main panel
+            Panel mainPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.White
+            };
+
+            // Create control panel
+            Panel controlPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 200,
+                BackColor = Color.LightGray
+            };
+
+            // Create labels
+            Label lblCategory = new Label
+            {
+                Text = "Category:",
+                Location = new Point(20, 20),
+                Size = new Size(80, 20),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+
+            Label lblReportType = new Label
+            {
+                Text = "Report Type:",
+                Location = new Point(20, 50),
+                Size = new Size(80, 20),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+
+            Label lblSearch = new Label
+            {
+                Text = "Search:",
+                Location = new Point(20, 80),
+                Size = new Size(80, 20),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+
+            // Create dropdowns
+            comboBox1 = new ComboBox
+            {
+                Location = new Point(110, 20),
+                Size = new Size(200, 20),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+
+            comboBox2 = new ComboBox
+            {
+                Location = new Point(110, 50),
+                Size = new Size(200, 20),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            comboBox2.Items.AddRange(new object[] { "All Items", "Low Stock (≤10)", "Out of Stock", "By Value (High to Low)" });
+
+            // Create search textbox
+            textBox1 = new TextBox
+            {
+                Location = new Point(110, 80),
+                Size = new Size(200, 20)
+            };
+
+            // Create radio buttons for stock status
+            radioButton1 = new RadioButton
+            {
+                Text = "All Items",
+                Location = new Point(350, 20),
+                Size = new Size(100, 20),
+                Checked = true,
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+
+            radioButton2 = new RadioButton
+            {
+                Text = "Low Stock (≤10)",
+                Location = new Point(350, 40),
+                Size = new Size(120, 20),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+
+            radioButton3 = new RadioButton
+            {
+                Text = "Out of Stock",
+                Location = new Point(350, 60),
+                Size = new Size(100, 20),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+
+            // Update button texts and add event handlers
+            btnReport.Text = "Generate Report";
+            btnReport.Size = new Size(120, 32);
+            btnReport.Location = new Point(500, 20);
+            btnReport.Click += btnReport_Click;
+
+            btnExit.Text = "Exit";
+            btnExit.Size = new Size(75, 32);
+            btnExit.Location = new Point(640, 20);
+            btnExit.Click += btnExit_Click;
+
+            // Add export and print buttons
+            Button btnExport = new Button
+            {
+                Text = "Export PDF",
+                Location = new Point(500, 60),
+                Size = new Size(120, 32),
+                BackColor = Color.LightGreen,
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+            btnExport.Click += btnExport_Click;
+
+            Button btnPrint = new Button
+            {
+                Text = "Print",
+                Location = new Point(640, 60),
+                Size = new Size(75, 32),
+                BackColor = Color.LightYellow,
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+            };
+            btnPrint.Click += btnPrint_Click;
+
+            // Add controls to control panel
+            controlPanel.Controls.AddRange(new Control[] {
+                lblCategory, lblReportType, lblSearch,
+                comboBox1, comboBox2, textBox1,
+                radioButton1, radioButton2, radioButton3,
+                btnReport, btnExit, btnExport, btnPrint
+            });
+
+            // Create report viewer
+            reportViewer = new ReportViewer
+            {
+                Dock = DockStyle.Fill,
+                ProcessingMode = ProcessingMode.Local
+            };
+
+            // Add panels to main panel
+            mainPanel.Controls.Add(reportViewer);
+            mainPanel.Controls.Add(controlPanel);
+
+            // Add main panel to form
+            this.Controls.Add(mainPanel);
+
+            // Set report path
+            reportViewer.LocalReport.ReportPath = "Reports/StockInHandReport.rdlc";
+
+            // Set form properties
+            this.Text = "Stock In Hand Report";
+            this.WindowState = FormWindowState.Maximized;
         }
 
-        private void LoadDistributors()
+        private void LoadCategories()
         {
             try
             {
-                string query = "SELECT DISTINCT Category FROM Items WHERE IsActive = 1 ORDER BY Category";
-                DataTable dt = DatabaseConnection.ExecuteQuery(query);
-                comboBox1.DataSource = dt;
-                comboBox1.DisplayMember = "Category";
-                comboBox1.ValueMember = "Category";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading distributors: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void LoadPrincipals()
-        {
-            try
-            {
-                string query = "SELECT DISTINCT Category FROM Items WHERE IsActive = 1 ORDER BY Category";
-                DataTable dt = DatabaseConnection.ExecuteQuery(query);
-                comboBox2.DataSource = dt;
-                comboBox2.DisplayMember = "Category";
-                comboBox2.ValueMember = "Category";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading principals: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void GenerateReport()
-        {
-            try
-            {
-                string query = "";
-                string reportTitle = "";
-
-                if (radioButton1.Checked) // Stock Summary
-                {
-                    query = @"SELECT 
-                                i.ItemID,
-                                i.ItemName,
-                                i.Category,
-                                i.Price,
-                                i.StockQuantity,
-                                i.Price * i.StockQuantity as StockValue
-                               FROM Items i
-                               WHERE i.IsActive = 1";
-                    reportTitle = "Stock Summary Report";
-                }
-                else if (radioButton2.Checked) // Stock Value Wise
-                {
-                    query = @"SELECT 
-                                i.ItemID,
-                                i.ItemName,
-                                i.Category,
-                                i.Price,
-                                i.StockQuantity,
-                                i.Price * i.StockQuantity as StockValue
-                               FROM Items i
-                               WHERE i.IsActive = 1
-                               ORDER BY i.Price * i.StockQuantity DESC";
-                    reportTitle = "Stock Value Wise Report";
-                }
-                else if (radioButton3.Checked) // Re-Order Level Report
-                {
-                    query = @"SELECT 
-                                i.ItemID,
-                                i.ItemName,
-                                i.Category,
-                                i.Price,
-                                i.StockQuantity,
-                                i.Price * i.StockQuantity as StockValue
-                               FROM Items i
-                               WHERE i.IsActive = 1 AND i.StockQuantity <= 10";
-                    reportTitle = "Re-Order Level Report";
-                }
-                else if (radioButton4.Checked) // Near Expiry Report
-                {
-                    // For now, using a placeholder since we don't have expiry dates
-                    query = @"SELECT 
-                                i.ItemID,
-                                i.ItemName,
-                                i.Category,
-                                i.Price,
-                                i.StockQuantity,
-                                i.Price * i.StockQuantity as StockValue
-                               FROM Items i
-                               WHERE i.IsActive = 1";
-                    reportTitle = "Near Expiry Report";
-                }
-
-                // Add distributor/principal filter if selected
-                if (comboBox1.SelectedValue != null && comboBox1.SelectedValue.ToString() != "")
-                {
-                    query += " AND i.Category = @Distributor";
-                }
-
-                query += " ORDER BY i.Category, i.ItemName";
-
-                SqlParameter[] parameters = null;
-                if (comboBox1.SelectedValue != null && comboBox1.SelectedValue.ToString() != "")
-                {
-                    parameters = new SqlParameter[] { new SqlParameter("@Distributor", comboBox1.SelectedValue.ToString()) };
-                }
-
-                reportData = DatabaseConnection.ExecuteQuery(query, parameters);
+                string query = "SELECT DISTINCT Category FROM Items WHERE IsActive = 1 AND Category IS NOT NULL ORDER BY Category";
+                DataTable categoryData = DatabaseConnection.ExecuteQuery(query);
                 
-                // Show report in a new form or print directly
-                ShowReport(reportTitle, reportData);
+                comboBox1.Items.Clear();
+                comboBox1.Items.Add("All Categories");
+                
+                foreach (DataRow row in categoryData.Rows)
+                {
+                    comboBox1.Items.Add(row["Category"].ToString());
+                }
+                
+                comboBox1.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error generating report: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error loading categories: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void ShowReport(string title, DataTable data)
+        private void SetDefaultReportType()
         {
-            // Create a simple report display form
-            Form reportForm = new Form();
-            reportForm.Text = title;
-            reportForm.Size = new Size(800, 600);
-            reportForm.StartPosition = FormStartPosition.CenterScreen;
-
-            DataGridView dgv = new DataGridView();
-            dgv.Dock = DockStyle.Fill;
-            dgv.AutoGenerateColumns = true;
-            dgv.DataSource = data;
-
-            reportForm.Controls.Add(dgv);
-            reportForm.Show();
+            comboBox2.SelectedIndex = 0;
         }
 
         private void btnReport_Click(object sender, EventArgs e)
         {
-            GenerateReport();
+            GenerateStockReport();
         }
 
-        private void PrintReport(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        private void GenerateStockReport()
         {
-            Graphics g = e.Graphics;
-            Font titleFont = new Font("Arial", 16, FontStyle.Bold);
-            Font headerFont = new Font("Arial", 10, FontStyle.Bold);
-            Font dataFont = new Font("Arial", 9);
-
-            int yPos = 50;
-            g.DrawString("Stock In Hand Report", titleFont, Brushes.Black, 50, yPos);
-            yPos += 30;
-            g.DrawString("Generated on: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), dataFont, Brushes.Black, 50, yPos);
-            yPos += 30;
-
-            // Print headers
-            g.DrawString("Item Name", headerFont, Brushes.Black, 50, yPos);
-            g.DrawString("Category", headerFont, Brushes.Black, 200, yPos);
-            g.DrawString("Price", headerFont, Brushes.Black, 300, yPos);
-            g.DrawString("Quantity", headerFont, Brushes.Black, 400, yPos);
-            g.DrawString("Value", headerFont, Brushes.Black, 500, yPos);
-            yPos += 20;
-
-            // Print data
-            if (reportData != null)
+            try
             {
-                foreach (DataRow row in reportData.Rows)
-                {
-                    if (yPos > e.PageBounds.Height - 100) break;
+                string query = @"SELECT 
+                                i.ItemID,
+                                i.ItemName,
+                                i.Category,
+                                i.Price,
+                                i.StockQuantity,
+                                i.Price * i.StockQuantity as StockValue
+                               FROM Items i
+                               WHERE i.IsActive = 1";
 
-                    g.DrawString(row["ItemName"].ToString(), dataFont, Brushes.Black, 50, yPos);
-                    g.DrawString(row["Category"].ToString(), dataFont, Brushes.Black, 200, yPos);
-                    g.DrawString(Convert.ToDecimal(row["Price"]).ToString("N2"), dataFont, Brushes.Black, 300, yPos);
-                    g.DrawString(row["StockQuantity"].ToString(), dataFont, Brushes.Black, 400, yPos);
-                    g.DrawString(Convert.ToDecimal(row["StockValue"]).ToString("N2"), dataFont, Brushes.Black, 500, yPos);
-                    yPos += 15;
+                List<SqlParameter> parameters = new List<SqlParameter>();
+
+                // Add category filter
+                if (comboBox1.SelectedIndex > 0)
+                {
+                    query += " AND i.Category = @Category";
+                    parameters.Add(new SqlParameter("@Category", comboBox1.SelectedItem.ToString()));
                 }
+
+                // Add stock status filter
+                if (radioButton2.Checked)
+                {
+                    query += " AND i.StockQuantity <= 10";
+                }
+                else if (radioButton3.Checked)
+                {
+                    query += " AND i.StockQuantity = 0";
+                }
+
+                // Add sorting based on report type
+                switch (comboBox2.SelectedIndex)
+                {
+                    case 1: // Low Stock
+                        query += " AND i.StockQuantity <= 10";
+                        break;
+                    case 2: // Out of Stock
+                        query += " AND i.StockQuantity = 0";
+                        break;
+                    case 3: // By Value (High to Low)
+                        query += " ORDER BY i.Price * i.StockQuantity DESC";
+                        break;
+                    default:
+                        query += " ORDER BY i.Category, i.ItemName";
+                        break;
+                }
+
+                // If no specific sorting is applied, use default
+                if (!query.Contains("ORDER BY"))
+                {
+                    query += " ORDER BY i.Category, i.ItemName";
+                }
+
+                reportData = DatabaseConnection.ExecuteQuery(query, parameters.ToArray());
+                
+                if (reportData.Rows.Count > 0)
+                {
+                    LoadReportData();
+                    DisplaySummary();
+                }
+                else
+                {
+                    MessageBox.Show("No data found for the selected criteria.", "Information", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error generating report: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        private void LoadReportData()
+        {
+            try
+            {
+                reportViewer.LocalReport.DataSources.Clear();
+                ReportDataSource dataSource = new ReportDataSource("DataSet1", reportData);
+                reportViewer.LocalReport.DataSources.Add(dataSource);
+                reportViewer.RefreshReport();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading report data: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        private void DisplaySummary()
+        {
+            decimal totalStockValue = 0;
+            int totalItems = reportData.Rows.Count;
+            int lowStockItems = 0;
+            int outOfStockItems = 0;
+
+            foreach (DataRow row in reportData.Rows)
+            {
+                totalStockValue += Convert.ToDecimal(row["StockValue"]);
+                int stockQty = Convert.ToInt32(row["StockQuantity"]);
+                if (stockQty <= 10) lowStockItems++;
+                if (stockQty == 0) outOfStockItems++;
+            }
+
+            string summary = $"Stock Summary:\n" +
+                           $"Total Items: {totalItems}\n" +
+                           $"Total Stock Value: ${totalStockValue:N2}\n" +
+                           $"Low Stock Items (≤10): {lowStockItems}\n" +
+                           $"Out of Stock Items: {outOfStockItems}";
+
+            MessageBox.Show(summary, "Stock Report Summary", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (reportData != null && reportData.Rows.Count > 0)
+                {
+                    SaveFileDialog saveDialog = new SaveFileDialog
+                    {
+                        Filter = "PDF files (*.pdf)|*.pdf",
+                        FileName = $"StockInHandReport_{DateTime.Now:yyyyMMdd}.pdf"
+                    };
+
+                    if (saveDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        ExportToPDF(saveDialog.FileName);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No data to export.", "Information", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error exporting: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ExportToPDF(string fileName)
+        {
+            try
+            {
+                Warning[] warnings;
+                string[] streamIds;
+                string mimeType = string.Empty;
+                string encoding = string.Empty;
+                string extension = string.Empty;
+
+                byte[] bytes = reportViewer.LocalReport.Render("PDF", null, out mimeType, 
+                    out encoding, out extension, out streamIds, out warnings);
+
+                System.IO.File.WriteAllBytes(fileName, bytes);
+                MessageBox.Show("Report exported successfully!", "Success", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error exporting report: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnPrint_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (reportData != null && reportData.Rows.Count > 0)
+                {
+                    reportViewer.PrintDialog();
+                }
+                else
+                {
+                    MessageBox.Show("No data to print.", "Information", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error printing: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private void btnExit_Click(object sender, EventArgs e)
         {

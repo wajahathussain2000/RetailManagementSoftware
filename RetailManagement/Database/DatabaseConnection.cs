@@ -7,7 +7,7 @@ namespace RetailManagement.Database
 {
     public class DatabaseConnection
     {
-        private static string connectionString = "Data Source=.;Initial Catalog=RetailManagementDB;Integrated Security=True;";
+        private static string connectionString = "Data Source=138.199.217.216,1433;Initial Catalog=RetailManagementDB;user id=sa;password=System@8954;TrustServerCertificate=true;";
 
         public static SqlConnection GetConnection()
         {

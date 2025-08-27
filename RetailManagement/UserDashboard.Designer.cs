@@ -46,6 +46,19 @@
             this.label4 = new System.Windows.Forms.Label();
             this.btnCompanies = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.pbExit = new System.Windows.Forms.PictureBox();
+            this.pbStockInHand = new System.Windows.Forms.PictureBox();
+            this.pbSalesReport = new System.Windows.Forms.PictureBox();
+            this.pbCustomerPayment = new System.Windows.Forms.PictureBox();
+            this.pbCustomerLedger = new System.Windows.Forms.PictureBox();
+            this.pbCustomerBalance = new System.Windows.Forms.PictureBox();
+            this.pbSaleReturn = new System.Windows.Forms.PictureBox();
+            this.pbEditBill = new System.Windows.Forms.PictureBox();
+            this.pbCreditBill = new System.Windows.Forms.PictureBox();
+            this.pbNewBill = new System.Windows.Forms.PictureBox();
+            this.pbNewPurchase = new System.Windows.Forms.PictureBox();
+            this.pbItems = new System.Windows.Forms.PictureBox();
+            this.pbCompanies = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.button14 = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -83,33 +96,20 @@
             this.expenseTransactionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.expenseReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reportsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.backupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pbStockInHand = new System.Windows.Forms.PictureBox();
-            this.pbSalesReport = new System.Windows.Forms.PictureBox();
-            this.pbCustomerPayment = new System.Windows.Forms.PictureBox();
-            this.pbCustomerLedger = new System.Windows.Forms.PictureBox();
-            this.pbCustomerBalance = new System.Windows.Forms.PictureBox();
-            this.pbSaleReturn = new System.Windows.Forms.PictureBox();
-            this.pbEditBill = new System.Windows.Forms.PictureBox();
-            this.pbCreditBill = new System.Windows.Forms.PictureBox();
-            this.pbNewBill = new System.Windows.Forms.PictureBox();
-            this.pbNewPurchase = new System.Windows.Forms.PictureBox();
-            this.pbItems = new System.Windows.Forms.PictureBox();
-            this.pbCompanies = new System.Windows.Forms.PictureBox();
-            this.pbExit = new System.Windows.Forms.PictureBox();
             this.updateStockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stockInHandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.genericSearchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.productSearchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.singleProductDetailToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.profitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.userActivityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.profitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.userActivityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.backupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changePasswordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbExit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbStockInHand)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSalesReport)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbCustomerPayment)).BeginInit();
@@ -122,7 +122,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbNewPurchase)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbItems)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbCompanies)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbExit)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnExit
@@ -359,6 +360,162 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             // 
+            // pbExit
+            // 
+            this.pbExit.BackColor = System.Drawing.Color.White;
+            this.pbExit.Image = global::RetailManagement.Properties.Resources.cancel;
+            this.pbExit.Location = new System.Drawing.Point(1244, 27);
+            this.pbExit.Name = "pbExit";
+            this.pbExit.Size = new System.Drawing.Size(44, 38);
+            this.pbExit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbExit.TabIndex = 24;
+            this.pbExit.TabStop = false;
+            this.pbExit.Click += new System.EventHandler(this.pbExit_Click);
+            // 
+            // pbStockInHand
+            // 
+            this.pbStockInHand.BackColor = System.Drawing.Color.White;
+            this.pbStockInHand.Image = global::RetailManagement.Properties.Resources.stock_in_hand;
+            this.pbStockInHand.Location = new System.Drawing.Point(1143, 27);
+            this.pbStockInHand.Name = "pbStockInHand";
+            this.pbStockInHand.Size = new System.Drawing.Size(44, 38);
+            this.pbStockInHand.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbStockInHand.TabIndex = 22;
+            this.pbStockInHand.TabStop = false;
+            this.pbStockInHand.Click += new System.EventHandler(this.pbStockInHand_Click);
+            // 
+            // pbSalesReport
+            // 
+            this.pbSalesReport.BackColor = System.Drawing.Color.White;
+            this.pbSalesReport.Image = global::RetailManagement.Properties.Resources.items;
+            this.pbSalesReport.Location = new System.Drawing.Point(1042, 27);
+            this.pbSalesReport.Name = "pbSalesReport";
+            this.pbSalesReport.Size = new System.Drawing.Size(44, 38);
+            this.pbSalesReport.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbSalesReport.TabIndex = 20;
+            this.pbSalesReport.TabStop = false;
+            this.pbSalesReport.Click += new System.EventHandler(this.pbSalesReport_Click);
+            // 
+            // pbCustomerPayment
+            // 
+            this.pbCustomerPayment.BackColor = System.Drawing.Color.White;
+            this.pbCustomerPayment.Image = global::RetailManagement.Properties.Resources.customer_payment;
+            this.pbCustomerPayment.Location = new System.Drawing.Point(941, 27);
+            this.pbCustomerPayment.Name = "pbCustomerPayment";
+            this.pbCustomerPayment.Size = new System.Drawing.Size(44, 38);
+            this.pbCustomerPayment.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbCustomerPayment.TabIndex = 18;
+            this.pbCustomerPayment.TabStop = false;
+            this.pbCustomerPayment.Click += new System.EventHandler(this.pbCustomerPayment_Click);
+            // 
+            // pbCustomerLedger
+            // 
+            this.pbCustomerLedger.BackColor = System.Drawing.Color.White;
+            this.pbCustomerLedger.Image = global::RetailManagement.Properties.Resources.customer_ledger;
+            this.pbCustomerLedger.Location = new System.Drawing.Point(840, 27);
+            this.pbCustomerLedger.Name = "pbCustomerLedger";
+            this.pbCustomerLedger.Size = new System.Drawing.Size(44, 38);
+            this.pbCustomerLedger.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbCustomerLedger.TabIndex = 16;
+            this.pbCustomerLedger.TabStop = false;
+            this.pbCustomerLedger.Click += new System.EventHandler(this.pbCustomerLedger_Click);
+            // 
+            // pbCustomerBalance
+            // 
+            this.pbCustomerBalance.BackColor = System.Drawing.Color.White;
+            this.pbCustomerBalance.Image = global::RetailManagement.Properties.Resources.customer_balance;
+            this.pbCustomerBalance.Location = new System.Drawing.Point(739, 27);
+            this.pbCustomerBalance.Name = "pbCustomerBalance";
+            this.pbCustomerBalance.Size = new System.Drawing.Size(44, 38);
+            this.pbCustomerBalance.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbCustomerBalance.TabIndex = 14;
+            this.pbCustomerBalance.TabStop = false;
+            this.pbCustomerBalance.Click += new System.EventHandler(this.pbCustomerBalance_Click);
+            // 
+            // pbSaleReturn
+            // 
+            this.pbSaleReturn.BackColor = System.Drawing.Color.White;
+            this.pbSaleReturn.Image = global::RetailManagement.Properties.Resources.sale_return;
+            this.pbSaleReturn.Location = new System.Drawing.Point(638, 27);
+            this.pbSaleReturn.Name = "pbSaleReturn";
+            this.pbSaleReturn.Size = new System.Drawing.Size(44, 38);
+            this.pbSaleReturn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbSaleReturn.TabIndex = 12;
+            this.pbSaleReturn.TabStop = false;
+            this.pbSaleReturn.Click += new System.EventHandler(this.pbSaleReturn_Click);
+            // 
+            // pbEditBill
+            // 
+            this.pbEditBill.BackColor = System.Drawing.Color.White;
+            this.pbEditBill.Image = global::RetailManagement.Properties.Resources.edit_bill;
+            this.pbEditBill.Location = new System.Drawing.Point(537, 27);
+            this.pbEditBill.Name = "pbEditBill";
+            this.pbEditBill.Size = new System.Drawing.Size(44, 38);
+            this.pbEditBill.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbEditBill.TabIndex = 10;
+            this.pbEditBill.TabStop = false;
+            this.pbEditBill.Click += new System.EventHandler(this.pbEditBill_Click);
+            // 
+            // pbCreditBill
+            // 
+            this.pbCreditBill.BackColor = System.Drawing.Color.White;
+            this.pbCreditBill.Image = global::RetailManagement.Properties.Resources.credit_bill;
+            this.pbCreditBill.Location = new System.Drawing.Point(436, 27);
+            this.pbCreditBill.Name = "pbCreditBill";
+            this.pbCreditBill.Size = new System.Drawing.Size(44, 38);
+            this.pbCreditBill.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbCreditBill.TabIndex = 8;
+            this.pbCreditBill.TabStop = false;
+            this.pbCreditBill.Click += new System.EventHandler(this.pbCreditBill_Click);
+            // 
+            // pbNewBill
+            // 
+            this.pbNewBill.BackColor = System.Drawing.Color.White;
+            this.pbNewBill.Image = global::RetailManagement.Properties.Resources.bill;
+            this.pbNewBill.Location = new System.Drawing.Point(335, 27);
+            this.pbNewBill.Name = "pbNewBill";
+            this.pbNewBill.Size = new System.Drawing.Size(44, 38);
+            this.pbNewBill.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbNewBill.TabIndex = 6;
+            this.pbNewBill.TabStop = false;
+            this.pbNewBill.Click += new System.EventHandler(this.pbNewBill_Click);
+            // 
+            // pbNewPurchase
+            // 
+            this.pbNewPurchase.BackColor = System.Drawing.Color.White;
+            this.pbNewPurchase.Image = global::RetailManagement.Properties.Resources.purchase;
+            this.pbNewPurchase.Location = new System.Drawing.Point(234, 27);
+            this.pbNewPurchase.Name = "pbNewPurchase";
+            this.pbNewPurchase.Size = new System.Drawing.Size(44, 38);
+            this.pbNewPurchase.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbNewPurchase.TabIndex = 4;
+            this.pbNewPurchase.TabStop = false;
+            this.pbNewPurchase.Click += new System.EventHandler(this.pbNewPurchase_Click);
+            // 
+            // pbItems
+            // 
+            this.pbItems.BackColor = System.Drawing.Color.White;
+            this.pbItems.Image = global::RetailManagement.Properties.Resources.items;
+            this.pbItems.Location = new System.Drawing.Point(135, 27);
+            this.pbItems.Name = "pbItems";
+            this.pbItems.Size = new System.Drawing.Size(44, 38);
+            this.pbItems.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbItems.TabIndex = 2;
+            this.pbItems.TabStop = false;
+            this.pbItems.Click += new System.EventHandler(this.pbItems_Click);
+            // 
+            // pbCompanies
+            // 
+            this.pbCompanies.BackColor = System.Drawing.Color.White;
+            this.pbCompanies.Image = global::RetailManagement.Properties.Resources.office_building;
+            this.pbCompanies.Location = new System.Drawing.Point(32, 27);
+            this.pbCompanies.Name = "pbCompanies";
+            this.pbCompanies.Size = new System.Drawing.Size(44, 38);
+            this.pbCompanies.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbCompanies.TabIndex = 0;
+            this.pbCompanies.TabStop = false;
+            this.pbCompanies.Click += new System.EventHandler(this.pbCompanies_Click);
+            // 
             // panel1
             // 
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -440,6 +597,8 @@
             // 
             // setupToolStripMenuItem
             // 
+            this.setupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.changePasswordToolStripMenuItem});
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
             this.setupToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
             this.setupToolStripMenuItem.Text = "Setup";
@@ -660,190 +819,28 @@
             this.reportsToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
             this.reportsToolStripMenuItem.Text = "Reports";
             // 
-            // backupToolStripMenuItem
-            // 
-            this.backupToolStripMenuItem.Name = "backupToolStripMenuItem";
-            this.backupToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
-            this.backupToolStripMenuItem.Text = "Backup";
-            // 
-            // pbStockInHand
-            // 
-            this.pbStockInHand.BackColor = System.Drawing.Color.White;
-            this.pbStockInHand.Image = global::RetailManagement.Properties.Resources.stock_in_hand;
-            this.pbStockInHand.Location = new System.Drawing.Point(1143, 27);
-            this.pbStockInHand.Name = "pbStockInHand";
-            this.pbStockInHand.Size = new System.Drawing.Size(44, 38);
-            this.pbStockInHand.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbStockInHand.TabIndex = 22;
-            this.pbStockInHand.TabStop = false;
-            this.pbStockInHand.Click += new System.EventHandler(this.pbStockInHand_Click);
-            // 
-            // pbSalesReport
-            // 
-            this.pbSalesReport.BackColor = System.Drawing.Color.White;
-            this.pbSalesReport.Image = global::RetailManagement.Properties.Resources.items;
-            this.pbSalesReport.Location = new System.Drawing.Point(1042, 27);
-            this.pbSalesReport.Name = "pbSalesReport";
-            this.pbSalesReport.Size = new System.Drawing.Size(44, 38);
-            this.pbSalesReport.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbSalesReport.TabIndex = 20;
-            this.pbSalesReport.TabStop = false;
-            this.pbSalesReport.Click += new System.EventHandler(this.pbSalesReport_Click);
-            // 
-            // pbCustomerPayment
-            // 
-            this.pbCustomerPayment.BackColor = System.Drawing.Color.White;
-            this.pbCustomerPayment.Image = global::RetailManagement.Properties.Resources.customer_payment;
-            this.pbCustomerPayment.Location = new System.Drawing.Point(941, 27);
-            this.pbCustomerPayment.Name = "pbCustomerPayment";
-            this.pbCustomerPayment.Size = new System.Drawing.Size(44, 38);
-            this.pbCustomerPayment.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbCustomerPayment.TabIndex = 18;
-            this.pbCustomerPayment.TabStop = false;
-            this.pbCustomerPayment.Click += new System.EventHandler(this.pbCustomerPayment_Click);
-            // 
-            // pbCustomerLedger
-            // 
-            this.pbCustomerLedger.BackColor = System.Drawing.Color.White;
-            this.pbCustomerLedger.Image = global::RetailManagement.Properties.Resources.customer_ledger;
-            this.pbCustomerLedger.Location = new System.Drawing.Point(840, 27);
-            this.pbCustomerLedger.Name = "pbCustomerLedger";
-            this.pbCustomerLedger.Size = new System.Drawing.Size(44, 38);
-            this.pbCustomerLedger.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbCustomerLedger.TabIndex = 16;
-            this.pbCustomerLedger.TabStop = false;
-            this.pbCustomerLedger.Click += new System.EventHandler(this.pbCustomerLedger_Click);
-            // 
-            // pbCustomerBalance
-            // 
-            this.pbCustomerBalance.BackColor = System.Drawing.Color.White;
-            this.pbCustomerBalance.Image = global::RetailManagement.Properties.Resources.customer_balance;
-            this.pbCustomerBalance.Location = new System.Drawing.Point(739, 27);
-            this.pbCustomerBalance.Name = "pbCustomerBalance";
-            this.pbCustomerBalance.Size = new System.Drawing.Size(44, 38);
-            this.pbCustomerBalance.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbCustomerBalance.TabIndex = 14;
-            this.pbCustomerBalance.TabStop = false;
-            this.pbCustomerBalance.Click += new System.EventHandler(this.pbCustomerBalance_Click);
-            // 
-            // pbSaleReturn
-            // 
-            this.pbSaleReturn.BackColor = System.Drawing.Color.White;
-            this.pbSaleReturn.Image = global::RetailManagement.Properties.Resources.sale_return;
-            this.pbSaleReturn.Location = new System.Drawing.Point(638, 27);
-            this.pbSaleReturn.Name = "pbSaleReturn";
-            this.pbSaleReturn.Size = new System.Drawing.Size(44, 38);
-            this.pbSaleReturn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbSaleReturn.TabIndex = 12;
-            this.pbSaleReturn.TabStop = false;
-            this.pbSaleReturn.Click += new System.EventHandler(this.pbSaleReturn_Click);
-            // 
-            // pbEditBill
-            // 
-            this.pbEditBill.BackColor = System.Drawing.Color.White;
-            this.pbEditBill.Image = global::RetailManagement.Properties.Resources.edit_bill;
-            this.pbEditBill.Location = new System.Drawing.Point(537, 27);
-            this.pbEditBill.Name = "pbEditBill";
-            this.pbEditBill.Size = new System.Drawing.Size(44, 38);
-            this.pbEditBill.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbEditBill.TabIndex = 10;
-            this.pbEditBill.TabStop = false;
-            this.pbEditBill.Click += new System.EventHandler(this.pbEditBill_Click);
-            // 
-            // pbCreditBill
-            // 
-            this.pbCreditBill.BackColor = System.Drawing.Color.White;
-            this.pbCreditBill.Image = global::RetailManagement.Properties.Resources.credit_bill;
-            this.pbCreditBill.Location = new System.Drawing.Point(436, 27);
-            this.pbCreditBill.Name = "pbCreditBill";
-            this.pbCreditBill.Size = new System.Drawing.Size(44, 38);
-            this.pbCreditBill.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbCreditBill.TabIndex = 8;
-            this.pbCreditBill.TabStop = false;
-            this.pbCreditBill.Click += new System.EventHandler(this.pbCreditBill_Click);
-            // 
-            // pbNewBill
-            // 
-            this.pbNewBill.BackColor = System.Drawing.Color.White;
-            this.pbNewBill.Image = global::RetailManagement.Properties.Resources.bill;
-            this.pbNewBill.Location = new System.Drawing.Point(335, 27);
-            this.pbNewBill.Name = "pbNewBill";
-            this.pbNewBill.Size = new System.Drawing.Size(44, 38);
-            this.pbNewBill.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbNewBill.TabIndex = 6;
-            this.pbNewBill.TabStop = false;
-            this.pbNewBill.Click += new System.EventHandler(this.pbNewBill_Click);
-            // 
-            // pbNewPurchase
-            // 
-            this.pbNewPurchase.BackColor = System.Drawing.Color.White;
-            this.pbNewPurchase.Image = global::RetailManagement.Properties.Resources.purchase;
-            this.pbNewPurchase.Location = new System.Drawing.Point(234, 27);
-            this.pbNewPurchase.Name = "pbNewPurchase";
-            this.pbNewPurchase.Size = new System.Drawing.Size(44, 38);
-            this.pbNewPurchase.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbNewPurchase.TabIndex = 4;
-            this.pbNewPurchase.TabStop = false;
-            this.pbNewPurchase.Click += new System.EventHandler(this.pbNewPurchase_Click);
-            // 
-            // pbItems
-            // 
-            this.pbItems.BackColor = System.Drawing.Color.White;
-            this.pbItems.Image = global::RetailManagement.Properties.Resources.items;
-            this.pbItems.Location = new System.Drawing.Point(135, 27);
-            this.pbItems.Name = "pbItems";
-            this.pbItems.Size = new System.Drawing.Size(44, 38);
-            this.pbItems.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbItems.TabIndex = 2;
-            this.pbItems.TabStop = false;
-            this.pbItems.Click += new System.EventHandler(this.pbItems_Click);
-            // 
-            // pbCompanies
-            // 
-            this.pbCompanies.BackColor = System.Drawing.Color.White;
-            this.pbCompanies.Image = global::RetailManagement.Properties.Resources.office_building;
-            this.pbCompanies.Location = new System.Drawing.Point(32, 27);
-            this.pbCompanies.Name = "pbCompanies";
-            this.pbCompanies.Size = new System.Drawing.Size(44, 38);
-            this.pbCompanies.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbCompanies.TabIndex = 0;
-            this.pbCompanies.TabStop = false;
-            this.pbCompanies.Click += new System.EventHandler(this.pbCompanies_Click);
-            // 
-            // pbExit
-            // 
-            this.pbExit.BackColor = System.Drawing.Color.White;
-            this.pbExit.Image = global::RetailManagement.Properties.Resources.cancel;
-            this.pbExit.Location = new System.Drawing.Point(1244, 27);
-            this.pbExit.Name = "pbExit";
-            this.pbExit.Size = new System.Drawing.Size(44, 38);
-            this.pbExit.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbExit.TabIndex = 24;
-            this.pbExit.TabStop = false;
-            this.pbExit.Click += new System.EventHandler(this.pbExit_Click);
-            // 
             // updateStockToolStripMenuItem
             // 
             this.updateStockToolStripMenuItem.Name = "updateStockToolStripMenuItem";
-            this.updateStockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.updateStockToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.updateStockToolStripMenuItem.Text = "Update Stock";
             // 
             // stockInHandToolStripMenuItem
             // 
             this.stockInHandToolStripMenuItem.Name = "stockInHandToolStripMenuItem";
-            this.stockInHandToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stockInHandToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.stockInHandToolStripMenuItem.Text = "Stock In Hand";
             // 
             // genericSearchToolStripMenuItem
             // 
             this.genericSearchToolStripMenuItem.Name = "genericSearchToolStripMenuItem";
-            this.genericSearchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.genericSearchToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.genericSearchToolStripMenuItem.Text = "Generic Search";
             // 
             // productSearchToolStripMenuItem
             // 
             this.productSearchToolStripMenuItem.Name = "productSearchToolStripMenuItem";
-            this.productSearchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.productSearchToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.productSearchToolStripMenuItem.Text = "Product Search";
             // 
             // singleProductDetailToolStripMenuItem
@@ -852,6 +849,11 @@
             this.singleProductDetailToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.singleProductDetailToolStripMenuItem.Text = "Single Product Detail";
             // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(183, 6);
+            // 
             // profitToolStripMenuItem
             // 
             this.profitToolStripMenuItem.Name = "profitToolStripMenuItem";
@@ -859,21 +861,29 @@
             this.profitToolStripMenuItem.Text = "Profit Loss";
             this.profitToolStripMenuItem.Click += new System.EventHandler(this.profitToolStripMenuItem_Click);
             // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(183, 6);
+            // 
             // userActivityToolStripMenuItem
             // 
             this.userActivityToolStripMenuItem.Name = "userActivityToolStripMenuItem";
             this.userActivityToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.userActivityToolStripMenuItem.Text = "User Activity";
             // 
-            // toolStripSeparator6
+            // backupToolStripMenuItem
             // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(183, 6);
+            this.backupToolStripMenuItem.Name = "backupToolStripMenuItem";
+            this.backupToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
+            this.backupToolStripMenuItem.Text = "Backup";
             // 
-            // toolStripSeparator7
+            // changePasswordToolStripMenuItem
             // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(183, 6);
+            this.changePasswordToolStripMenuItem.Name = "changePasswordToolStripMenuItem";
+            this.changePasswordToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.changePasswordToolStripMenuItem.Text = "Change Password";
+            this.changePasswordToolStripMenuItem.Click += new System.EventHandler(this.changePasswordToolStripMenuItem_Click);
             // 
             // UserDashboard
             // 
@@ -890,10 +900,7 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbExit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbStockInHand)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSalesReport)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbCustomerPayment)).EndInit();
@@ -906,7 +913,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbNewPurchase)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbItems)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbCompanies)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbExit)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -991,5 +1001,6 @@
         private System.Windows.Forms.ToolStripMenuItem userActivityToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem changePasswordToolStripMenuItem;
     }
 }

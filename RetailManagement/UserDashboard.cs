@@ -267,7 +267,8 @@ namespace RetailManagement
 
         private void profitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PasswordFormShow();
+            ProfitAndLoss profitAndLoss = new ProfitAndLoss();
+            profitAndLoss.Show();
         }
 
         public void ExpenseReportFormShow()
@@ -382,6 +383,11 @@ namespace RetailManagement
         {
             LowStockAlertReport lowStockAlertReport = new LowStockAlertReport();
             lowStockAlertReport.Show();
+        }
+
+        private void changePasswordToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PasswordFormShow();
         }
     }
 }
