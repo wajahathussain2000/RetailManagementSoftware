@@ -430,6 +430,8 @@
     <None Include="Reports\SupplierLedgerReport.rdlc" />
     <None Include="Reports\CashFlowReport.rdlc" />
     <None Include="Reports\SupplierReport.rdlc" />
+    <None Include="Reports\BarcodeLabelPrintReport.rdlc" />
+    <None Include="Reports\CustomerPurchaseHistoryReport.rdlc" />
     <None Include="Resources\office-building.png" />
   </ItemGroup>
   <ItemGroup>
