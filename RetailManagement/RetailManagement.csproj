@@ -412,8 +412,24 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Reports\CustomerOutstandingReport.rdlc" />
     <None Include="Reports\SalesReport.rdlc" />
     <None Include="Reports\StockInHandReport.rdlc" />
+    <None Include="Reports\DailySummaryReport.rdlc" />
+    <None Include="Reports\PurchaseReport.rdlc" />
+    <None Include="Reports\CustomerOutstanding.rdlc" />
+    <None Include="Reports\InventoryReport.rdlc" />
+    <None Include="Reports\ExpenseReport.rdlc" />
+    <None Include="Reports\LowStockAlertReport.rdlc" />
+    <None Include="Reports\ProfitAndLossReport.rdlc" />
+    <None Include="Reports\CustomerLedgerReport.rdlc" />
+    <None Include="Reports\SalesReturnReport.rdlc" />
+    <None Include="Reports\PurchaseReturnReport.rdlc" />
+    <None Include="Reports\ExpiryReport.rdlc" />
+    <None Include="Reports\GSTReport.rdlc" />
+    <None Include="Reports\SupplierLedgerReport.rdlc" />
+    <None Include="Reports\CashFlowReport.rdlc" />
+    <None Include="Reports\SupplierReport.rdlc" />
     <None Include="Resources\office-building.png" />
   </ItemGroup>
   <ItemGroup>

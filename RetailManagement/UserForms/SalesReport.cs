@@ -165,26 +165,26 @@ namespace RetailManagement.UserForms
         private void GenerateSalesReport()
         {
             try
-            {
-                string query = @"SELECT 
-                                s.SaleID,
-                                s.BillNumber,
-                                c.CustomerName,
-                                s.SaleDate,
-                                s.TotalAmount,
-                                s.Discount,
-                                s.NetAmount,
-                                s.PaymentMethod
-                               FROM Sales s
-                               INNER JOIN Customers c ON s.CustomerID = c.CustomerID
-                               WHERE s.IsActive = 1 
+        {
+            string query = @"SELECT 
+                            s.SaleID,
+                            s.BillNumber,
+                            c.CustomerName,
+                            s.SaleDate,
+                            s.TotalAmount,
+                            s.Discount,
+                            s.NetAmount,
+                            s.PaymentMethod
+                           FROM Sales s
+                           INNER JOIN Customers c ON s.CustomerID = c.CustomerID
+                           WHERE s.IsActive = 1 
                                AND s.SaleDate BETWEEN @FromDate AND @ToDate";
 
                 List<SqlParameter> parameters = new List<SqlParameter>
                 {
-                    new SqlParameter("@FromDate", dateTimePicker1.Value.Date),
-                    new SqlParameter("@ToDate", dateTimePicker2.Value.Date.AddDays(1).AddSeconds(-1))
-                };
+                new SqlParameter("@FromDate", dateTimePicker1.Value.Date),
+                new SqlParameter("@ToDate", dateTimePicker2.Value.Date.AddDays(1).AddSeconds(-1))
+            };
 
                 // Add customer filter
                 if (cmbCustomer.SelectedItem is ComboBoxItem selectedCustomer && selectedCustomer.ID > 0)
