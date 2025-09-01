@@ -301,15 +301,15 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dgvTransactions.Rows[e.RowIndex];
-                selectedTransactionId = Convert.ToInt32(row.Cells["TransactionID"].Value);
+                selectedTransactionId = SafeDataHelper.SafeGetCellInt32(row, "TransactionID");
                 
                 dtpTransactionDate.Value = Convert.ToDateTime(row.Cells["TransactionDate"].Value);
-                cmbTransactionType.Text = row.Cells["TransactionType"].Value.ToString();
+                cmbTransactionType.Text = SafeDataHelper.SafeGetCellString(row, "TransactionType");
                 numAmount.Value = Convert.ToDecimal(row.Cells["Amount"].Value);
-                txtDescription.Text = row.Cells["Description"].Value.ToString();
-                txtBankName.Text = row.Cells["BankName"].Value.ToString();
-                txtAccountNumber.Text = row.Cells["AccountNumber"].Value.ToString();
-                txtRemarks.Text = row.Cells["Remarks"].Value.ToString();
+                txtDescription.Text = SafeDataHelper.SafeGetCellString(row, "Description");
+                txtBankName.Text = SafeDataHelper.SafeGetCellString(row, "BankName");
+                txtAccountNumber.Text = SafeDataHelper.SafeGetCellString(row, "AccountNumber");
+                txtRemarks.Text = SafeDataHelper.SafeGetCellString(row, "Remarks");
 
                 btnUpdate.Enabled = true;
                 btnDelete.Enabled = true;

@@ -357,13 +357,13 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dgvUsers.Rows[e.RowIndex];
-                selectedUserId = Convert.ToInt32(row.Cells["UserID"].Value);
+                selectedUserId = SafeDataHelper.SafeGetCellInt32(row, "UserID");
                 
-                txtUsername.Text = row.Cells["Username"].Value.ToString();
-                txtFullName.Text = row.Cells["FullName"].Value.ToString();
-                cmbRole.Text = row.Cells["Role"].Value.ToString();
-                txtEmail.Text = row.Cells["Email"].Value.ToString();
-                txtPhone.Text = row.Cells["Phone"].Value.ToString();
+                txtUsername.Text = SafeDataHelper.SafeGetCellString(row, "Username");
+                txtFullName.Text = SafeDataHelper.SafeGetCellString(row, "FullName");
+                cmbRole.Text = SafeDataHelper.SafeGetCellString(row, "Role");
+                txtEmail.Text = SafeDataHelper.SafeGetCellString(row, "Email");
+                txtPhone.Text = SafeDataHelper.SafeGetCellString(row, "Phone");
                 
                 btnUpdate.Enabled = true;
                 btnDelete.Enabled = true;

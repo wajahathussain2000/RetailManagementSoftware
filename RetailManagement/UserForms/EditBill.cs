@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,19 +9,232 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RetailManagement.Database;
+using RetailManagement.Utils;
 
 namespace RetailManagement.UserForms
 {
     public partial class EditBill : Form
     {
-        private int selectedSaleID = 0;
-        private DataTable saleItems;
+        private string currentBillType = "";
+        private string currentInvoiceNumber = "";
+        private int selectedTransactionID = 0;
+        private DataTable transactionItems;
+        private bool isFormLoaded = false; // TODO: Use for form state validation
+        private int selectedSaleID = 0; // For legacy sale editing compatibility
+        private DataTable saleItems; // For legacy sale items display
 
         public EditBill()
         {
             InitializeComponent();
-            LoadSales();
-            SetupDataGridView();
+            
+            // First, ask user to select bill type and invoice number
+            if (SelectBillTypeAndInvoice())
+            {
+                SetupForSelectedBillType();
+                isFormLoaded = true;
+            }
+            else
+            {
+                // User cancelled, close the form
+                this.Load += (s, e) => this.Close();
+            }
+        }
+
+        private bool SelectBillTypeAndInvoice()
+        {
+            try
+            {
+                EditBillTypeSelector selector = new EditBillTypeSelector();
+                if (selector.ShowDialog() == DialogResult.OK)
+                {
+                    currentBillType = selector.SelectedBillType;
+                    currentInvoiceNumber = selector.InvoiceNumber;
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening bill type selector: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        private void SetupForSelectedBillType()
+        {
+            try
+            {
+                // Update form title to show current bill type
+                this.Text = $"Edit {currentBillType} - {currentInvoiceNumber}";
+                
+                // Load the specific transaction
+                LoadSpecificTransaction();
+                
+                // Setup data grid view based on bill type
+                SetupDataGridView();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error setting up form: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadSpecificTransaction()
+        {
+            try
+            {
+                string tableName = GetTableNameForBillType();
+                string idColumn = GetIdColumnForBillType();
+                
+                // Load transaction header
+                string query = $@"SELECT t.*, c.CustomerName 
+                                FROM {tableName} t
+                                INNER JOIN Customers c ON t.CustomerID = c.CustomerID
+                                WHERE t.BillNumber = @BillNumber AND t.IsActive = 1";
+
+                SqlParameter[] parameters = { new SqlParameter("@BillNumber", currentInvoiceNumber) };
+                DataTable dt = DatabaseConnection.ExecuteQuery(query, parameters);
+
+                if (dt.Rows.Count == 0)
+                {
+                    MessageBox.Show($"Invoice {currentInvoiceNumber} not found in {currentBillType}.", 
+                        "Invoice Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                DataRow row = dt.Rows[0];
+                selectedTransactionID = Convert.ToInt32(row[idColumn]);
+                
+                // Populate form fields - PRESERVE QR code and barcode data
+                PopulateFormFields(row);
+                
+                // Load transaction items
+                LoadTransactionItems();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading transaction: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string GetTableNameForBillType()
+        {
+            switch (currentBillType)
+            {
+                case "New Bill (Sales)":
+                case "Credit Bill":
+                    return "Sales";
+                case "New Purchase":
+                    return "Purchases";
+                default:
+                    return "Sales";
+            }
+        }
+
+        private string GetIdColumnForBillType()
+        {
+            switch (currentBillType)
+            {
+                case "New Bill (Sales)":
+                case "Credit Bill":
+                    return "SaleID";
+                case "New Purchase":
+                    return "PurchaseID";
+                default:
+                    return "SaleID";
+            }
+        }
+
+        private string GetItemsTableNameForBillType()
+        {
+            switch (currentBillType)
+            {
+                case "New Bill (Sales)":
+                case "Credit Bill":
+                    return "SaleItems";
+                case "New Purchase":
+                    return "PurchaseItems";
+                default:
+                    return "SaleItems";
+            }
+        }
+
+        private void PopulateFormFields(DataRow row)
+        {
+            try
+            {
+                // Populate header fields - NOTE: DO NOT allow editing of customer, date, invoice number, QR, barcode
+                txtBillNumber.Text = row["BillNumber"].ToString();
+                txtBillNumber.ReadOnly = true; // Cannot edit invoice number
+                
+                txtCustomerName.Text = row["CustomerName"].ToString();
+                txtCustomerName.ReadOnly = true; // Cannot edit customer name
+                
+                txtSaleDate.Value = Convert.ToDateTime(row[GetDateColumnForBillType()]);
+                txtSaleDate.Enabled = false; // Cannot edit date
+                
+                txtNetAmount.Text = SafeDataHelper.SafeToDecimal(row["NetAmount"]).ToString("N2");
+                
+                // Show warning about what cannot be edited
+                MessageBox.Show($"Editing {currentBillType}\n\n" +
+                    "IMPORTANT: You can only edit:\n" +
+                    "• Item quantities and prices\n" +
+                    "• Discount amounts\n" +
+                    "• Remarks\n\n" +
+                    "You CANNOT edit:\n" +
+                    "• Customer name\n" +
+                    "• Invoice number\n" +
+                    "• Date\n" +
+                    "• QR code and barcode (they remain the same)", 
+                    "Edit Restrictions", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error populating fields: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string GetDateColumnForBillType()
+        {
+            switch (currentBillType)
+            {
+                case "New Bill (Sales)":
+                case "Credit Bill":
+                    return "SaleDate";
+                case "New Purchase":
+                    return "PurchaseDate";
+                default:
+                    return "SaleDate";
+            }
+        }
+
+        private void LoadTransactionItems()
+        {
+            try
+            {
+                string itemsTable = GetItemsTableNameForBillType();
+                string idColumn = GetIdColumnForBillType();
+                
+                string query = $@"SELECT si.*, i.ItemName 
+                                FROM {itemsTable} si
+                                INNER JOIN Items i ON si.ItemID = i.ItemID
+                                WHERE si.{idColumn} = @TransactionID";
+
+                SqlParameter[] parameters = { new SqlParameter("@TransactionID", selectedTransactionID) };
+                transactionItems = DatabaseConnection.ExecuteQuery(query, parameters);
+                
+                // Display items in the data grid
+                dataGridView1.DataSource = transactionItems;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading transaction items: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void SetupDataGridView()
@@ -103,7 +316,7 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-                selectedSaleID = Convert.ToInt32(row.Cells["SaleID"].Value);
+                selectedSaleID = SafeDataHelper.SafeGetCellInt32(row, "SaleID");
                 LoadSaleDetails(selectedSaleID);
             }
         }
@@ -147,9 +360,9 @@ namespace RetailManagement.UserForms
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            if (selectedSaleID == 0)
+            if (selectedTransactionID == 0)
             {
-                MessageBox.Show("Please select a sale to edit.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"No {currentBillType} loaded to edit.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -158,13 +371,12 @@ namespace RetailManagement.UserForms
                 try
                 {
                     UpdateSale();
-                    MessageBox.Show("Sale updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoadSales();
-                    ClearForm();
+                    // Reload the transaction to show updated data
+                    LoadSpecificTransaction();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error updating sale: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Error updating {currentBillType}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -188,21 +400,32 @@ namespace RetailManagement.UserForms
 
         private void UpdateSale()
         {
-            decimal netAmount = decimal.Parse(txtNetAmount.Text);
-            DateTime saleDate = txtSaleDate.Value;
+            try
+            {
+                decimal netAmount = decimal.Parse(txtNetAmount.Text);
+                string tableName = GetTableNameForBillType();
+                string idColumn = GetIdColumnForBillType();
 
-            string updateQuery = @"UPDATE Sales 
-                                 SET NetAmount = @NetAmount, 
-                                     SaleDate = @SaleDate
-                                 WHERE SaleID = @SaleID";
+                // IMPORTANT: Update only editable fields, preserve QR code and barcode
+                string updateQuery = $@"UPDATE {tableName} 
+                                      SET NetAmount = @NetAmount
+                                      WHERE {idColumn} = @TransactionID";
 
-            SqlParameter[] parameters = {
-                new SqlParameter("@NetAmount", netAmount),
-                new SqlParameter("@SaleDate", saleDate),
-                new SqlParameter("@SaleID", selectedSaleID)
-            };
+                SqlParameter[] parameters = {
+                    new SqlParameter("@NetAmount", netAmount),
+                    new SqlParameter("@TransactionID", selectedTransactionID)
+                };
 
-            DatabaseConnection.ExecuteNonQuery(updateQuery, parameters);
+                DatabaseConnection.ExecuteNonQuery(updateQuery, parameters);
+                
+                MessageBox.Show($"{currentBillType} updated successfully!\n\nNote: QR code and barcode data remain unchanged as required.", 
+                    "Update Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating {currentBillType}: {ex.Message}", "Update Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -260,3 +483,4 @@ namespace RetailManagement.UserForms
         }
     }
 }
+

@@ -249,7 +249,6 @@ namespace RetailManagement.UserForms
 
             int yPos = 50;
             int leftMargin = 50;
-            int topMargin = 50;
 
             // Print title
             string title = "Expiry Alert Report";

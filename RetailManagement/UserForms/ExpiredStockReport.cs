@@ -96,7 +96,7 @@ namespace RetailManagement.UserForms
             {
                 if (row.Cells["DaysUntilExpiry"].Value != DBNull.Value)
                 {
-                    int daysUntilExpiry = Convert.ToInt32(row.Cells["DaysUntilExpiry"].Value);
+                    int daysUntilExpiry = SafeDataHelper.SafeGetCellInt32(row, "DaysUntilExpiry");
                     if (daysUntilExpiry < 0)
                     {
                         row.DefaultCellStyle.BackColor = Color.LightCoral;
@@ -180,7 +180,6 @@ namespace RetailManagement.UserForms
 
                 int yPos = 50;
                 int leftMargin = 50;
-                int topMargin = 50;
 
                 // Print title
                 string title = "EXPIRED STOCK REPORT";

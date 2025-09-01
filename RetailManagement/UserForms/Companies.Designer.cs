@@ -51,6 +51,7 @@
             this.gridViewCompanies.Name = "gridViewCompanies";
             this.gridViewCompanies.Size = new System.Drawing.Size(240, 291);
             this.gridViewCompanies.TabIndex = 0;
+            this.gridViewCompanies.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridViewCompanies_CellClick);
             // 
             // label1
             // 
@@ -100,7 +101,7 @@
             // 
             this.txtComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtComputerName.BackColor = System.Drawing.Color.LemonChiffon;
-            this.txtComputerName.Enabled = false;
+            this.txtComputerName.Enabled = true;
             this.txtComputerName.Location = new System.Drawing.Point(130, 119);
             this.txtComputerName.Multiline = true;
             this.txtComputerName.Name = "txtComputerName";
@@ -138,6 +139,7 @@
             this.btnSave.TabIndex = 4;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
@@ -149,6 +151,7 @@
             this.btnCancel.TabIndex = 5;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnExit
             // 

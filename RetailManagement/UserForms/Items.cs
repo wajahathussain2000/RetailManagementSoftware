@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using RetailManagement.Database;
 using RetailManagement.Models;
+using RetailManagement.Utils;
+using System.Text.RegularExpressions;
 
 namespace RetailManagement.UserForms
 {
@@ -19,15 +21,37 @@ namespace RetailManagement.UserForms
         private int selectedItemID = 0;
         private DataTable itemsData;
 
+        private bool isDisposing = false;
+        private int currentUserID = 1; // Default admin user
+        private PictureBox picBarcode; // Barcode image display
+
         public Items()
         {
             InitializeComponent();
             InitializeForm();
+            LoadCompanies();
             LoadItems();
             LoadCategories();
+            LoadUnitTypes();
             SetupDataGridView();
             SetupEventHandlers();
+            LoadExpiryAlerts();
+            
+            // Add FormClosing event to ensure cleanup
+            this.FormClosing += Items_FormClosing;
         }
+
+        public Items(int userID) : this()
+        {
+            currentUserID = userID;
+        }
+
+        private void Items_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            CleanupResources();
+        }
+
+
 
         private void InitializeForm()
         {
@@ -44,6 +68,9 @@ namespace RetailManagement.UserForms
 
         private void AddMissingControls()
         {
+            // Add comprehensive medicine management controls
+            AddEnhancedMedicineControls();
+            
             // Add status label
             Label lblStatus = new Label
             {
@@ -51,7 +78,8 @@ namespace RetailManagement.UserForms
                 Location = new Point(604, 470),
                 Size = new Size(200, 20),
                 Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold),
-                ForeColor = Color.Black
+                ForeColor = Color.Black,
+                Name = "lblStatus"
             };
             this.Controls.Add(lblStatus);
 
@@ -62,7 +90,8 @@ namespace RetailManagement.UserForms
                 Location = new Point(410, 32),
                 Size = new Size(75, 36),
                 Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold),
-                Enabled = false
+                Enabled = false,
+                Name = "btnDelete"
             };
             btnDelete.Click += btnDelete_Click;
             panel2.Controls.Add(btnDelete);
@@ -73,7 +102,8 @@ namespace RetailManagement.UserForms
                 Text = "Filter by Category:",
                 Location = new Point(604, 15),
                 Size = new Size(100, 20),
-                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold),
+                Name = "lblCategoryFilter"
             };
             this.Controls.Add(lblCategoryFilter);
 
@@ -82,32 +112,55 @@ namespace RetailManagement.UserForms
             {
                 Location = new Point(710, 12),
                 Size = new Size(150, 20),
-                DropDownStyle = ComboBoxStyle.DropDownList
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Name = "comboBoxCategory"
             };
             comboBoxCategory.SelectedIndexChanged += comboBoxCategory_SelectedIndexChanged;
             this.Controls.Add(comboBoxCategory);
 
             // Update search textbox properties
+            InitializeSearchTextBox();
+        }
+
+        private void InitializeSearchTextBox()
+        {
+            // Remove existing event handlers first to prevent duplicates
+            txtSearch.TextChanged -= txtSearch_TextChanged;
+            txtSearch.GotFocus -= TxtSearch_GotFocus;
+            txtSearch.LostFocus -= TxtSearch_LostFocus;
+
+            // Set initial state
             txtSearch.Text = "Search items...";
             txtSearch.ForeColor = Color.Gray;
-            txtSearch.TextChanged += txtSearch_TextChanged;
             
-            // Add focus events to handle placeholder behavior
-            txtSearch.GotFocus += (s, e) => {
+            // Add event handlers
+            txtSearch.TextChanged += txtSearch_TextChanged;
+            txtSearch.GotFocus += TxtSearch_GotFocus;
+            txtSearch.LostFocus += TxtSearch_LostFocus;
+        }
+
+        private void TxtSearch_GotFocus(object sender, EventArgs e)
+        {
+            if (!isDisposing && !this.IsDisposed && txtSearch != null)
+            {
                 if (txtSearch.Text == "Search items...")
                 {
                     txtSearch.Text = "";
                     txtSearch.ForeColor = Color.Black;
                 }
-            };
-            
-            txtSearch.LostFocus += (s, e) => {
+            }
+        }
+
+        private void TxtSearch_LostFocus(object sender, EventArgs e)
+        {
+            if (!isDisposing && !this.IsDisposed && txtSearch != null)
+            {
                 if (string.IsNullOrWhiteSpace(txtSearch.Text))
                 {
                     txtSearch.Text = "Search items...";
                     txtSearch.ForeColor = Color.Gray;
                 }
-            };
+            }
         }
 
         private void SetupEventHandlers()
@@ -175,6 +228,14 @@ namespace RetailManagement.UserForms
                 Width = 150
             };
 
+            DataGridViewTextBoxColumn colCompany = new DataGridViewTextBoxColumn
+            {
+                Name = "CompanyName",
+                HeaderText = "Company",
+                DataPropertyName = "CompanyName",
+                Width = 150
+            };
+
             DataGridViewTextBoxColumn colCreatedDate = new DataGridViewTextBoxColumn
             {
                 Name = "CreatedDate",
@@ -186,7 +247,7 @@ namespace RetailManagement.UserForms
 
             gridViewProducts.Columns.AddRange(new DataGridViewColumn[] {
                 colItemID, colItemName, colDescription, colPrice, 
-                colStockQuantity, colCategory, colCreatedDate
+                colStockQuantity, colCategory, colCompany, colCreatedDate
             });
 
             // Set grid properties
@@ -203,9 +264,32 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                string query = @"SELECT ItemID, ItemName, Description, Price, StockQuantity, 
-                               Category, CreatedDate FROM Items WHERE IsActive = 1 
-                               ORDER BY ItemName";
+                // Get the correct stock column name
+                string stockColumnName = DatabaseConnection.GetStockColumnName();
+                
+                // Check if Barcode column exists
+                string barcodeColumn = "";
+                try
+                {
+                    string checkColumnQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name = 'Barcode'";
+                    int columnExists = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkColumnQuery));
+                    if (columnExists > 0)
+                    {
+                        barcodeColumn = ", i.Barcode";
+                    }
+                }
+                catch
+                {
+                    // If checking fails, assume column doesn't exist
+                    barcodeColumn = "";
+                }
+
+                string query = $@"SELECT i.ItemID, i.ItemName, i.Description, i.Price, i.{stockColumnName} as StockQuantity, 
+                               i.Category{barcodeColumn}, i.CreatedDate, ISNULL(c.CompanyName, 'No Company') as CompanyName, i.CompanyID
+                               FROM Items i 
+                               LEFT JOIN Companies c ON i.CompanyID = c.CompanyID
+                               WHERE i.IsActive = 1 
+                               ORDER BY i.ItemName";
                 
                 itemsData = DatabaseConnection.ExecuteQuery(query);
                 gridViewProducts.DataSource = itemsData;
@@ -224,24 +308,10 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                string query = "SELECT DISTINCT Category FROM Items WHERE IsActive = 1 AND Category IS NOT NULL ORDER BY Category";
-                DataTable categoryData = DatabaseConnection.ExecuteQuery(query);
-                
-                // Load categories into comboBox1 (Company dropdown) using DataSource
-                DataTable comboBox1Data = new DataTable();
-                comboBox1Data.Columns.Add("Category", typeof(string));
-                comboBox1Data.Rows.Add("All Companies");
-                
-                foreach (DataRow row in categoryData.Rows)
-                {
-                    comboBox1Data.Rows.Add(row["Category"].ToString());
-                }
-                
-                comboBox1.DataSource = comboBox1Data;
-                comboBox1.DisplayMember = "Category";
-                comboBox1.SelectedIndex = 0;
-
                 // Load categories into category filter combo box using DataSource
+                string categoryQuery = "SELECT DISTINCT Category FROM Items WHERE IsActive = 1 AND Category IS NOT NULL ORDER BY Category";
+                DataTable categoryData = DatabaseConnection.ExecuteQuery(categoryQuery);
+                
                 ComboBox comboBoxCategory = this.Controls.OfType<ComboBox>().FirstOrDefault(c => c.Location.X == 710);
                 if (comboBoxCategory != null)
                 {
@@ -266,12 +336,367 @@ namespace RetailManagement.UserForms
             }
         }
 
+        private void LoadCompanies()
+        {
+            try
+            {
+                // Remove existing event handler first to prevent duplicates
+                comboBox1.SelectedIndexChanged -= ComboBox1_SelectedIndexChanged;
+                
+                // Load companies into comboBox1 using DataSource
+                string query = "SELECT CompanyID, CompanyName FROM Companies WHERE IsActive = 1 ORDER BY CompanyName";
+                DataTable companiesData = DatabaseConnection.ExecuteQuery(query);
+                
+                // Create a DataTable for ComboBox binding with additional "All Companies" option
+                DataTable comboBox1Data = new DataTable();
+                comboBox1Data.Columns.Add("CompanyID", typeof(int));
+                comboBox1Data.Columns.Add("CompanyName", typeof(string));
+                
+                // Add "All Companies" option
+                comboBox1Data.Rows.Add(0, "All Companies");
+                
+                // Add actual companies
+                foreach (DataRow row in companiesData.Rows)
+                {
+                    comboBox1Data.Rows.Add(row["CompanyID"], row["CompanyName"]);
+                }
+                
+                comboBox1.DataSource = comboBox1Data;
+                comboBox1.ValueMember = "CompanyID";
+                comboBox1.DisplayMember = "CompanyName";
+                comboBox1.SelectedIndex = 0;
+                
+                // Add selection changed event
+                comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading companies: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!isDisposing && !this.IsDisposed)
+            {
+                FilterItemsByCompany();
+            }
+        }
+
+        private void FilterItemsByCompany()
+        {
+            try
+            {
+                if (comboBox1.SelectedValue != null)
+                {
+                    int selectedCompanyID = Convert.ToInt32(comboBox1.SelectedValue);
+                    
+                    if (selectedCompanyID == 0) // "All Companies" selected
+                    {
+                        LoadItems(); // Load all items
+                    }
+                    else
+                    {
+                        // Load items for specific company
+                        string stockColumnName = DatabaseConnection.GetStockColumnName();
+                        // Check if Barcode column exists
+                        string barcodeColumn = "";
+                        try
+                        {
+                            string checkColumnQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name = 'Barcode'";
+                            int columnExists = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkColumnQuery));
+                            if (columnExists > 0)
+                            {
+                                barcodeColumn = ", i.Barcode";
+                            }
+                        }
+                        catch
+                        {
+                            barcodeColumn = "";
+                        }
+
+                        string query = $@"SELECT i.ItemID, i.ItemName, i.Description, i.Price, i.{stockColumnName} as StockQuantity, 
+                                       i.Category{barcodeColumn}, i.CreatedDate, c.CompanyName 
+                                       FROM Items i 
+                                       LEFT JOIN Companies c ON i.CompanyID = c.CompanyID
+                                       WHERE i.IsActive = 1 AND i.CompanyID = @CompanyID
+                                       ORDER BY i.ItemName";
+                        
+                        SqlParameter[] parameters = { new SqlParameter("@CompanyID", selectedCompanyID) };
+                        itemsData = DatabaseConnection.ExecuteQuery(query, parameters);
+                        gridViewProducts.DataSource = itemsData;
+                        
+                        UpdateStatusLabel();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error filtering items by company: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void AddEnhancedMedicineControls()
+        {
+            // Only add minimal essential features without disrupting the existing form layout
+            AddBarcodeTextBox();
+            AddEssentialButtons();
+            AddInfoStatusBox();
+        }
+        
+        private void AddBarcodeTextBox()
+        {
+            // Just add the editable barcode textbox where the original placeholder was
+            TextBox txtBarcode = new TextBox()
+            {
+                Name = "txtBarcode", 
+                Location = new Point(250, 233), // Position where barcode field should be
+                Size = new Size(150, 20),
+                Text = "Enter or auto-generate",
+                ForeColor = Color.Gray,
+                BackColor = Color.LightYellow
+            };
+            
+            // Add barcode functionality
+            txtBarcode.TextChanged += TxtBarcode_TextChanged;
+            txtBarcode.KeyDown += TxtBarcode_KeyDown;
+            txtBarcode.GotFocus += TxtBarcode_GotFocus;
+            txtBarcode.LostFocus += TxtBarcode_LostFocus;
+            
+            panel1.Controls.Add(txtBarcode);
+            
+            // Create the missing PictureBox for barcode image display
+            picBarcode = new PictureBox()
+            {
+                Name = "picBarcode",
+                Location = new Point(250, 260), // Position below the textbox
+                Size = new Size(200, 80),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.White,
+                SizeMode = PictureBoxSizeMode.CenterImage
+            };
+            
+            panel1.Controls.Add(picBarcode);
+            
+            // Add a label for the barcode image
+            Label lblBarcodeImage = new Label()
+            {
+                Name = "lblBarcodeImage",
+               
+                Location = new Point(250, 245),
+                Size = new Size(100, 15),
+                Font = new Font("Microsoft Sans Serif", 8f, FontStyle.Bold)
+            };
+            
+            panel1.Controls.Add(lblBarcodeImage);
+        }
+        
+        private void AddEssentialButtons()
+        {
+            // Add only the essential Manage and Substitutes buttons as requested
+            Button btnManageSubstitutes = new Button()
+            {
+                Name = "btnManageSubstitutes",
+                Text = "Substitutes",
+                Location = new Point(740, 435), // Position below other form elements
+                Size = new Size(100, 30),
+                BackColor = Color.LightGreen,
+                Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Bold)
+            };
+            btnManageSubstitutes.Click += BtnManageSubstitutes_Click;
+            panel1.Controls.Add(btnManageSubstitutes);
+        }
+        
+        private void AddInfoStatusBox()
+        {
+            // Create System Status box similar to UserMainScreen
+            GroupBox infoBox = new GroupBox()
+            {
+                Text = "System Status",
+                Name = "infoBox",
+                Location = new Point(580, 420), // Move to bottom
+                Size = new Size(280, 100),
+                Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold),
+                ForeColor = Color.White,
+                BackColor = Color.Transparent
+            };
+            
+            // Today label and date
+            Label lblToday = new Label()
+            {
+                Text = "Today: " + DateTime.Now.ToString("dddd, MMMM dd, yyyy"),
+                Location = new Point(10, 20),
+                Size = new Size(250, 15),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular),
+                ForeColor = Color.Gray,
+                BackColor = Color.Transparent
+            };
+            
+            // Time label
+            Label lblTime = new Label()
+            {
+                Text = "Time: " + DateTime.Now.ToString("h:mm:ss tt"),
+                Name = "lblTime",
+                Location = new Point(10, 35),
+                Size = new Size(250, 15),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular),
+                ForeColor = Color.Gray,
+                BackColor = Color.Transparent
+            };
+            
+            // Low Stock Items
+            Label lblLowStock = new Label()
+            {
+                Text = "Low Stock Items: ",
+                Name = "lblLowStock",
+                Location = new Point(10, 50),
+                Size = new Size(200, 15),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular),
+                ForeColor = Color.Red,
+                BackColor = Color.Transparent
+            };
+            
+            // Session info
+            Label lblSession = new Label()
+            {
+                Text = "Session: " + (UserSession.Role ?? "User") + " | " + DateTime.Now.ToString("h:mm tt"),
+                Location = new Point(10, 65),
+                Size = new Size(250, 15),
+                Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular),
+                ForeColor = Color.Gray,
+                BackColor = Color.Transparent
+            };
+            
+            // Add all labels to the group box
+            infoBox.Controls.Add(lblToday);
+            infoBox.Controls.Add(lblTime);
+            infoBox.Controls.Add(lblLowStock);
+            infoBox.Controls.Add(lblSession);
+            
+            // Add the group box to panel1
+            panel1.Controls.Add(infoBox);
+            
+            // Load the actual statistics
+            LoadItemStatistics();
+        }
+        
+        private void LoadItemStatistics()
+        {
+            try
+            {
+                // Get low stock count (items with stock < 10)
+                string stockColumnName = DatabaseConnection.GetStockColumnName();
+                string lowStockQuery = $"SELECT COUNT(*) FROM Items WHERE IsActive = 1 AND {stockColumnName} < 10";
+                int lowStockItems = Convert.ToInt32(DatabaseConnection.ExecuteScalar(lowStockQuery));
+                
+                // Update the low stock label
+                var lblLowStock = panel1.Controls.OfType<GroupBox>()
+                    .FirstOrDefault(g => g.Name == "infoBox")?.Controls.OfType<Label>()
+                    .FirstOrDefault(l => l.Name == "lblLowStock");
+                if (lblLowStock != null) 
+                {
+                    lblLowStock.Text = $"Low Stock Items: {lowStockItems}";
+                    lblLowStock.ForeColor = lowStockItems > 0 ? Color.Red : Color.Green;
+                }
+                
+                // Update time every time this is called
+                var lblTime = panel1.Controls.OfType<GroupBox>()
+                    .FirstOrDefault(g => g.Name == "infoBox")?.Controls.OfType<Label>()
+                    .FirstOrDefault(l => l.Name == "lblTime");
+                if (lblTime != null) 
+                {
+                    lblTime.Text = "Time: " + DateTime.Now.ToString("h:mm:ss tt");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle errors silently or show in status
+                System.Diagnostics.Debug.WriteLine($"Error loading item statistics: {ex.Message}");
+            }
+        }
+        
+        private void LoadUnitTypes()
+        {
+            ComboBox cmbUnitType = panel1.Controls.OfType<ComboBox>().FirstOrDefault(c => c.Name == "cmbUnitType");
+            if (cmbUnitType != null)
+            {
+                cmbUnitType.Items.Clear();
+                cmbUnitType.Items.AddRange(new string[] {
+                    "Tablet", "Capsule", "Syrup", "Injection", "Bottle", "Strip", 
+                    "Tube", "Vial", "Drops", "Cream", "Ointment", "Powder", "Sachet"
+                });
+                cmbUnitType.SelectedIndex = 0; // Default to Tablet
+            }
+        }
+        
+        private void LoadExpiryAlerts()
+        {
+            try
+            {
+                // Load and display expiry alerts using stored procedure
+                int alertCount = 0;
+                try
+                {
+                    // Try using the stored procedure first
+                    string spQuery = "EXEC sp_GetExpiryAlerts @DaysAhead = 90";
+                    DataTable expiryData = DatabaseConnection.ExecuteQuery(spQuery);
+                    alertCount = expiryData.Rows.Count;
+                }
+                catch
+                {
+                    // Fallback to direct query
+                    string alertQuery = @"SELECT COUNT(*) FROM ExpiryAlerts 
+                                        WHERE IsActive = 1 AND IsAcknowledged = 0 
+                                        AND AlertType IN ('EXPIRING', 'EXPIRED', 'EXPIRING_SOON')";
+                    
+                    alertCount = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(alertQuery));
+                }
+                
+                if (alertCount > 0)
+                {
+                    // Update expiry report button to show alert count
+                    Button btnExpiryReport = panel2.Controls.OfType<Button>().FirstOrDefault(b => b.Name == "btnExpiryReport");
+                    if (btnExpiryReport != null)
+                    {
+                        btnExpiryReport.Text = $"Expiry ({alertCount})";
+                        btnExpiryReport.BackColor = alertCount > 5 ? Color.DarkRed : Color.Red;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Handle silently as this is not critical
+            }
+        }
+
         private void UpdateStatusLabel()
         {
             Label lblStatus = this.Controls.OfType<Label>().FirstOrDefault(l => l.Text.StartsWith("Total Items:"));
             if (lblStatus != null && itemsData != null)
             {
-                lblStatus.Text = $"Total Items: {itemsData.Rows.Count}";
+                int lowStockCount = 0;
+                int expiredCount = 0;
+                
+                try
+                {
+                    // Get low stock count
+                    string lowStockQuery = "SELECT COUNT(*) FROM Items WHERE StockQuantity <= ReorderLevel AND IsActive = 1";
+                    lowStockCount = Convert.ToInt32(DatabaseConnection.ExecuteScalar(lowStockQuery));
+                    
+                    // Get expired items count
+                    string expiredQuery = @"SELECT COUNT(DISTINCT ib.ItemID) FROM ItemBatches ib 
+                                          WHERE ib.ExpiryDate <= GETDATE() AND ib.IsActive = 1 AND ib.QuantityAvailable > 0";
+                    expiredCount = Convert.ToInt32(DatabaseConnection.ExecuteScalar(expiredQuery));
+                }
+                catch
+                {
+                    // Handle silently
+                }
+                
+                lblStatus.Text = $"Total: {itemsData.Rows.Count} | Low Stock: {lowStockCount} | Expired: {expiredCount}";
+                lblStatus.ForeColor = (lowStockCount > 0 || expiredCount > 0) ? Color.Red : Color.Black;
             }
         }
 
@@ -285,11 +710,18 @@ namespace RetailManagement.UserForms
             textBox6.Text = ""; // Pack Size
             textBox7.Text = ""; // Re-Order Level
             textBox8.Text = ""; // Generic Name
-            textBox9.Text = ""; // Distribution Disc.
-            textBox10.Text = ""; // Sales Tax
-            textBox11.Text = ""; // Sales Tax
+           
+           
+            
+            
+            // Clear enhanced medicine fields
+            ClearEnhancedFields();
+            
             selectedItemID = 0;
             isEditMode = false;
+            
+            // Reset company selection to "All Companies"
+            comboBox1.SelectedIndex = 0;
             
             // Update button states
             btnSave.Text = "Save";
@@ -306,6 +738,47 @@ namespace RetailManagement.UserForms
             // Clear selection in grid
             gridViewProducts.ClearSelection();
         }
+        
+        private void ClearEnhancedFields()
+        {
+            // Clear enhanced medicine management fields
+            var txtBarcode = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtBarcode");
+            if (txtBarcode != null) 
+            {
+                txtBarcode.Text = "";
+                txtBarcode.BackColor = Color.LightYellow;
+            }
+            
+            // Clear barcode image
+            var picBarcode = panel1.Controls.OfType<PictureBox>().FirstOrDefault(p => p.Name == "picBarcode");
+            if (picBarcode != null) 
+            {
+                picBarcode.Image = null;
+            }
+            
+            var txtHSN = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtHSN");
+            if (txtHSN != null) txtHSN.Text = "";
+            
+            var cmbUnitType = panel1.Controls.OfType<ComboBox>().FirstOrDefault(c => c.Name == "cmbUnitType");
+            if (cmbUnitType != null) cmbUnitType.SelectedIndex = 0;
+            
+            var txtMRP = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtMRP");
+            if (txtMRP != null) txtMRP.Text = "";
+            
+            var txtGSTRate = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtGSTRate");
+            if (txtGSTRate != null) txtGSTRate.Text = "12.00"; // Default GST rate
+            
+            var txtMinStock = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtMinStock");
+            if (txtMinStock != null) txtMinStock.Text = "10";
+            
+            var txtMaxStock = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtMaxStock");
+            if (txtMaxStock != null) txtMaxStock.Text = "1000";
+            
+            var chkPrescription = panel1.Controls.OfType<CheckBox>().FirstOrDefault(c => c.Name == "chkPrescription");
+            if (chkPrescription != null) chkPrescription.Checked = false;
+            
+            checkBox1.Checked = false; // IsBlocked
+        }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
@@ -313,6 +786,16 @@ namespace RetailManagement.UserForms
             btnSave.Enabled = true;
             btnCancel.Enabled = true;
             textBox1.Focus();
+            
+            // Auto-generate barcode for new item
+            int selectedCompanyID = 0;
+            if (comboBox1.SelectedValue != null)
+            {
+                selectedCompanyID = Convert.ToInt32(comboBox1.SelectedValue);
+            }
+            
+            // Generate barcode and display it immediately
+            AutoGenerateAndDisplayBarcode("", selectedCompanyID, "NEW");
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -340,43 +823,233 @@ namespace RetailManagement.UserForms
             }
         }
 
+
+
         private void InsertItem()
         {
-            string query = @"INSERT INTO Items (ItemName, Description, Price, StockQuantity, Category, CreatedDate, IsActive) 
-                           VALUES (@ItemName, @Description, @Price, @StockQuantity, @Category, @CreatedDate, 1)";
+            string stockColumnName = DatabaseConnection.GetStockColumnName();
+            
+            // Check if Barcode column exists
+            bool hasBarcodeColumn = false;
+            try
+            {
+                string checkColumnQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name = 'Barcode'";
+                int columnExists = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkColumnQuery));
+                hasBarcodeColumn = columnExists > 0;
+            }
+            catch
+            {
+                hasBarcodeColumn = false;
+            }
 
-            SqlParameter[] parameters = {
+            // Get selected company ID (0 means no company selected)
+            int selectedCompanyID = Convert.ToInt32(comboBox1.SelectedValue);
+            object companyIDValue = selectedCompanyID == 0 ? (object)DBNull.Value : selectedCompanyID;
+
+            string barcode = "";
+            string barcodeColumn = "";
+            string barcodeValue = "";
+            
+            if (hasBarcodeColumn)
+            {
+                // Generate barcode automatically
+                barcode = GenerateItemBarcode(selectedCompanyID, textBox3.Text.Trim());
+                
+                // Update the barcode textbox with generated barcode
+                var txtBarcode = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtBarcode");
+                if (txtBarcode != null) 
+                {
+                    if (string.IsNullOrEmpty(txtBarcode.Text))
+                    {
+                        txtBarcode.Text = barcode;
+                    }
+                    else
+                    {
+                        barcode = txtBarcode.Text.Trim(); // Use user-provided barcode
+                    }
+                }
+                
+                barcodeColumn = ", Barcode";
+                barcodeValue = ", @Barcode";
+            }
+
+            string query = $@"INSERT INTO Items (ItemName, Description, Price, {stockColumnName}, Category, CompanyID{barcodeColumn}, CreatedDate, IsActive) 
+                           VALUES (@ItemName, @Description, @Price, @StockQuantity, @Category, @CompanyID{barcodeValue}, @CreatedDate, 1)";
+
+            var parameterList = new List<SqlParameter>
+            {
                 new SqlParameter("@ItemName", textBox1.Text.Trim()),
                 new SqlParameter("@Description", textBox8.Text.Trim()),
                 new SqlParameter("@Price", decimal.Parse(textBox4.Text)),
                 new SqlParameter("@StockQuantity", string.IsNullOrEmpty(textBox6.Text) ? 0 : int.Parse(textBox6.Text)),
                 new SqlParameter("@Category", textBox3.Text.Trim()),
+                new SqlParameter("@CompanyID", companyIDValue),
                 new SqlParameter("@CreatedDate", DateTime.Now)
             };
 
-            DatabaseConnection.ExecuteNonQuery(query, parameters);
-            MessageBox.Show("Item added successfully!", "Success", 
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (hasBarcodeColumn)
+            {
+                parameterList.Add(new SqlParameter("@Barcode", barcode));
+            }
+
+            DatabaseConnection.ExecuteNonQuery(query, parameterList.ToArray());
+            
+            string successMessage = hasBarcodeColumn ? 
+                $"Item added successfully!\nBarcode: {barcode}" : 
+                "Item added successfully!";
+            MessageBox.Show(successMessage, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void UpdateItem()
         {
-            string query = @"UPDATE Items SET ItemName = @ItemName, Description = @Description, 
-                           Price = @Price, StockQuantity = @StockQuantity, Category = @Category 
+            string stockColumnName = DatabaseConnection.GetStockColumnName();
+            
+            // Check if Barcode column exists
+            bool hasBarcodeColumn = false;
+            try
+            {
+                string checkColumnQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name = 'Barcode'";
+                int columnExists = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkColumnQuery));
+                hasBarcodeColumn = columnExists > 0;
+            }
+            catch
+            {
+                hasBarcodeColumn = false;
+            }
+
+            // Get selected company ID (0 means no company selected)
+            int selectedCompanyID = Convert.ToInt32(comboBox1.SelectedValue);
+            object companyIDValue = selectedCompanyID == 0 ? (object)DBNull.Value : selectedCompanyID;
+
+            string barcode = "";
+            string barcodeUpdate = "";
+            
+            if (hasBarcodeColumn)
+            {
+                // Get barcode from textbox (keep existing or allow manual entry)
+                var txtBarcode = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtBarcode");
+                if (txtBarcode != null)
+                {
+                    barcode = txtBarcode.Text.Trim();
+                    if (string.IsNullOrEmpty(barcode))
+                    {
+                        // Generate new barcode if empty
+                        barcode = GenerateItemBarcode(selectedCompanyID, textBox3.Text.Trim());
+                        txtBarcode.Text = barcode;
+                    }
+                }
+                barcodeUpdate = ", Barcode = @Barcode";
+            }
+
+            string query = $@"UPDATE Items SET ItemName = @ItemName, Description = @Description, 
+                           Price = @Price, {stockColumnName} = @StockQuantity, Category = @Category, CompanyID = @CompanyID{barcodeUpdate}
                            WHERE ItemID = @ItemID";
 
-            SqlParameter[] parameters = {
+            var parameterList = new List<SqlParameter>
+            {
                 new SqlParameter("@ItemID", selectedItemID),
                 new SqlParameter("@ItemName", textBox1.Text.Trim()),
                 new SqlParameter("@Description", textBox8.Text.Trim()),
                 new SqlParameter("@Price", decimal.Parse(textBox4.Text)),
                 new SqlParameter("@StockQuantity", string.IsNullOrEmpty(textBox6.Text) ? 0 : int.Parse(textBox6.Text)),
-                new SqlParameter("@Category", textBox3.Text.Trim())
+                new SqlParameter("@Category", textBox3.Text.Trim()),
+                new SqlParameter("@CompanyID", companyIDValue)
             };
 
-            DatabaseConnection.ExecuteNonQuery(query, parameters);
+            if (hasBarcodeColumn)
+            {
+                parameterList.Add(new SqlParameter("@Barcode", barcode));
+            }
+
+            DatabaseConnection.ExecuteNonQuery(query, parameterList.ToArray());
             MessageBox.Show("Item updated successfully!", "Success", 
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Generates a unique barcode for pharmacy items
+        /// </summary>
+        private string GenerateItemBarcode(int companyId, string category)
+        {
+            try
+            {
+                // Use BarcodeHelper to generate unique barcode
+                return BarcodeHelper.GenerateUniqueBarcode(companyId > 0 ? companyId : (int?)null, category);
+            }
+            catch (Exception ex)
+            {
+                // Fallback barcode generation
+                long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                return $"PH{companyId:D2}{(timestamp % 1000000):D6}";
+            }
+        }
+
+        /// <summary>
+        /// Auto generate and display barcode when product is selected
+        /// </summary>
+        private void AutoGenerateAndDisplayBarcode(string barcodeText, int companyID, string category)
+        {
+            try
+            {
+                var txtBarcode = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtBarcode");
+                var picBarcode = panel1.Controls.OfType<PictureBox>().FirstOrDefault(p => p.Name == "picBarcode");
+
+                // If no barcode provided, generate one
+                if (string.IsNullOrEmpty(barcodeText))
+                {
+                    barcodeText = GenerateItemBarcode(companyID, category);
+                    if (txtBarcode != null)
+                    {
+                        txtBarcode.Text = barcodeText;
+                        txtBarcode.BackColor = Color.LightCyan; // Show it's auto-generated
+                    }
+                }
+                else
+                {
+                    if (txtBarcode != null)
+                    {
+                        txtBarcode.Text = barcodeText;
+                        txtBarcode.BackColor = Color.LightYellow; // Normal existing barcode
+                    }
+                }
+
+                // Generate and display barcode image automatically
+                if (picBarcode != null && !string.IsNullOrEmpty(barcodeText))
+                {
+                    try
+                    {
+                        System.Drawing.Image barcodeImage = BarcodeHelper.GenerateCode128Barcode(barcodeText, 200, 50, false);
+                        picBarcode.Image = barcodeImage;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Show simple error in picture box
+                        Bitmap errorImage = new Bitmap(200, 50);
+                        using (Graphics g = Graphics.FromImage(errorImage))
+                        {
+                            g.Clear(Color.White);
+                            g.DrawString("Barcode Error", new Font("Arial", 8), Brushes.Red, 5, 5);
+                            g.DrawString(barcodeText, new Font("Arial", 8), Brushes.Black, 5, 20);
+                        }
+                        picBarcode.Image = errorImage;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Silent error handling - don't show popup during product selection
+                var picBarcode = panel1.Controls.OfType<PictureBox>().FirstOrDefault(p => p.Name == "picBarcode");
+                if (picBarcode != null)
+                {
+                    Bitmap errorImage = new Bitmap(200, 50);
+                    using (Graphics g = Graphics.FromImage(errorImage))
+                    {
+                        g.Clear(Color.White);
+                        g.DrawString("Error generating barcode", new Font("Arial", 8), Brushes.Red, 5, 15);
+                    }
+                    picBarcode.Image = errorImage;
+                }
+            }
         }
 
         private bool ValidateForm()
@@ -520,13 +1193,33 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = gridViewProducts.Rows[e.RowIndex];
-                selectedItemID = Convert.ToInt32(row.Cells["ItemID"].Value);
                 
-                textBox1.Text = row.Cells["ItemName"].Value.ToString();
-                textBox8.Text = row.Cells["Description"].Value.ToString();
-                textBox4.Text = Convert.ToDecimal(row.Cells["Price"].Value).ToString("F2");
-                textBox6.Text = row.Cells["StockQuantity"].Value.ToString();
-                textBox3.Text = row.Cells["Category"].Value.ToString();
+                // Safely handle conversions using centralized SafeDataHelper
+                selectedItemID = SafeDataHelper.SafeGetCellInt32(row, "ItemID");
+                textBox1.Text = SafeDataHelper.SafeGetCellString(row, "ItemName");
+                textBox8.Text = SafeDataHelper.SafeGetCellString(row, "Description");
+                textBox4.Text = SafeDataHelper.SafeGetCellDecimal(row, "Price").ToString("F2");
+                textBox6.Text = SafeDataHelper.SafeGetCellString(row, "StockQuantity");
+                textBox3.Text = SafeDataHelper.SafeGetCellString(row, "Category");
+                
+                // Auto-generate and display barcode automatically
+                string existingBarcode = SafeDataHelper.SafeGetCellString(row, "Barcode");
+                int companyID = SafeDataHelper.SafeGetCellInt32(row, "CompanyID");
+                string category = SafeDataHelper.SafeGetCellString(row, "Category");
+                
+                // This will handle both existing barcodes and auto-generation for missing ones
+                AutoGenerateAndDisplayBarcode(existingBarcode, companyID, category);
+                
+                // Set the company in comboBox1 if CompanyID is available
+                int selectedCompanyID = SafeDataHelper.SafeGetCellInt32(row, "CompanyID");
+                if (selectedCompanyID > 0)
+                {
+                    comboBox1.SelectedValue = selectedCompanyID;
+                }
+                else
+                {
+                    comboBox1.SelectedIndex = 0; // Select "All Companies"
+                }
                 
                 isEditMode = true;
                 btnSave.Text = "Update";
@@ -544,12 +1237,75 @@ namespace RetailManagement.UserForms
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            this.Dispose();
+            CleanupResources();
+            this.Close();
+        }
+
+        internal void CleanupResources()
+        {
+            if (!isDisposing)
+            {
+                isDisposing = true;
+                
+                try
+                {
+                    // Remove FormClosing event to prevent recursive calls
+                    this.FormClosing -= Items_FormClosing;
+                    
+                    // Remove event handlers to prevent garbage collection issues
+                    if (comboBox1 != null)
+                        comboBox1.SelectedIndexChanged -= ComboBox1_SelectedIndexChanged;
+                    
+                    if (txtSearch != null)
+                    {
+                        txtSearch.TextChanged -= txtSearch_TextChanged;
+                        txtSearch.GotFocus -= TxtSearch_GotFocus;
+                        txtSearch.LostFocus -= TxtSearch_LostFocus;
+                    }
+                    
+                    // Find and remove dynamically created control event handlers
+                    ComboBox comboBoxCategory = this.Controls.OfType<ComboBox>().FirstOrDefault(c => c.Name == "comboBoxCategory");
+                    if (comboBoxCategory != null)
+                        comboBoxCategory.SelectedIndexChanged -= comboBoxCategory_SelectedIndexChanged;
+                    
+                    Button btnDelete = panel2?.Controls.OfType<Button>().FirstOrDefault(b => b.Name == "btnDelete");
+                    if (btnDelete != null)
+                        btnDelete.Click -= btnDelete_Click;
+                    
+                    // Remove barcode event handlers
+                    TextBox txtBarcode = panel1?.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtBarcode");
+                    if (txtBarcode != null)
+                    {
+                        txtBarcode.TextChanged -= TxtBarcode_TextChanged;
+                        txtBarcode.KeyDown -= TxtBarcode_KeyDown;
+                        txtBarcode.GotFocus -= TxtBarcode_GotFocus;
+                        txtBarcode.LostFocus -= TxtBarcode_LostFocus;
+                    }
+                    
+                    Button btnGenerateBarcode = panel1?.Controls.OfType<Button>().FirstOrDefault(b => b.Name == "btnGenerateBarcode");
+                    if (btnGenerateBarcode != null)
+                        btnGenerateBarcode.Click -= BtnGenerateBarcode_Click;
+                    
+                    // Dispose data table
+                    if (itemsData != null)
+                    {
+                        itemsData.Dispose();
+                        itemsData = null;
+                    }
+                }
+                catch
+                {
+                    // Ignore disposal errors to prevent crashes during cleanup
+                }
+            }
         }
 
         private void comboBoxCategory_SelectedIndexChanged(object sender, EventArgs e)
         {
-            FilterItems();
+            if (!isDisposing && !this.IsDisposed)
+            {
+                FilterItems();
+            }
         }
 
         private void FilterItems()
@@ -584,7 +1340,10 @@ namespace RetailManagement.UserForms
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
-            SearchItems();
+            if (!isDisposing && !this.IsDisposed)
+            {
+                SearchItems();
+            }
         }
 
         private void SearchItems()
@@ -609,6 +1368,292 @@ namespace RetailManagement.UserForms
                 MessageBox.Show("Error searching items: " + ex.Message, "Error", 
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        
+        // Enhanced Medicine Management Event Handlers
+        private void BtnManageBatches_Click(object sender, EventArgs e)
+        {
+            if (selectedItemID == 0)
+            {
+                MessageBox.Show("Please select an item first.", "Information", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            
+            // Open Batch Management Form
+            BatchManagementForm batchForm = new BatchManagementForm(selectedItemID, textBox1.Text);
+            batchForm.ShowDialog();
+            
+            // Refresh items after batch management
+            LoadItems();
+        }
+        
+        private void BtnManageSubstitutes_Click(object sender, EventArgs e)
+        {
+            if (selectedItemID == 0)
+            {
+                MessageBox.Show("Please select an item first.", "Information", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            
+            // Open Substitute Management Form
+            SubstituteManagementForm substituteForm = new SubstituteManagementForm(selectedItemID, textBox1.Text);
+            substituteForm.ShowDialog();
+        }
+        
+        private void BtnLowStockAlert_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Execute low stock alert procedure
+                string query = "EXEC sp_GetLowStockAlert";
+                DataTable lowStockData = DatabaseConnection.ExecuteQuery(query);
+                
+                if (lowStockData.Rows.Count > 0)
+                {
+                    LowStockReportForm reportForm = new LowStockReportForm(lowStockData);
+                    reportForm.Show();
+                }
+                else
+                {
+                    MessageBox.Show("No items are currently running low on stock.", "Information", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error generating low stock report: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        
+        private void BtnExpiryReport_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Execute expiry report procedure
+                string query = "EXEC sp_GetExpiryReport @DaysAhead = 90, @IncludeExpired = 1";
+                DataTable expiryData = DatabaseConnection.ExecuteQuery(query);
+                
+                if (expiryData.Rows.Count > 0)
+                {
+                    ExpiryReportForm reportForm = new ExpiryReportForm(expiryData);
+                    reportForm.Show();
+                }
+                else
+                {
+                    MessageBox.Show("No items are expiring in the next 90 days.", "Information", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error generating expiry report: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        
+        private void LogUserActivity(string action, string tableName, string description)
+        {
+            try
+            {
+                string query = @"INSERT INTO UserActivityLog (UserID, Activity, ModuleName, Description, LogDate) 
+                               VALUES (@UserID, @Activity, @ModuleName, @Description, @LogDate)";
+                
+                SqlParameter[] parameters = {
+                    new SqlParameter("@UserID", currentUserID),
+                    new SqlParameter("@Activity", action),
+                    new SqlParameter("@ModuleName", "Items"),
+                    new SqlParameter("@Description", description),
+                    new SqlParameter("@LogDate", DateTime.Now)
+                };
+                
+                DatabaseConnection.ExecuteNonQuery(query, parameters);
+            }
+            catch
+            {
+                // Log errors silently - don't interrupt the main operation
+            }
+        }
+
+        // Enhanced Barcode Functionality Event Handlers
+        private void TxtBarcode_GotFocus(object sender, EventArgs e)
+        {
+            TextBox txtBarcode = sender as TextBox;
+            if (txtBarcode != null && txtBarcode.Text == "Enter or auto-generate")
+            {
+                txtBarcode.Text = "";
+                txtBarcode.ForeColor = Color.Black;
+            }
+        }
+
+        private void TxtBarcode_LostFocus(object sender, EventArgs e)
+        {
+            TextBox txtBarcode = sender as TextBox;
+            if (txtBarcode != null && string.IsNullOrWhiteSpace(txtBarcode.Text))
+            {
+                txtBarcode.Text = "Enter or auto-generate";
+                txtBarcode.ForeColor = Color.Gray;
+            }
+        }
+
+        private void TxtBarcode_TextChanged(object sender, EventArgs e)
+        {
+            if (!isDisposing && !this.IsDisposed)
+            {
+                TextBox txtBarcode = sender as TextBox;
+                if (txtBarcode != null && !string.IsNullOrWhiteSpace(txtBarcode.Text) && txtBarcode.Text != "Enter or auto-generate")
+                {
+                    // Validate barcode format and generate image
+                    if (BarcodeHelper.IsValidCode128Text(txtBarcode.Text))
+                    {
+                        txtBarcode.BackColor = Color.LightGreen; // Valid barcode
+                        GenerateBarcodeImageFromText(txtBarcode.Text);
+                    }
+                    else
+                    {
+                        txtBarcode.BackColor = Color.LightCoral; // Invalid barcode
+                        ClearBarcodeImage();
+                    }
+                }
+                else
+                {
+                    txtBarcode.BackColor = Color.LightYellow; // Default/empty
+                    ClearBarcodeImage();
+                }
+            }
+        }
+
+        private void TxtBarcode_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                TextBox txtBarcode = sender as TextBox;
+                if (txtBarcode != null && !string.IsNullOrWhiteSpace(txtBarcode.Text))
+                {
+                    // Generate barcode image on Enter key
+                    GenerateBarcodeImageFromText(txtBarcode.Text);
+                    MessageBox.Show("Barcode generated successfully!", "Success", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void BtnGenerateBarcode_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var txtBarcode = panel1.Controls.OfType<TextBox>().FirstOrDefault(t => t.Name == "txtBarcode");
+                if (txtBarcode != null)
+                {
+                    if (string.IsNullOrWhiteSpace(txtBarcode.Text))
+                    {
+                        // Auto-generate a new barcode
+                        int selectedCompanyID = 0;
+                        if (comboBox1.SelectedValue != null)
+                        {
+                            selectedCompanyID = Convert.ToInt32(comboBox1.SelectedValue);
+                        }
+                        
+                        string newBarcode = GenerateItemBarcode(selectedCompanyID, textBox3.Text.Trim());
+                        txtBarcode.Text = newBarcode;
+                        txtBarcode.BackColor = Color.LightCyan; // Show it's auto-generated
+                    }
+                    
+                    // Generate and display barcode image
+                    GenerateBarcodeImageFromText(txtBarcode.Text);
+                    MessageBox.Show($"Barcode generated: {txtBarcode.Text}", "Barcode Generated", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error generating barcode: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void GenerateBarcodeImageFromText(string barcodeText)
+        {
+            try
+            {
+                var picBarcode = panel1.Controls.OfType<PictureBox>().FirstOrDefault(p => p.Name == "picBarcode");
+                if (picBarcode != null && !string.IsNullOrWhiteSpace(barcodeText))
+                {
+                    // Dispose previous image to prevent memory leaks
+                    if (picBarcode.Image != null)
+                    {
+                        picBarcode.Image.Dispose();
+                        picBarcode.Image = null;
+                    }
+                    
+                    // Generate new barcode image
+                    System.Drawing.Image barcodeImage = BarcodeHelper.GenerateCode128Barcode(barcodeText, 200, 50, true);
+                    picBarcode.Image = barcodeImage;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Show error in picture box instead of popup
+                var picBarcode = panel1.Controls.OfType<PictureBox>().FirstOrDefault(p => p.Name == "picBarcode");
+                if (picBarcode != null)
+                {
+                    Bitmap errorImage = new Bitmap(200, 50);
+                    using (Graphics g = Graphics.FromImage(errorImage))
+                    {
+                        g.Clear(Color.White);
+                        g.DrawString("Invalid Barcode", new Font("Arial", 8), Brushes.Red, 5, 5);
+                        g.DrawString(barcodeText, new Font("Arial", 8), Brushes.Black, 5, 20);
+                    }
+                    picBarcode.Image = errorImage;
+                }
+            }
+        }
+
+        private void ClearBarcodeImage()
+        {
+            var picBarcode = panel1.Controls.OfType<PictureBox>().FirstOrDefault(p => p.Name == "picBarcode");
+            if (picBarcode != null)
+            {
+                if (picBarcode.Image != null)
+                {
+                    picBarcode.Image.Dispose();
+                    picBarcode.Image = null;
+                }
+            }
+        }
+
+        private void Button14_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Button btn = sender as Button;
+                if (btn != null)
+                {
+                    // Toggle between Pack (P) and Loose (L) mode
+                    if (btn.Text == "P")
+                    {
+                        btn.Text = "L";
+                        btn.BackColor = Color.Orange;
+                    }
+                    else
+                    {
+                        btn.Text = "P";
+                        btn.BackColor = Color.LightGreen;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error toggling pack/loose mode: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

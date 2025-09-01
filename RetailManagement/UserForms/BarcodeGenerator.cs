@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Printing;
 using RetailManagement.Database;
+using RetailManagement.Utils;
 
 namespace RetailManagement.UserForms
 {
@@ -81,8 +82,8 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dgvItems.Rows[e.RowIndex];
-                int itemId = Convert.ToInt32(row.Cells["ItemID"].Value);
-                string itemName = row.Cells["ItemName"].Value.ToString();
+                int itemId = SafeDataHelper.SafeGetCellInt32(row, "ItemID");
+                string itemName = SafeDataHelper.SafeGetCellString(row, "ItemName");
                 
                 // Generate barcode (using ItemID as barcode)
                 selectedBarcode = itemId.ToString("D6"); // 6-digit format
@@ -104,38 +105,8 @@ namespace RetailManagement.UserForms
                     return;
                 }
 
-                // Create a simple barcode representation
-                Bitmap barcodeImage = new Bitmap(300, 100);
-                using (Graphics g = Graphics.FromImage(barcodeImage))
-                {
-                    g.Clear(Color.White);
-                    
-                    // Draw barcode lines
-                    Random rand = new Random(selectedBarcode.GetHashCode()); // Use barcode as seed for consistent pattern
-                    int x = 10;
-                    int barWidth = 2;
-                    
-                    for (int i = 0; i < selectedBarcode.Length; i++)
-                    {
-                        int digit = int.Parse(selectedBarcode[i].ToString());
-                        int barHeight = 60 + (digit * 3); // Vary height based on digit
-                        
-                        // Draw bars
-                        for (int j = 0; j < digit + 1; j++)
-                        {
-                            g.FillRectangle(Brushes.Black, x, 10, barWidth, barHeight);
-                            x += barWidth + 1;
-                        }
-                        x += 2; // Space between digits
-                    }
-                    
-                    // Draw barcode text
-                    using (Font font = new Font("Arial", 12, FontStyle.Bold))
-                    {
-                        g.DrawString(selectedBarcode, font, Brushes.Black, 10, 75);
-                    }
-                }
-                
+                // Generate real Code 128 barcode using BarcodeHelper
+                Bitmap barcodeImage = BarcodeHelper.GenerateCode128Barcode(selectedBarcode, 300, 80, true);
                 pictureBoxBarcode.Image = barcodeImage;
             }
             catch (Exception ex)
@@ -263,8 +234,8 @@ namespace RetailManagement.UserForms
                         return;
                     }
 
-                    int itemId = Convert.ToInt32(row.Cells["ItemID"].Value);
-                    string itemName = row.Cells["ItemName"].Value.ToString();
+                    int itemId = SafeDataHelper.SafeGetCellInt32(row, "ItemID");
+                    string itemName = SafeDataHelper.SafeGetCellString(row, "ItemName");
                     string barcode = itemId.ToString("D6");
 
                     // Draw barcode box

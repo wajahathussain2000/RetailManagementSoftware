@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Reporting.WinForms;
 using RetailManagement.Database;
 
 namespace RetailManagement.UserForms
@@ -61,19 +62,23 @@ namespace RetailManagement.UserForms
                 DateTime fromDate = txtFrom.Value.Date;
                 DateTime toDate = txtTo.Value.Date;
 
-                string query = @"SELECT 
-                                Date,
+                                string query = @"SELECT 
+                                TransactionDate,
+                                TransactionType,
+                                Reference,
                                 Description,
                                 Debit,
                                 Credit,
                                 Balance
                                FROM (
                                    SELECT 
-                                       s.SaleDate as Date,
-                                       'Sale - ' + s.BillNumber as Description,
+                                       s.SaleDate as TransactionDate,
+                                       'Sale' as TransactionType,
+                                       s.BillNumber as Reference,
+                                       'Sale - Invoice: ' + s.BillNumber as Description,
                                        s.NetAmount as Debit,
-                                       0 as Credit,
-                                       0 as Balance
+                                       0.00 as Credit,
+                                       0.00 as Balance
                                    FROM Sales s
                                    WHERE s.CustomerID = @CustomerID AND s.IsActive = 1
                                    AND s.SaleDate BETWEEN @FromDate AND @ToDate
@@ -81,16 +86,18 @@ namespace RetailManagement.UserForms
                                    UNION ALL
                                    
                                    SELECT 
-                                       cp.PaymentDate as Date,
-                                       'Payment - ' + cp.PaymentMethod as Description,
-                                       0 as Debit,
+                                       cp.PaymentDate as TransactionDate,
+                                       'Payment' as TransactionType,
+                                       ISNULL(cp.ReferenceNumber, 'PAY' + CAST(cp.PaymentID as VARCHAR(10))) as Reference,
+                                       'Payment Received - ' + cp.PaymentMethod as Description,
+                                       0.00 as Debit,
                                        cp.Amount as Credit,
-                                       0 as Balance
+                                       0.00 as Balance
                                    FROM CustomerPayments cp
                                    WHERE cp.CustomerID = @CustomerID
                                    AND cp.PaymentDate BETWEEN @FromDate AND @ToDate
                                ) as Ledger
-                               ORDER BY Date";
+ORDER BY TransactionDate";
 
                 SqlParameter[] parameters = { 
                     new SqlParameter("@CustomerID", customerID),
@@ -132,26 +139,91 @@ namespace RetailManagement.UserForms
                 return;
             }
 
-            // Create a simple report display form
+            try
+            {
+                // Create report display form with ReportViewer
+                Form reportForm = new Form();
+                reportForm.Text = $"Customer Ledger Report - {comboBox1.Text}";
+                reportForm.Size = new Size(1000, 700);
+                reportForm.StartPosition = FormStartPosition.CenterScreen;
+                reportForm.WindowState = FormWindowState.Maximized;
+
+                ReportViewer reportViewer = new ReportViewer();
+                reportViewer.Dock = DockStyle.Fill;
+                reportViewer.ProcessingMode = ProcessingMode.Local;
+
+                // Set the RDLC report path
+                string reportPath = System.IO.Path.Combine(Application.StartupPath, "Reports", "CustomerLedgerReport.rdlc");
+                reportViewer.LocalReport.ReportPath = reportPath;
+
+                // Clear any existing data sources
+                reportViewer.LocalReport.DataSources.Clear();
+
+                // Add the data source for the report
+                ReportDataSource dataSource = new ReportDataSource("DataSet1", ledgerData);
+                reportViewer.LocalReport.DataSources.Add(dataSource);
+
+                // Set report parameters
+                ReportParameter[] parameters = new ReportParameter[]
+                {
+                    new ReportParameter("CustomerID", comboBox1.SelectedValue.ToString()),
+                    new ReportParameter("StartDate", txtFrom.Value.ToString("dd/MM/yyyy")),
+                    new ReportParameter("EndDate", txtTo.Value.ToString("dd/MM/yyyy"))
+                };
+                reportViewer.LocalReport.SetParameters(parameters);
+
+                // Refresh the report
+                reportViewer.RefreshReport();
+
+                reportForm.Controls.Add(reportViewer);
+                reportForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error displaying report: {ex.Message}", "Report Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                
+                // Fallback to simple DataGridView display
+                ShowSimpleLedgerDisplay();
+            }
+        }
+
+        private void ShowSimpleLedgerDisplay()
+        {
+            // Fallback method - simple DataGridView display
             Form reportForm = new Form();
-            reportForm.Text = "Customer Ledger Report";
+            reportForm.Text = $"Customer Ledger - {comboBox1.Text}";
             reportForm.Size = new Size(900, 600);
             reportForm.StartPosition = FormStartPosition.CenterScreen;
 
             DataGridView dgv = new DataGridView();
             dgv.Dock = DockStyle.Fill;
             dgv.AutoGenerateColumns = false;
-            dgv.Columns.Add("Date", "Date");
+            dgv.ReadOnly = true;
+            dgv.AllowUserToAddRows = false;
+            dgv.AllowUserToDeleteRows = false;
+            
+            dgv.Columns.Add("TransactionDate", "Date");
+            dgv.Columns.Add("TransactionType", "Type");
+            dgv.Columns.Add("Reference", "Reference");
             dgv.Columns.Add("Description", "Description");
             dgv.Columns.Add("Debit", "Debit");
             dgv.Columns.Add("Credit", "Credit");
             dgv.Columns.Add("Balance", "Balance");
 
-            dgv.Columns["Date"].DataPropertyName = "Date";
+            dgv.Columns["TransactionDate"].DataPropertyName = "TransactionDate";
+            dgv.Columns["TransactionType"].DataPropertyName = "TransactionType";
+            dgv.Columns["Reference"].DataPropertyName = "Reference";
             dgv.Columns["Description"].DataPropertyName = "Description";
             dgv.Columns["Debit"].DataPropertyName = "Debit";
             dgv.Columns["Credit"].DataPropertyName = "Credit";
             dgv.Columns["Balance"].DataPropertyName = "Balance";
+
+            // Format currency columns
+            dgv.Columns["Debit"].DefaultCellStyle.Format = "C2";
+            dgv.Columns["Credit"].DefaultCellStyle.Format = "C2";
+            dgv.Columns["Balance"].DefaultCellStyle.Format = "C2";
+            dgv.Columns["TransactionDate"].DefaultCellStyle.Format = "dd/MM/yyyy";
 
             dgv.DataSource = ledgerData;
 

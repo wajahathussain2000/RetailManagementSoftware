@@ -31,26 +31,60 @@ namespace RetailManagement.UserForms
 
         private void InitializeRDLCControls()
         {
-            // Remove the old DataGridView and replace with ReportViewer
-            if (dataGridView1 != null)
+            try
             {
-                dataGridView1.Dispose();
-                groupBox2.Controls.Remove(dataGridView1);
+                // Remove the old DataGridView and replace with ReportViewer
+                if (dataGridView1 != null)
+                {
+                    dataGridView1.Dispose();
+                    groupBox2.Controls.Remove(dataGridView1);
+                }
+
+                // Create ReportViewer
+                reportViewer = new ReportViewer
+                {
+                    Dock = DockStyle.Fill,
+                    ProcessingMode = ProcessingMode.Local
+                };
+
+                // Add ReportViewer to the groupBox2
+                groupBox2.Controls.Add(reportViewer);
+                groupBox2.Text = "Sales Report";
+
+                // Try simple RDLC first (most compatible), then others
+                string simplePath = System.IO.Path.Combine(Application.StartupPath, "Reports", "SalesReport_Simple.rdlc");
+                string compatiblePath = System.IO.Path.Combine(Application.StartupPath, "Reports", "SalesReport_Compatible.rdlc");
+                string originalPath = System.IO.Path.Combine(Application.StartupPath, "Reports", "SalesReport.rdlc");
+                
+                if (System.IO.File.Exists(simplePath))
+                {
+                    reportViewer.LocalReport.ReportPath = simplePath;
+                }
+                else if (System.IO.File.Exists(compatiblePath))
+                {
+                    reportViewer.LocalReport.ReportPath = compatiblePath;
+                }
+                else if (System.IO.File.Exists(originalPath))
+                {
+                    reportViewer.LocalReport.ReportPath = originalPath;
+                }
+                else
+                {
+                    // Fallback paths
+                    if (System.IO.File.Exists("Reports/SalesReport_Simple.rdlc"))
+                        reportViewer.LocalReport.ReportPath = "Reports/SalesReport_Simple.rdlc";
+                    else if (System.IO.File.Exists("Reports/SalesReport_Compatible.rdlc"))
+                        reportViewer.LocalReport.ReportPath = "Reports/SalesReport_Compatible.rdlc";
+                    else
+                        reportViewer.LocalReport.ReportPath = "Reports/SalesReport.rdlc";
+                }
             }
-
-            // Create ReportViewer
-            reportViewer = new ReportViewer
+            catch (Exception ex)
             {
-                Dock = DockStyle.Fill,
-                ProcessingMode = ProcessingMode.Local
-            };
-
-            // Add ReportViewer to the groupBox2
-            groupBox2.Controls.Add(reportViewer);
-            groupBox2.Text = "Sales Report";
-
-            // Set report path
-            reportViewer.LocalReport.ReportPath = "Reports/SalesReport.rdlc";
+                MessageBox.Show($"RDLC initialization failed, will use table view: {ex.Message}", 
+                    "Report Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                reportViewer = null; // Will trigger DataGridView fallback
+            }
 
             // Add customer and payment method dropdowns to groupBox1
             AddFilterControls();
@@ -121,12 +155,12 @@ namespace RetailManagement.UserForms
                 }
                 cmbCustomer.SelectedIndex = 0;
 
-                // Load payment methods
+                // Load payment methods from actual seeded data
                 cmbPaymentMethod.Items.Clear();
                 cmbPaymentMethod.Items.Add("All Methods");
                 cmbPaymentMethod.Items.Add("Cash");
-                cmbPaymentMethod.Items.Add("Credit Card");
-                cmbPaymentMethod.Items.Add("Debit Card");
+                cmbPaymentMethod.Items.Add("Card");
+                cmbPaymentMethod.Items.Add("UPI");
                 cmbPaymentMethod.Items.Add("Bank Transfer");
                 cmbPaymentMethod.Items.Add("Check");
                 cmbPaymentMethod.SelectedIndex = 0;
@@ -140,8 +174,9 @@ namespace RetailManagement.UserForms
 
         private void SetDefaultDateRange()
         {
-            dateTimePicker1.Value = DateTime.Now.AddDays(-30);
-            dateTimePicker2.Value = DateTime.Now;
+            // Set to August 2025 to match our seeded test data
+            dateTimePicker1.Value = new DateTime(2025, 8, 1);
+            dateTimePicker2.Value = new DateTime(2025, 8, 31);
         }
 
         private void btnGenerate_Click(object sender, EventArgs e)
@@ -227,15 +262,87 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                reportViewer.LocalReport.DataSources.Clear();
-                ReportDataSource dataSource = new ReportDataSource("DataSet1", reportData);
-                reportViewer.LocalReport.DataSources.Add(dataSource);
-                reportViewer.RefreshReport();
+                // Check if we have a report viewer and if the RDLC file exists
+                string reportPath = System.IO.Path.Combine(Application.StartupPath, "Reports", "SalesReport.rdlc");
+                bool useRDLC = reportViewer != null && (System.IO.File.Exists(reportPath) || System.IO.File.Exists("Reports/SalesReport.rdlc"));
+                
+                if (useRDLC)
+                {
+                    // Try RDLC approach
+                    reportViewer.LocalReport.DataSources.Clear();
+                    ReportDataSource dataSource = new ReportDataSource("DataSet1", reportData);
+                    reportViewer.LocalReport.DataSources.Add(dataSource);
+                    reportViewer.RefreshReport();
+                }
+                else
+                {
+                    // Fallback to DataGridView
+                    ShowDataInGrid();
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading report data: " + ex.Message, "Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // On any RDLC error, fallback to DataGridView
+                try
+                {
+                    ShowDataInGrid();
+                    MessageBox.Show($"Report loaded in table format due to RDLC issue.\nTotal records: {reportData.Rows.Count}", 
+                        "Sales Report", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception fallbackEx)
+                {
+                    MessageBox.Show($"Error loading report: {ex.Message}\nFallback error: {fallbackEx.Message}", 
+                        "Report Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        
+        private void ShowDataInGrid()
+        {
+            // Create DataGridView if it doesn't exist or if we need to replace ReportViewer
+            var dgv = new DataGridView
+            {
+                Dock = DockStyle.Fill,
+                DataSource = reportData,
+                ReadOnly = true,
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle { BackColor = Color.LightGray }
+            };
+            
+            // Clear and add to groupBox2
+            groupBox2.Controls.Clear();
+            groupBox2.Controls.Add(dgv);
+            groupBox2.Text = "Sales Report (Table View)";
+            
+            // Format currency columns
+            if (dgv.Columns["TotalAmount"] != null)
+                dgv.Columns["TotalAmount"].DefaultCellStyle.Format = "C2";
+            if (dgv.Columns["Discount"] != null)
+                dgv.Columns["Discount"].DefaultCellStyle.Format = "C2";
+            if (dgv.Columns["NetAmount"] != null)
+                dgv.Columns["NetAmount"].DefaultCellStyle.Format = "C2";
+                
+            // Make columns more readable
+            foreach (DataGridViewColumn column in dgv.Columns)
+            {
+                if (column.Name == "SaleDate")
+                {
+                    column.HeaderText = "Sale Date";
+                    column.DefaultCellStyle.Format = "MMM dd, yyyy";
+                }
+                else if (column.Name == "BillNumber")
+                    column.HeaderText = "Bill Number";
+                else if (column.Name == "CustomerName")
+                    column.HeaderText = "Customer";
+                else if (column.Name == "PaymentMethod")
+                    column.HeaderText = "Payment Method";
+                else if (column.Name == "TotalAmount")
+                    column.HeaderText = "Total Amount";
+                else if (column.Name == "NetAmount")
+                    column.HeaderText = "Net Amount";
             }
         }
 

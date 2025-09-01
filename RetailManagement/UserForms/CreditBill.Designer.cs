@@ -67,6 +67,11 @@
             this.btnNewItem = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
+            this.btnPrint = new System.Windows.Forms.Button();
+            this.button14 = new System.Windows.Forms.Button();
+            this.textBox15 = new System.Windows.Forms.TextBox();
+            this.pictureBoxQR = new System.Windows.Forms.PictureBox();
+            this.pictureBoxBarcode = new System.Windows.Forms.PictureBox();
             this.label15 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label20 = new System.Windows.Forms.Label();
@@ -83,6 +88,8 @@
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbExit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxQR)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBarcode)).BeginInit();
             this.SuspendLayout();
             // 
             // Quantity
@@ -214,35 +221,34 @@
             this.groupBox1.Controls.Add(this.textBox9);
             this.groupBox1.Controls.Add(this.textBox5);
             this.groupBox1.Controls.Add(this.textBox3);
-            this.groupBox1.Controls.Add(this.textBox2);
             this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.button14);
+            this.groupBox1.Controls.Add(this.textBox15);
             this.groupBox1.Location = new System.Drawing.Point(12, 135);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(866, 100);
+            this.groupBox1.Size = new System.Drawing.Size(950, 100);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             // 
             // textBox4
             // 
-            this.textBox4.BackColor = System.Drawing.Color.Firebrick;
             this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox4.ForeColor = System.Drawing.Color.White;
-            this.textBox4.Location = new System.Drawing.Point(197, 25);
+            this.textBox4.Location = new System.Drawing.Point(428, 57);
             this.textBox4.Multiline = true;
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(73, 26);
-            this.textBox4.TabIndex = 22;
+            this.textBox4.Size = new System.Drawing.Size(56, 26);
+            this.textBox4.TabIndex = 3;
             this.textBox4.Text = "0";
-            this.textBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // textBox6
             // 
             this.textBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox6.Location = new System.Drawing.Point(507, 57);
+            this.textBox6.Location = new System.Drawing.Point(552, 57);
             this.textBox6.Multiline = true;
             this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(73, 26);
-            this.textBox6.TabIndex = 21;
+            this.textBox6.Size = new System.Drawing.Size(56, 26);
+            this.textBox6.TabIndex = 5;
             this.textBox6.Text = "0.00";
             this.textBox6.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
@@ -318,7 +324,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(799, 57);
+            this.button1.Location = new System.Drawing.Point(887, 57);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(52, 26);
             this.button1.TabIndex = 10;
@@ -328,10 +334,10 @@
             // textBox10
             // 
             this.textBox10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox10.Location = new System.Drawing.Point(586, 57);
+            this.textBox10.Location = new System.Drawing.Point(614, 57);
             this.textBox10.Multiline = true;
             this.textBox10.Name = "textBox10";
-            this.textBox10.Size = new System.Drawing.Size(105, 26);
+            this.textBox10.Size = new System.Drawing.Size(77, 26);
             this.textBox10.TabIndex = 9;
             this.textBox10.Text = "0.00";
             this.textBox10.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -339,7 +345,7 @@
             // textBox9
             // 
             this.textBox9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox9.Location = new System.Drawing.Point(703, 57);
+            this.textBox9.Location = new System.Drawing.Point(802, 57);
             this.textBox9.Multiline = true;
             this.textBox9.Name = "textBox9";
             this.textBox9.Size = new System.Drawing.Size(79, 26);
@@ -350,10 +356,10 @@
             // textBox5
             // 
             this.textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox5.Location = new System.Drawing.Point(428, 57);
+            this.textBox5.Location = new System.Drawing.Point(490, 57);
             this.textBox5.Multiline = true;
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(73, 26);
+            this.textBox5.Size = new System.Drawing.Size(56, 26);
             this.textBox5.TabIndex = 4;
             this.textBox5.Text = "0.00";
             this.textBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -375,6 +381,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(27, 26);
             this.textBox2.TabIndex = 1;
+            this.textBox2.Text = "P";
             // 
             // textBox1
             // 
@@ -503,6 +510,59 @@
             this.btnSave.TabIndex = 49;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
+            // 
+            // btnPrint
+            // 
+            this.btnPrint.BackColor = System.Drawing.Color.LightGreen;
+            this.btnPrint.Enabled = false;
+            this.btnPrint.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnPrint.Location = new System.Drawing.Point(229, 604);
+            this.btnPrint.Name = "btnPrint";
+            this.btnPrint.Size = new System.Drawing.Size(75, 36);
+            this.btnPrint.TabIndex = 100;
+            this.btnPrint.Text = "Print";
+            this.btnPrint.UseVisualStyleBackColor = false;
+            this.btnPrint.Visible = false;
+            // 
+            // button14
+            // 
+            this.button14.Location = new System.Drawing.Point(395, 57);
+            this.button14.Name = "button14";
+            this.button14.Size = new System.Drawing.Size(27, 26);
+            this.button14.TabIndex = 101;
+            this.button14.Text = "P";
+            this.button14.UseVisualStyleBackColor = true;
+            // 
+            // textBox15
+            // 
+            this.textBox15.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox15.Location = new System.Drawing.Point(697, 57);
+            this.textBox15.Multiline = true;
+            this.textBox15.Name = "textBox15";
+            this.textBox15.Size = new System.Drawing.Size(96, 26);
+            this.textBox15.TabIndex = 102;
+            this.textBox15.Text = "0.00";
+            this.textBox15.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // pictureBoxQR
+            // 
+            this.pictureBoxQR.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBoxQR.Location = new System.Drawing.Point(1000, 450);
+            this.pictureBoxQR.Name = "pictureBoxQR";
+            this.pictureBoxQR.Size = new System.Drawing.Size(150, 150);
+            this.pictureBoxQR.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxQR.TabIndex = 103;
+            this.pictureBoxQR.TabStop = false;
+            // 
+            // pictureBoxBarcode
+            // 
+            this.pictureBoxBarcode.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBoxBarcode.Location = new System.Drawing.Point(1010, 80);
+            this.pictureBoxBarcode.Name = "pictureBoxBarcode";
+            this.pictureBoxBarcode.Size = new System.Drawing.Size(180, 60);
+            this.pictureBoxBarcode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBoxBarcode.TabIndex = 104;
+            this.pictureBoxBarcode.TabStop = false;
             // 
             // label15
             // 
@@ -639,7 +699,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(890, 749);
+            this.ClientSize = new System.Drawing.Size(1000, 749);
             this.Controls.Add(this.textBox8);
             this.Controls.Add(this.label21);
             this.Controls.Add(this.textBox12);
@@ -659,6 +719,9 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label20);
             this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.btnPrint);
+            this.Controls.Add(this.pictureBoxQR);
+            this.Controls.Add(this.pictureBoxBarcode);
             this.Name = "CreditBill";
             this.Text = "CreditBill";
             this.groupBox1.ResumeLayout(false);
@@ -667,6 +730,8 @@
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbExit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxQR)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBarcode)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -725,5 +790,10 @@
         private System.Windows.Forms.TextBox textBox13;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Button btnPrint;
+        private System.Windows.Forms.Button button14;
+        private System.Windows.Forms.TextBox textBox15;
+        private System.Windows.Forms.PictureBox pictureBoxQR;
+        private System.Windows.Forms.PictureBox pictureBoxBarcode;
     }
 }

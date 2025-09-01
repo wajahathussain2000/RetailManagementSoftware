@@ -28,8 +28,10 @@ namespace RetailManagement.UserForms
 
         private void InitializeRDLCControls()
         {
-            // Remove old controls and replace with ReportViewer
-            this.Controls.Clear();
+            try
+            {
+                // Remove old controls and replace with ReportViewer
+                this.Controls.Clear();
             
             // Create main panel
             Panel mainPanel = new Panel
@@ -87,11 +89,32 @@ namespace RetailManagement.UserForms
             };
             comboBox2.Items.AddRange(new object[] { "All Items", "Low Stock (≤10)", "Out of Stock", "By Value (High to Low)" });
 
-            // Create search textbox
+            // Create search textbox with placeholder
             textBox1 = new TextBox
             {
                 Location = new Point(110, 80),
-                Size = new Size(200, 20)
+                Size = new Size(200, 20),
+                Text = "Search by item name or category...",
+                ForeColor = Color.Gray
+            };
+            
+            // Add placeholder text functionality
+            textBox1.GotFocus += (s, e) =>
+            {
+                if (textBox1.Text == "Search by item name or category...")
+                {
+                    textBox1.Text = "";
+                    textBox1.ForeColor = Color.Black;
+                }
+            };
+            
+            textBox1.LostFocus += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(textBox1.Text))
+                {
+                    textBox1.Text = "Search by item name or category...";
+                    textBox1.ForeColor = Color.Gray;
+                }
             };
 
             // Create radio buttons for stock status
@@ -130,6 +153,14 @@ namespace RetailManagement.UserForms
             btnExit.Size = new Size(75, 32);
             btnExit.Location = new Point(640, 20);
             btnExit.Click += btnExit_Click;
+
+            // Add event handlers for real-time filtering
+            comboBox1.SelectedIndexChanged += Filter_Changed;
+            comboBox2.SelectedIndexChanged += Filter_Changed;
+            textBox1.TextChanged += TextSearch_Changed;
+            radioButton1.CheckedChanged += Filter_Changed;
+            radioButton2.CheckedChanged += Filter_Changed;
+            radioButton3.CheckedChanged += Filter_Changed;
 
             // Add export and print buttons
             Button btnExport = new Button
@@ -174,12 +205,37 @@ namespace RetailManagement.UserForms
             // Add main panel to form
             this.Controls.Add(mainPanel);
 
-            // Set report path
-            reportViewer.LocalReport.ReportPath = "Reports/StockInHandReport.rdlc";
+            // Try simple RDLC first (most compatible), then others
+            string simplePath = System.IO.Path.Combine(Application.StartupPath, "Reports", "StockInHandReport_Simple.rdlc");
+            string originalPath = System.IO.Path.Combine(Application.StartupPath, "Reports", "StockInHandReport.rdlc");
+            
+            if (System.IO.File.Exists(simplePath))
+            {
+                reportViewer.LocalReport.ReportPath = simplePath;
+            }
+            else if (System.IO.File.Exists(originalPath))
+            {
+                reportViewer.LocalReport.ReportPath = originalPath;
+            }
+            else
+            {
+                // Fallback paths
+                if (System.IO.File.Exists("Reports/StockInHandReport_Simple.rdlc"))
+                    reportViewer.LocalReport.ReportPath = "Reports/StockInHandReport_Simple.rdlc";
+                else
+                    reportViewer.LocalReport.ReportPath = "Reports/StockInHandReport.rdlc";
+            }
 
             // Set form properties
             this.Text = "Stock In Hand Report";
             this.WindowState = FormWindowState.Maximized;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"RDLC initialization failed, will use table view: {ex.Message}", 
+                    "Report Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                reportViewer = null; // Will trigger DataGridView fallback
+            }
         }
 
         private void LoadCategories()
@@ -211,7 +267,25 @@ namespace RetailManagement.UserForms
 
         private void SetDefaultReportType()
         {
+            // Setup ComboBox2 with proper stock report types
+            if (comboBox2.Items.Count == 0)
+            {
+                comboBox2.Items.Clear();
+                comboBox2.Items.AddRange(new string[] {
+                    "All Items",
+                    "Low Stock",
+                    "Out of Stock",
+                    "By Value (High to Low)"
+                });
+            }
             comboBox2.SelectedIndex = 0;
+        }
+
+        private int GetLowStockThreshold()
+        {
+            // You can make this configurable or read from settings
+            // For now, return a default value of 10
+            return 10;
         }
 
         private void btnReport_Click(object sender, EventArgs e)
@@ -223,56 +297,96 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                string query = @"SELECT 
+                // Get the correct stock column name (dynamic based on database structure)
+                string stockColumnName = DatabaseConnection.GetStockColumnName();
+                
+                string query = $@"SELECT 
                                 i.ItemID,
                                 i.ItemName,
                                 i.Category,
                                 i.Price,
-                                i.StockQuantity,
-                                i.Price * i.StockQuantity as StockValue
+                                ISNULL({stockColumnName}, 0) as StockQuantity,
+                                ISNULL(i.Price * {stockColumnName}, 0) as StockValue,
+                                ISNULL(i.PurchasePrice, 0) as PurchasePrice,
+                                CASE 
+                                    WHEN ISNULL({stockColumnName}, 0) = 0 THEN 'Out of Stock'
+                                    WHEN ISNULL({stockColumnName}, 0) <= 10 THEN 'Low Stock'
+                                    ELSE 'In Stock'
+                                END as StockStatus
                                FROM Items i
                                WHERE i.IsActive = 1";
 
                 List<SqlParameter> parameters = new List<SqlParameter>();
 
                 // Add category filter
-                if (comboBox1.SelectedIndex > 0)
+                if (comboBox1.SelectedIndex > 0 && comboBox1.SelectedItem != null)
                 {
-                    query += " AND i.Category = @Category";
-                    parameters.Add(new SqlParameter("@Category", comboBox1.SelectedItem.ToString()));
+                    DataRowView selectedCategory = comboBox1.SelectedItem as DataRowView;
+                    if (selectedCategory != null)
+                    {
+                        string categoryValue = selectedCategory["Category"].ToString();
+                        if (categoryValue != "All Categories")
+                        {
+                            query += " AND i.Category = @Category";
+                            parameters.Add(new SqlParameter("@Category", categoryValue));
+                        }
+                    }
                 }
 
-                // Add stock status filter
-                if (radioButton2.Checked)
+                // Add text search filter (ignore placeholder text)
+                if (!string.IsNullOrWhiteSpace(textBox1.Text) && 
+                    textBox1.Text != "Search by item name or category..." &&
+                    textBox1.ForeColor != Color.Gray)
                 {
-                    query += " AND i.StockQuantity <= 10";
-                }
-                else if (radioButton3.Checked)
-                {
-                    query += " AND i.StockQuantity = 0";
-                }
-
-                // Add sorting based on report type
-                switch (comboBox2.SelectedIndex)
-                {
-                    case 1: // Low Stock
-                        query += " AND i.StockQuantity <= 10";
-                        break;
-                    case 2: // Out of Stock
-                        query += " AND i.StockQuantity = 0";
-                        break;
-                    case 3: // By Value (High to Low)
-                        query += " ORDER BY i.Price * i.StockQuantity DESC";
-                        break;
-                    default:
-                        query += " ORDER BY i.Category, i.ItemName";
-                        break;
+                    query += " AND (i.ItemName LIKE @SearchText OR i.Category LIKE @SearchText)";
+                    parameters.Add(new SqlParameter("@SearchText", "%" + textBox1.Text.Trim() + "%"));
                 }
 
-                // If no specific sorting is applied, use default
-                if (!query.Contains("ORDER BY"))
+                // Check radio button selection first, then comboBox2 as fallback
+                bool useRadioFilter = false;
+                if (radioButton2.Checked) // Low Stock
                 {
-                    query += " ORDER BY i.Category, i.ItemName";
+                    int lowStockThreshold = GetLowStockThreshold();
+                    query += $" AND ISNULL({stockColumnName}, 0) <= {lowStockThreshold} AND ISNULL({stockColumnName}, 0) > 0";
+                    query += $" ORDER BY {stockColumnName} ASC, i.ItemName";
+                    useRadioFilter = true;
+                }
+                else if (radioButton3.Checked) // Out of Stock
+                {
+                    query += $" AND ISNULL({stockColumnName}, 0) = 0";
+                    query += " ORDER BY i.ItemName";
+                    useRadioFilter = true;
+                }
+                else if (radioButton1.Checked) // All Items
+                {
+                    // No additional filter for All Items radio button
+                    useRadioFilter = true;
+                }
+
+                // If no radio button selection or All Items selected, use comboBox2 filter
+                if (!useRadioFilter || radioButton1.Checked)
+                {
+                    switch (comboBox2.SelectedIndex)
+                    {
+                        case 0: // All Items - no additional filter
+                            query += " ORDER BY i.Category, i.ItemName";
+                            break;
+                        case 1: // Low Stock
+                            int lowStockThreshold = GetLowStockThreshold();
+                            query += $" AND ISNULL({stockColumnName}, 0) <= {lowStockThreshold} AND ISNULL({stockColumnName}, 0) > 0";
+                            query += $" ORDER BY {stockColumnName} ASC, i.ItemName";
+                            break;
+                        case 2: // Out of Stock
+                            query += $" AND ISNULL({stockColumnName}, 0) = 0";
+                            query += " ORDER BY i.ItemName";
+                            break;
+                        case 3: // By Value (High to Low)
+                            query += $" ORDER BY ISNULL(i.Price * {stockColumnName}, 0) DESC";
+                            break;
+                        default:
+                            query += " ORDER BY i.Category, i.ItemName";
+                            break;
+                    }
                 }
 
                 reportData = DatabaseConnection.ExecuteQuery(query, parameters.ToArray());
@@ -413,6 +527,74 @@ namespace RetailManagement.UserForms
         private void btnExit_Click(object sender, EventArgs e)
         {
             this.Dispose();
+        }
+
+        // Enhanced Filter Event Handlers
+        private void Filter_Changed(object sender, EventArgs e)
+        {
+            // Auto-generate report when filter changes
+            try
+            {
+                if (reportData != null || (comboBox1.SelectedIndex >= 0 && comboBox2.SelectedIndex >= 0))
+                {
+                    GenerateStockReport();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Silent catch for filter changes to avoid constant error popups
+                System.Diagnostics.Debug.WriteLine($"Filter change error: {ex.Message}");
+            }
+        }
+
+        private System.Windows.Forms.Timer searchTimer;
+        private void TextSearch_Changed(object sender, EventArgs e)
+        {
+            // Implement debounced search to avoid too many queries while typing
+            if (searchTimer != null)
+            {
+                searchTimer.Stop();
+                searchTimer.Dispose();
+            }
+
+            searchTimer = new System.Windows.Forms.Timer();
+            searchTimer.Interval = 500; // 500ms delay after user stops typing
+            searchTimer.Tick += (s, args) =>
+            {
+                searchTimer.Stop();
+                searchTimer.Dispose();
+                searchTimer = null;
+                
+                try
+                {
+                    GenerateStockReport();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Search error: {ex.Message}");
+                }
+            };
+            searchTimer.Start();
+        }
+
+        // Enhanced error handling and validation
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            try
+            {
+                // Clean up timer
+                if (searchTimer != null)
+                {
+                    searchTimer.Stop();
+                    searchTimer.Dispose();
+                    searchTimer = null;
+                }
+            }
+            catch
+            {
+                // Silent cleanup
+            }
+            base.OnFormClosing(e);
         }
     }
 }

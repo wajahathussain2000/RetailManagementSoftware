@@ -61,20 +61,6 @@ namespace RetailManagement.UserForms
             try
             {
                 int daysThreshold = (int)numDaysThreshold.Value;
-                string reportType = "";
-                
-                if (rbNearExpiry.Checked)
-                {
-                    reportType = "Near Expiry";
-                }
-                else if (rbExpired.Checked)
-                {
-                    reportType = "Expired";
-                }
-                else
-                {
-                    reportType = "All";
-                }
                 
                 string query = @"SELECT 
                                     i.ItemID,

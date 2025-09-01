@@ -90,9 +90,9 @@
             this.label3.ForeColor = System.Drawing.Color.White;
             this.label3.Location = new System.Drawing.Point(616, 89);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(86, 15);
+            this.label3.Size = new System.Drawing.Size(110, 15);
             this.label3.TabIndex = 5;
-            this.label3.Text = "Opening Bal";
+            this.label3.Text = "Outstanding Bal";
             // 
             // textBox1
             // 
@@ -123,7 +123,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(68, 15);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Customer";
+            this.label2.Text = "Supplier";
             // 
             // dateTimePicker1
             // 
@@ -311,7 +311,7 @@
             this.Controls.Add(this.panel1);
             this.Name = "CustomerPayment";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Customer\'s Payment Section";
+            this.Text = "Supplier Payment Section";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();

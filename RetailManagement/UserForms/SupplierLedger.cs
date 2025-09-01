@@ -232,9 +232,9 @@ namespace RetailManagement.UserForms
                 balance = totalDebit - totalCredit;
             }
 
-            lblTotalDebit.Text = $"Total Debit: ₹{totalDebit:N2}";
-            lblTotalCredit.Text = $"Total Credit: ₹{totalCredit:N2}";
-            lblBalance.Text = $"Balance: ₹{balance:N2}";
+            lblTotalDebit.Text = $"Total Debit: PKR {totalDebit:N2}";
+            lblTotalCredit.Text = $"Total Credit: PKR {totalCredit:N2}";
+            lblBalance.Text = $"Balance: PKR {balance:N2}";
 
             // Color code the balance
             if (balance > 0)
@@ -369,11 +369,11 @@ namespace RetailManagement.UserForms
                         yPos += 10;
                         graphics.DrawString("─".PadRight(50, '─'), headerFont, Brushes.Black, leftMargin, yPos);
                         yPos += 20;
-                        graphics.DrawString($"Total Debit: ₹{totalDebit:N2}", headerFont, Brushes.Black, leftMargin, yPos);
+                        graphics.DrawString($"Total Debit: PKR {totalDebit:N2}", headerFont, Brushes.Black, leftMargin, yPos);
                         yPos += 15;
-                        graphics.DrawString($"Total Credit: ₹{totalCredit:N2}", headerFont, Brushes.Black, leftMargin, yPos);
+                        graphics.DrawString($"Total Credit: PKR {totalCredit:N2}", headerFont, Brushes.Black, leftMargin, yPos);
                         yPos += 15;
-                        graphics.DrawString($"Balance: ₹{(totalDebit - totalCredit):N2}", headerFont, Brushes.Black, leftMargin, yPos);
+                        graphics.DrawString($"Balance: PKR {(totalDebit - totalCredit):N2}", headerFont, Brushes.Black, leftMargin, yPos);
                     }
                     else
                     {
@@ -465,4 +465,4 @@ namespace RetailManagement.UserForms
             LoadSupplierLedger();
         }
     }
-} 
+}

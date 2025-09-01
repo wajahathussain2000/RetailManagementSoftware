@@ -1,0 +1,215 @@
+-- =============================================================================================================
+-- RETAIL MANAGEMENT SYSTEM - FINAL WORKING TEST DATA SEED
+-- This script uses correct column names from the actual database schema
+-- =============================================================================================================
+
+USE RetailManagementDB;
+GO
+
+PRINT 'Starting final data seeding with correct schema...';
+
+-- =============================================================================================================
+-- 1. Clear existing test data (optional - comment out if you want to keep existing data)
+-- =============================================================================================================
+-- DELETE FROM SaleItems WHERE SaleID > 0;
+-- DELETE FROM Sales WHERE SaleID > 0;
+-- DELETE FROM PurchaseItems WHERE PurchaseID > 0;
+-- DELETE FROM Purchases WHERE PurchaseID > 0;
+-- DELETE FROM Expenses WHERE ExpenseID > 0;
+
+-- =============================================================================================================
+-- 2. USERS - Basic users (if not exists)
+-- =============================================================================================================
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'admin')
+INSERT INTO Users (Username, Password, FullName, Role, IsActive, CreatedDate) VALUES
+('admin', 'admin123', 'System Administrator', 'Admin', 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'pharmacist1')
+INSERT INTO Users (Username, Password, FullName, Role, IsActive, CreatedDate) VALUES
+('pharmacist1', 'pharm123', 'Dr. Sarah Ahmed', 'Pharmacist', 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'salesman1')
+INSERT INTO Users (Username, Password, FullName, Role, IsActive, CreatedDate) VALUES
+('salesman1', 'sales123', 'Ahmed Khan', 'Salesman', 1, GETDATE());
+
+-- =============================================================================================================
+-- 3. COMPANIES - Basic companies (if not exists)
+-- =============================================================================================================
+IF NOT EXISTS (SELECT 1 FROM Companies WHERE CompanyName = 'GSK Pakistan')
+INSERT INTO Companies (CompanyName, ContactPerson, Phone, Email, Address, IsActive, CreatedDate) VALUES
+('GSK Pakistan', 'Muhammad Ali', '+92-21-111-475-111', 'contact@gsk.pk', 'Karachi Industrial Area', 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Companies WHERE CompanyName = 'Searle Pakistan')
+INSERT INTO Companies (CompanyName, ContactPerson, Phone, Email, Address, IsActive, CreatedDate) VALUES
+('Searle Pakistan', 'Sara Khan', '+92-21-111-010-111', 'info@searle.com.pk', 'Karachi SITE Area', 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Companies WHERE CompanyName = 'Abbott Laboratories')
+INSERT INTO Companies (CompanyName, ContactPerson, Phone, Email, Address, IsActive, CreatedDate) VALUES
+('Abbott Laboratories', 'Dr. Ahmed Shah', '+92-21-111-111-050', 'pakistan@abbott.com', 'Karachi Industrial Area', 1, GETDATE());
+
+-- =============================================================================================================
+-- 4. CUSTOMERS - Basic customers (if not exists)
+-- =============================================================================================================
+IF NOT EXISTS (SELECT 1 FROM Customers WHERE CustomerName = 'Walk-in Customer')
+INSERT INTO Customers (CustomerName, Phone, Email, Address, City, State, PostalCode, CreditLimit, CreditDays, CurrentBalance, IsActive, CreatedDate) VALUES
+('Walk-in Customer', '', '', '', 'Karachi', 'Sindh', '', 0.00, 0, 0.00, 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Customers WHERE CustomerName = 'City Hospital')
+INSERT INTO Customers (CustomerName, Phone, Email, Address, City, State, PostalCode, CreditLimit, CreditDays, CurrentBalance, IsActive, CreatedDate) VALUES
+('City Hospital', '+92-21-111-222-333', 'procurement@cityhospital.pk', 'University Road', 'Karachi', 'Sindh', '75270', 500000.00, 30, 0.00, 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Customers WHERE CustomerName = 'Green Clinic')
+INSERT INTO Customers (CustomerName, Phone, Email, Address, City, State, PostalCode, CreditLimit, CreditDays, CurrentBalance, IsActive, CreatedDate) VALUES
+('Green Clinic', '+92-21-444-555-666', 'orders@greenclinic.pk', 'Gulshan-e-Iqbal', 'Karachi', 'Sindh', '75300', 100000.00, 15, 0.00, 1, GETDATE());
+
+-- =============================================================================================================
+-- 5. ITEMS - Basic medicines (using minimal required columns)
+-- =============================================================================================================
+IF NOT EXISTS (SELECT 1 FROM Items WHERE ItemName = 'Panadol Extra Tab')
+INSERT INTO Items (ItemName, Description, Category, CompanyID, Barcode, Price, MRP, StockQuantity, ReorderLevel, PackSize, IsActive, CreatedDate) VALUES
+('Panadol Extra Tab', 'Paracetamol + Caffeine Tablets', 'Pain Relief', 1, '123456789001', 3.50, 4.00, 1000, 100, 20, 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Items WHERE ItemName = 'Brufen 400mg Tab')
+INSERT INTO Items (ItemName, Description, Category, CompanyID, Barcode, Price, MRP, StockQuantity, ReorderLevel, PackSize, IsActive, CreatedDate) VALUES
+('Brufen 400mg Tab', 'Ibuprofen Tablets', 'Pain Relief', 2, '123456789002', 2.75, 3.25, 800, 80, 20, 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Items WHERE ItemName = 'Augmentin 625mg Tab')
+INSERT INTO Items (ItemName, Description, Category, CompanyID, Barcode, Price, MRP, StockQuantity, ReorderLevel, PackSize, IsActive, CreatedDate) VALUES
+('Augmentin 625mg Tab', 'Amoxicillin + Clavulanic Acid', 'Antibiotics', 3, '123456789003', 25.50, 30.00, 500, 50, 10, 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Items WHERE ItemName = 'Glucophage 500mg Tab')
+INSERT INTO Items (ItemName, Description, Category, CompanyID, Barcode, Price, MRP, StockQuantity, ReorderLevel, PackSize, IsActive, CreatedDate) VALUES
+('Glucophage 500mg Tab', 'Metformin Tablets', 'Diabetes', 1, '123456789004', 4.25, 5.00, 400, 40, 60, 1, GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM Items WHERE ItemName = 'Centrum Multivitamin')
+INSERT INTO Items (ItemName, Description, Category, CompanyID, Barcode, Price, MRP, StockQuantity, ReorderLevel, PackSize, IsActive, CreatedDate) VALUES
+('Centrum Multivitamin', 'Complete Multivitamin', 'Vitamins', 2, '123456789005', 12.00, 14.50, 300, 30, 30, 1, GETDATE());
+
+-- =============================================================================================================
+-- 6. PURCHASES - Sample purchase records
+-- =============================================================================================================
+INSERT INTO Purchases (PurchaseNumber, CompanyID, PurchaseDate, TotalAmount, CreatedDate, IsActive) VALUES
+('PUR001', 1, '2024-12-01', 15000.00, '2024-12-01', 1),
+('PUR002', 2, '2024-12-05', 22000.00, '2024-12-05', 1),
+('PUR003', 3, '2024-12-10', 18500.00, '2024-12-10', 1),
+('PUR004', 1, '2024-12-15', 25000.00, '2024-12-15', 1),
+('PUR005', 2, '2024-12-20', 20000.00, '2024-12-20', 1);
+
+-- =============================================================================================================
+-- 7. PURCHASE ITEMS - Purchase details
+-- =============================================================================================================
+INSERT INTO PurchaseItems (PurchaseID, ItemID, Quantity, Price, ExpiryDate, BatchNumber)
+VALUES
+(SCOPE_IDENTITY()-4, 1, 100, 3.00, '2026-12-01', 'BATCH001'),
+(SCOPE_IDENTITY()-4, 2, 50, 2.50, '2026-12-01', 'BATCH002'),
+(SCOPE_IDENTITY()-3, 3, 75, 22.00, '2026-12-05', 'BATCH003'),
+(SCOPE_IDENTITY()-3, 4, 60, 3.80, '2026-12-05', 'BATCH004'),
+(SCOPE_IDENTITY()-2, 5, 40, 10.50, '2026-12-10', 'BATCH005'),
+(SCOPE_IDENTITY()-2, 1, 80, 3.00, '2026-12-10', 'BATCH006'),
+(SCOPE_IDENTITY()-1, 2, 100, 2.50, '2026-12-15', 'BATCH007'),
+(SCOPE_IDENTITY()-1, 3, 50, 22.00, '2026-12-15', 'BATCH008'),
+(SCOPE_IDENTITY(), 4, 90, 3.80, '2026-12-20', 'BATCH009'),
+(SCOPE_IDENTITY(), 5, 30, 10.50, '2026-12-20', 'BATCH010');
+
+-- =============================================================================================================
+-- 8. SALES - Sample sales transactions
+-- =============================================================================================================
+INSERT INTO Sales (BillNumber, CustomerID, SaleDate, TotalAmount, Discount, NetAmount, PaymentMethod, IsCredit, IsActive, CreatedDate) VALUES
+('BILL000001', 1, '2024-12-20 09:30:00', 150.00, 7.50, 142.50, 'Cash', 0, 1, '2024-12-20 09:30:00'),
+('BILL000002', 1, '2024-12-20 11:15:00', 85.50, 4.25, 81.25, 'Card', 0, 1, '2024-12-20 11:15:00'),
+('BILL000003', 2, '2024-12-20 14:20:00', 1250.00, 62.50, 1187.50, 'Cash', 0, 1, '2024-12-20 14:20:00'),
+('BILL000004', 1, '2024-12-21 10:00:00', 95.75, 4.75, 91.00, 'UPI', 0, 1, '2024-12-21 10:00:00'),
+('BILL000005', 3, '2024-12-21 16:30:00', 475.00, 0.00, 475.00, 'Cash', 1, 1, '2024-12-21 16:30:00'),
+('BILL000006', 1, '2024-12-22 12:45:00', 67.50, 3.25, 64.25, 'Cash', 0, 1, '2024-12-22 12:45:00'),
+('BILL000007', 2, '2024-12-22 15:10:00', 890.00, 44.50, 845.50, 'Card', 0, 1, '2024-12-22 15:10:00'),
+('BILL000008', 1, '2024-12-23 09:20:00', 125.00, 6.25, 118.75, 'Cash', 0, 1, '2024-12-23 09:20:00'),
+('BILL000009', 3, '2024-12-23 13:40:00', 325.50, 0.00, 325.50, 'UPI', 1, 1, '2024-12-23 13:40:00'),
+('BILL000010', 1, '2024-12-24 11:30:00', 78.25, 3.90, 74.35, 'Cash', 0, 1, '2024-12-24 11:30:00');
+
+-- =============================================================================================================
+-- 9. SALE ITEMS - Sale details
+-- =============================================================================================================
+DECLARE @SaleID1 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000001');
+DECLARE @SaleID2 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000002');
+DECLARE @SaleID3 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000003');
+DECLARE @SaleID4 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000004');
+DECLARE @SaleID5 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000005');
+DECLARE @SaleID6 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000006');
+DECLARE @SaleID7 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000007');
+DECLARE @SaleID8 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000008');
+DECLARE @SaleID9 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000009');
+DECLARE @SaleID10 INT = (SELECT SaleID FROM Sales WHERE BillNumber = 'BILL000010');
+
+INSERT INTO SaleItems (SaleID, ItemID, Quantity, Price) VALUES
+-- Sale 1 items
+(@SaleID1, 1, 10, 4.00),
+(@SaleID1, 2, 5, 3.25),
+(@SaleID1, 4, 20, 5.00),
+-- Sale 2 items
+(@SaleID2, 1, 5, 4.00),
+(@SaleID2, 5, 5, 14.50),
+-- Sale 3 items (hospital bulk order)
+(@SaleID3, 3, 20, 30.00),
+(@SaleID3, 4, 50, 5.00),
+(@SaleID3, 1, 100, 4.00),
+-- Sale 4 items
+(@SaleID4, 2, 10, 3.25),
+(@SaleID4, 1, 15, 4.00),
+-- Sale 5 items (clinic credit)
+(@SaleID5, 3, 15, 30.00),
+(@SaleID5, 5, 1, 14.50),
+-- Sale 6 items
+(@SaleID6, 1, 15, 4.00),
+(@SaleID6, 2, 2, 3.25),
+-- Sale 7 items
+(@SaleID7, 4, 80, 5.00),
+(@SaleID7, 3, 10, 30.00),
+-- Sale 8 items
+(@SaleID8, 1, 20, 4.00),
+(@SaleID8, 2, 5, 3.25),
+(@SaleID8, 5, 2, 14.50),
+-- Sale 9 items
+(@SaleID9, 3, 10, 30.00),
+(@SaleID9, 1, 5, 4.00),
+-- Sale 10 items
+(@SaleID10, 1, 10, 4.00),
+(@SaleID10, 2, 10, 3.25);
+
+-- =============================================================================================================
+-- 10. EXPENSES - Using correct column names
+-- =============================================================================================================
+INSERT INTO Expenses (ExpenseDate, ExpenseCategory, ExpenseDescription, Amount, PaymentMethod, CreatedBy, CreatedDate, IsActive) VALUES
+('2024-12-01', 'Rent', 'Monthly shop rent', 45000.00, 'Bank Transfer', 1, '2024-12-01', 1),
+('2024-12-01', 'Utilities', 'Electricity bill', 8500.00, 'Cash', 1, '2024-12-01', 1),
+('2024-12-01', 'Salaries', 'Pharmacist salary', 35000.00, 'Bank Transfer', 1, '2024-12-01', 1),
+('2024-12-01', 'Salaries', 'Salesman salary', 25000.00, 'Bank Transfer', 1, '2024-12-01', 1),
+('2024-12-15', 'Transportation', 'Fuel and delivery costs', 3500.00, 'Cash', 1, '2024-12-15', 1),
+('2024-12-10', 'Office Supplies', 'Stationery and printing', 2500.00, 'Cash', 1, '2024-12-10', 1),
+('2024-12-20', 'Maintenance', 'Equipment maintenance', 4500.00, 'Cash', 1, '2024-12-20', 1);
+
+-- =============================================================================================================
+-- 11. Update customer balances for credit sales
+-- =============================================================================================================
+UPDATE Customers 
+SET CurrentBalance = ISNULL(
+    (SELECT SUM(s.NetAmount) 
+     FROM Sales s 
+     WHERE s.CustomerID = Customers.CustomerID 
+     AND s.IsCredit = 1 
+     AND s.IsActive = 1), 0
+);
+
+PRINT 'Final database seeding completed successfully!';
+PRINT '';
+PRINT 'Summary of data added:';
+PRINT '- 3 Users (Admin, Pharmacist, Salesman)';
+PRINT '- 3 Companies (GSK, Searle, Abbott)';
+PRINT '- 3 Customers (Walk-in, Hospital, Clinic)';
+PRINT '- 5 Items (Common medicines)';
+PRINT '- 5 Purchases with purchase items';
+PRINT '- 10 Sales with detailed sale items';
+PRINT '- 7 Expense records';
+PRINT '- Updated customer balances for credit sales';
+PRINT '';
+PRINT 'Test data is ready for your reports!';
+

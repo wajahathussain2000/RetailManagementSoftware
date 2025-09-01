@@ -237,12 +237,12 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-                selectedGSTID = Convert.ToInt32(row.Cells["GSTID"].Value);
+                selectedGSTID = SafeDataHelper.SafeGetCellInt32(row, "GSTID");
                 
-                cmbCategory.Text = row.Cells["Category"].Value.ToString();
-                txtGSTPercentage.Text = row.Cells["GSTPercentage"].Value.ToString();
-                txtHSNCode.Text = row.Cells["HSNCode"].Value.ToString();
-                txtDescription.Text = row.Cells["Description"].Value.ToString();
+                cmbCategory.Text = SafeDataHelper.SafeGetCellString(row, "Category");
+                txtGSTPercentage.Text = SafeDataHelper.SafeGetCellString(row, "GSTPercentage");
+                txtHSNCode.Text = SafeDataHelper.SafeGetCellString(row, "HSNCode");
+                txtDescription.Text = SafeDataHelper.SafeGetCellString(row, "Description");
                 chkActive.Checked = Convert.ToBoolean(row.Cells["IsActive"].Value);
                 
                 isEditMode = true;

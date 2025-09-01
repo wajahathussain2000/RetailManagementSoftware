@@ -12,27 +12,107 @@ namespace RetailManagement
 {
     public partial class MainScreen : Form
     {
+        private Login currentLoginControl;
+        private UserDashboard currentDashboardControl;
+        private bool isDisposing = false;
+
         public MainScreen()
         {
             InitializeComponent();
             LoadLoginControl();
+            
+            // Add form closing event to cleanup
+            this.FormClosing += MainScreen_FormClosing;
+        }
+
+        private void MainScreen_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            CleanupControls();
+        }
+
+        internal void CleanupControls()
+        {
+            if (!isDisposing)
+            {
+                isDisposing = true;
+                
+                try
+                {
+                    // Clean up login control
+                    if (currentLoginControl != null)
+                    {
+                        currentLoginControl.LoginSuccessful -= LoadUserDashboardControl;
+                        currentLoginControl.Dispose();
+                        currentLoginControl = null;
+                    }
+                    
+                    // Clean up dashboard control
+                    if (currentDashboardControl != null)
+                    {
+                        currentDashboardControl.CancelClicked -= LoadLoginControl;
+                        currentDashboardControl.Dispose();
+                        currentDashboardControl = null;
+                    }
+                }
+                catch
+                {
+                    // Ignore cleanup errors
+                }
+            }
         }
 
         private void LoadLoginControl()
         {
-            panel1.Controls.Clear();
-            Login loginControl = new Login();
-            loginControl.LoginSuccessful += LoadUserDashboardControl; // subscribe to event
-            loginControl.Dock = DockStyle.Fill;
-            panel1.Controls.Add(loginControl);
+            if (isDisposing) return;
+            
+            try
+            {
+                // Clean up existing dashboard control
+                if (currentDashboardControl != null)
+                {
+                    currentDashboardControl.CancelClicked -= LoadLoginControl;
+                    currentDashboardControl.Dispose();
+                    currentDashboardControl = null;
+                }
+                
+                panel1.Controls.Clear();
+                currentLoginControl = new Login();
+                currentLoginControl.LoginSuccessful += LoadUserDashboardControl;
+                currentLoginControl.Dock = DockStyle.Fill;
+                panel1.Controls.Add(currentLoginControl);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading login: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
         private void LoadUserDashboardControl()
         {
-            panel1.Controls.Clear();
-            UserDashboard dashboardControl = new UserDashboard();
-            dashboardControl.CancelClicked += LoadLoginControl; // subscribe to cancel event
-            dashboardControl.Dock = DockStyle.Fill;
-            panel1.Controls.Add(dashboardControl);
+            if (isDisposing) return;
+            
+            try
+            {
+                // Clean up existing login control
+                if (currentLoginControl != null)
+                {
+                    currentLoginControl.LoginSuccessful -= LoadUserDashboardControl;
+                    currentLoginControl.Dispose();
+                    currentLoginControl = null;
+                }
+                
+                panel1.Controls.Clear();
+                currentDashboardControl = new UserDashboard();
+                currentDashboardControl.CancelClicked += LoadLoginControl;
+                currentDashboardControl.Dock = DockStyle.Fill;
+                panel1.Controls.Add(currentDashboardControl);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading dashboard: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
 

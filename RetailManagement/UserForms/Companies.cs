@@ -22,6 +22,8 @@ namespace RetailManagement.UserForms
             InitializeComponent();
             LoadCompanies();
             SetupDataGridView();
+            LoadCompaniesDropdown();
+            InitializeForm();
         }
 
         private void SetupDataGridView()
@@ -50,12 +52,111 @@ namespace RetailManagement.UserForms
             }
         }
 
+        private void InitializeForm()
+        {
+            // Enable text boxes
+            txtComputerName.Enabled = true;
+            
+            // Set initial state
+            btnSave.Enabled = false;
+            btnCancel.Enabled = false;
+            
+            // Set focus
+            txtComputerName.Focus();
+        }
+
+
+
+        private void LoadCompaniesDropdown()
+        {
+            // Add a dropdown to select existing companies
+            try
+            {
+                string query = "SELECT CompanyID, CompanyName FROM Companies WHERE IsActive = 1 ORDER BY CompanyName";
+                DataTable dt = DatabaseConnection.ExecuteQuery(query);
+                
+                // Create and add dropdown if it doesn't exist
+                if (this.Controls.Find("cmbCompanies", true).Length == 0)
+                {
+                    ComboBox cmbCompanies = new ComboBox
+                    {
+                        Name = "cmbCompanies",
+                        Location = new Point(442, 30),
+                        Size = new Size(240, 25),
+                        DropDownStyle = ComboBoxStyle.DropDownList,
+                        DataSource = dt,
+                        DisplayMember = "CompanyName",
+                        ValueMember = "CompanyID"
+                    };
+                    
+                    cmbCompanies.SelectedIndexChanged += CmbCompanies_SelectedIndexChanged;
+                    this.Controls.Add(cmbCompanies);
+                    
+                    // Add label for dropdown
+                    Label lblCompanies = new Label
+                    {
+                        Text = "Select Company:",
+                        Location = new Point(442, 10),
+                        Size = new Size(100, 20),
+                        Font = new Font("Microsoft Sans Serif", 9, FontStyle.Bold),
+                        ForeColor = Color.White
+                    };
+                    this.Controls.Add(lblCompanies);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading companies dropdown: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CmbCompanies_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox cmb = sender as ComboBox;
+            if (cmb.SelectedValue != null && int.TryParse(cmb.SelectedValue.ToString(), out int companyId))
+            {
+                LoadCompanyDetails(companyId);
+            }
+        }
+
+        private void LoadCompanyDetails(int companyId)
+        {
+            try
+            {
+                string query = "SELECT * FROM Companies WHERE CompanyID = @CompanyID";
+                SqlParameter[] parameters = { new SqlParameter("@CompanyID", companyId) };
+                DataTable dt = DatabaseConnection.ExecuteQuery(query, parameters);
+                
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow row = dt.Rows[0];
+                    txtComputerID.Text = row["CompanyID"].ToString();
+                    txtComputerName.Text = row["CompanyName"].ToString();
+                    selectedCompanyID = companyId;
+                    isEditMode = true;
+                    btnSave.Enabled = true;
+                    btnCancel.Enabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading company details: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void ClearForm()
         {
             txtComputerID.Text = "";
             txtComputerName.Text = "";
             selectedCompanyID = 0;
             isEditMode = false;
+            
+            // Clear dropdown selection
+            ComboBox cmbCompanies = this.Controls.Find("cmbCompanies", true).FirstOrDefault() as ComboBox;
+            if (cmbCompanies != null)
+            {
+                cmbCompanies.SelectedIndex = -1;
+            }
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -81,6 +182,7 @@ namespace RetailManagement.UserForms
                         InsertCompany();
                     }
                     LoadCompanies();
+                    LoadCompaniesDropdown(); // Refresh dropdown
                     ClearForm();
                     btnSave.Enabled = false;
                     btnCancel.Enabled = false;
@@ -161,6 +263,7 @@ namespace RetailManagement.UserForms
                         SqlParameter[] parameters = { new SqlParameter("@CompanyID", selectedCompanyID) };
                         DatabaseConnection.ExecuteNonQuery(query, parameters);
                         LoadCompanies();
+                        LoadCompaniesDropdown(); // Refresh dropdown
                         ClearForm();
                         MessageBox.Show("Computer deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -181,9 +284,9 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = gridViewCompanies.Rows[e.RowIndex];
-                selectedCompanyID = Convert.ToInt32(row.Cells["CompanyID"].Value);
-                txtComputerID.Text = row.Cells["CompanyID"].Value.ToString();
-                txtComputerName.Text = row.Cells["CompanyName"].Value.ToString();
+                selectedCompanyID = SafeDataHelper.SafeGetCellInt32(row, "CompanyID");
+                txtComputerID.Text = SafeDataHelper.SafeGetCellString(row, "CompanyID");
+                txtComputerName.Text = SafeDataHelper.SafeGetCellString(row, "CompanyName");
                 isEditMode = true;
                 btnSave.Enabled = true;
                 btnCancel.Enabled = true;

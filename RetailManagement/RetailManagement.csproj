@@ -12,6 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -51,7 +52,11 @@
     <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SqlServer.Types.14.0.314.76\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
     </Reference>
+    <Reference Include="QRCoder, Version=1.4.3.0, Culture=neutral, PublicKeyToken=c4ed5b9ae8358a28, processorArchitecture=MSIL">
+      <HintPath>..\packages\QRCoder.1.4.3\lib\net40\QRCoder.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Xml.Linq" />
@@ -97,11 +102,23 @@
     <Compile Include="UserDashboard.Designer.cs">
       <DependentUpon>UserDashboard.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserForms\SupplierBalanceReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\SupplierBalanceReport.Designer.cs">
+      <DependentUpon>SupplierBalanceReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserForms\BaseReportForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UserForms\BaseReportForm.Designer.cs">
       <DependentUpon>BaseReportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ChangePassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ChangePassword.Designer.cs">
+      <DependentUpon>ChangePassword.cs</DependentUpon>
     </Compile>
     <Compile Include="UserForms\Companies.cs">
       <SubType>Form</SubType>
@@ -133,17 +150,104 @@
     <Compile Include="UserForms\EditBill.Designer.cs">
       <DependentUpon>EditBill.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserForms\EditBillTypeSelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UserForms\Items.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UserForms\Items.Designer.cs">
       <DependentUpon>Items.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserForms\NewBill.cs">
+    <Compile Include="UserForms\BatchManagementForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UserForms\NewBill.Designer.cs">
-      <DependentUpon>NewBill.cs</DependentUpon>
+    <Compile Include="UserForms\BatchManagementForm.Designer.cs">
+      <DependentUpon>BatchManagementForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\SubstituteManagementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\SubstituteManagementForm.Designer.cs">
+      <DependentUpon>SubstituteManagementForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\LowStockReportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\LowStockReportForm.Designer.cs">
+      <DependentUpon>LowStockReportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ExpiryReportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpiryReportForm.Designer.cs">
+      <DependentUpon>ExpiryReportForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\ComprehensiveSalesReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ComprehensiveReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerHistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\DailyReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\EnhancedPOSForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\EnhancedPurchaseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\StockReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\GSTReturnReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerSupplierDetailedReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ReturnReportsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\LedgerTrialBalanceForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomReportBuilderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\ExpiredStockManagementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\DaybookCashflowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\EnhancedBarcodeGeneratorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\EnhancedBarcodeGeneratorForm.Designer.cs">
+      <DependentUpon>EnhancedBarcodeGeneratorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\EnhancedLabelPrintingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\EnhancedLabelPrintingForm.Designer.cs">
+      <DependentUpon>EnhancedLabelPrintingForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\CloudSynchronizationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CloudSynchronizationForm.Designer.cs">
+      <DependentUpon>CloudSynchronizationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\MultiStoreBranchManagementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\MultiStoreBranchManagementForm.Designer.cs">
+      <DependentUpon>MultiStoreBranchManagementForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UserForms\NewPurchase.cs">
       <SubType>Form</SubType>
@@ -222,6 +326,21 @@
     </Compile>
     <Compile Include="UserForms\SupplierLedger.Designer.cs">
       <DependentUpon>SupplierLedger.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserForms\SupplierManagementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\EnhancedBillingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\BarcodeScannerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\NewBillForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\NewBillForm.Designer.cs">
+      <DependentUpon>NewBillForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UserForms\GSTReport.cs">
       <SubType>Form</SubType>
@@ -313,12 +432,6 @@
     <Compile Include="UserForms\BarcodeLabelPrint.Designer.cs">
       <DependentUpon>BarcodeLabelPrint.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserForms\ExpenseReport.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UserForms\ExpenseReport.Designer.cs">
-      <DependentUpon>ExpenseReport.cs</DependentUpon>
-    </Compile>
     <Compile Include="UserForms\InventoryReport.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -339,6 +452,22 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Database\DatabaseConnection.cs" />
+    <Compile Include="Database\SafeDataHelper.cs" />
+    <Compile Include="Database\GlobalExceptionHandler.cs" />
+    <Compile Include="Database\DataGridViewTemplate.cs" />
+    <Compile Include="Utils\BarcodeHelper.cs" />
+    <Compile Include="Utils\BarcodeScanningHelper.cs" />
+    <Compile Include="Utils\CustomerBindingHelper.cs" />
+    <Compile Include="Utils\DashboardStatusHelper.cs" />
+    <Compile Include="UserForms\CashCounterManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\DatabaseBackupManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserForms\CustomerManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Sale.cs" />
@@ -370,8 +499,8 @@
     <EmbeddedResource Include="UserForms\Items.resx">
       <DependentUpon>Items.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserForms\NewBill.resx">
-      <DependentUpon>NewBill.cs</DependentUpon>
+    <EmbeddedResource Include="UserForms\NewBillForm.resx">
+      <DependentUpon>NewBillForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserForms\NewPurchase.resx">
       <DependentUpon>NewPurchase.cs</DependentUpon>
@@ -398,6 +527,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="bin\Debug\RetailManagement.exe.config" />
+    <None Include="obj\Release\RetailManagement.csproj.AssemblyReference.cache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -413,26 +544,114 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Reports\CustomerOutstandingReport.rdlc" />
-    <None Include="Reports\SalesReport.rdlc" />
-    <None Include="Reports\StockInHandReport.rdlc" />
-    <None Include="Reports\DailySummaryReport.rdlc" />
-    <None Include="Reports\PurchaseReport.rdlc" />
-    <None Include="Reports\CustomerOutstanding.rdlc" />
-    <None Include="Reports\InventoryReport.rdlc" />
-    <None Include="Reports\ExpenseReport.rdlc" />
-    <None Include="Reports\LowStockAlertReport.rdlc" />
-    <None Include="Reports\ProfitAndLossReport.rdlc" />
-    <None Include="Reports\CustomerLedgerReport.rdlc" />
-    <None Include="Reports\SalesReturnReport.rdlc" />
-    <None Include="Reports\PurchaseReturnReport.rdlc" />
-    <None Include="Reports\ExpiryReport.rdlc" />
-    <None Include="Reports\GSTReport.rdlc" />
-    <None Include="Reports\SupplierLedgerReport.rdlc" />
-    <None Include="Reports\CashFlowReport.rdlc" />
-    <None Include="Reports\SupplierReport.rdlc" />
-    <None Include="Reports\BarcodeLabelPrintReport.rdlc" />
-    <None Include="Reports\CustomerPurchaseHistoryReport.rdlc" />
+    <Content Include="Reports\CustomerOutstandingReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SalesReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SalesReport_Compatible.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SalesReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\StockInHandReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\StockInHandReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\PurchaseReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ExpenseReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\CustomerLedgerReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\InventoryReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\DailySalesReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\MonthlySalesReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ExpiredMedicinesReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ProfitReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\CustomerWiseSalesReport_Simple.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\DailySummaryReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\PurchaseReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\CustomerOutstanding.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\InventoryReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ExpenseReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\LowStockAlertReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ProfitAndLossReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\CustomerLedgerReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SalesReturnReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\PurchaseReturnReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ExpiryReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\GSTReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SupplierLedgerReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\CashFlowReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SupplierReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\BarcodeLabelPrintReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\CustomerPurchaseHistoryReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\GSTR1Report.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ThermalBillReceipt.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\ThermalPurchaseReceipt.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\SupplierBalanceReport.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\office-building.png" />
   </ItemGroup>
   <ItemGroup>
@@ -469,6 +688,9 @@
     <None Include="Resources\stock_in_hand.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\Debug\RetailManagement.exe" />
+    <Content Include="bin\Debug\RetailManagement.pdb" />
+    <Content Include="obj\Release\RetailManagement.csproj.FileListAbsolute.txt" />
     <Content Include="SqlServerTypes\readme.htm" />
     <Content Include="SqlServerTypes\x64\msvcr120.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -482,6 +704,10 @@
     <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Release\" />
+    <Folder Include="RetailManagement\Reports\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

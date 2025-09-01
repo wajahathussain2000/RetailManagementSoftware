@@ -249,13 +249,13 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-                selectedExpenseID = Convert.ToInt32(row.Cells["ExpenseID"].Value);
+                selectedExpenseID = SafeDataHelper.SafeGetCellInt32(row, "ExpenseID");
                 
                 dtpExpenseDate.Value = Convert.ToDateTime(row.Cells["ExpenseDate"].Value);
-                cmbCategory.Text = row.Cells["Category"].Value.ToString();
-                txtDescription.Text = row.Cells["Description"].Value.ToString();
-                txtAmount.Text = row.Cells["Amount"].Value.ToString();
-                cmbPaymentMethod.Text = row.Cells["PaymentMethod"].Value.ToString();
+                cmbCategory.Text = SafeDataHelper.SafeGetCellString(row, "Category");
+                txtDescription.Text = SafeDataHelper.SafeGetCellString(row, "Description");
+                txtAmount.Text = SafeDataHelper.SafeGetCellString(row, "Amount");
+                cmbPaymentMethod.Text = SafeDataHelper.SafeGetCellString(row, "PaymentMethod");
                 
                 isEditMode = true;
                 btnSave.Text = "Update";
