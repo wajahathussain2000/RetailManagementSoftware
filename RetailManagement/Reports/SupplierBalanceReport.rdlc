@@ -647,7 +647,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!CreditLimit.Value, "C")</Value>
+                              <Value>=Format(Fields!CreditLimit.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Segoe UI</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -682,7 +682,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!TotalPurchases.Value, "C")</Value>
+                              <Value>=Format(Fields!TotalPurchases.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Segoe UI</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -717,7 +717,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!TotalPayments.Value, "C")</Value>
+                              <Value>=Format(Fields!TotalPayments.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Segoe UI</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -752,7 +752,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!OutstandingBalance.Value, "C")</Value>
+                              <Value>=Format(Fields!OutstandingBalance.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Segoe UI</FontFamily>
                                 <FontSize>9pt</FontSize>

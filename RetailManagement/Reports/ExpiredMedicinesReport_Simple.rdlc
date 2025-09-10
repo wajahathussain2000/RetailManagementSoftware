@@ -644,7 +644,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!UnitPrice.Value, "C")</Value>
+                              <Value>=Format(Fields!UnitPrice.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -680,7 +680,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!TotalValue.Value, "C")</Value>
+                              <Value>=Format(Fields!TotalValue.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>

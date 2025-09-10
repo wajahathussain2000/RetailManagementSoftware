@@ -412,14 +412,15 @@ namespace RetailManagement.UserForms
             // 
             // textBox1
             // 
-            this.textBox1.ForeColor = System.Drawing.Color.Gray;
+            this.textBox1.ForeColor = System.Drawing.Color.Black;
             this.textBox1.Location = new System.Drawing.Point(128, 88);
             this.textBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(348, 38);
             this.textBox1.TabIndex = 0;
-            this.textBox1.Text = "Type to search items by name or scan barcode...";
+            this.textBox1.Text = "";
             // 
             // dataGridView1
             // 
@@ -725,7 +726,7 @@ namespace RetailManagement.UserForms
             // pictureBoxQR
             // 
             this.pictureBoxQR.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxQR.Location = new System.Drawing.Point(1535, 834);
+            this.pictureBoxQR.Location = new System.Drawing.Point(1535, 795);
             this.pictureBoxQR.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pictureBoxQR.Name = "pictureBoxQR";
             this.pictureBoxQR.Size = new System.Drawing.Size(224, 184);

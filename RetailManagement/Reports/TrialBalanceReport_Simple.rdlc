@@ -402,7 +402,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!DebitBalance.Value, "C2")</Value>
+                              <Value>=Format(Fields!DebitBalance.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -437,7 +437,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!CreditBalance.Value, "C2")</Value>
+                              <Value>=Format(Fields!CreditBalance.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -915,7 +915,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!DebitBalance.Value, "C2")</Value>
+                              <Value>=Format(Fields!DebitBalance.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>9pt</FontSize>
@@ -950,7 +950,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!CreditBalance.Value, "C2")</Value>
+                              <Value>=Format(Fields!CreditBalance.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>9pt</FontSize>

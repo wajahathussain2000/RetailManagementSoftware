@@ -407,7 +407,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!CashInflow.Value, "C2")</Value>
+                                  <Value>=Format(Fields!CashInflow.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -441,7 +441,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!CashOutflow.Value, "C2")</Value>
+                                  <Value>=Format(Fields!CashOutflow.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -475,7 +475,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!NetCashFlow.Value, "C2")</Value>
+                                  <Value>=Format(Fields!NetCashFlow.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -510,7 +510,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!OpeningBalance.Value, "C2")</Value>
+                                  <Value>=Format(Fields!OpeningBalance.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -543,7 +543,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!ClosingBalance.Value, "C2")</Value>
+                                  <Value>=Format(Fields!ClosingBalance.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -611,7 +611,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Cash Inflow: {0} | Total Cash Outflow: {1} | Net Cash Flow: {2}", Format(Sum(Fields!CashInflow.Value), "C2"), Format(Sum(Fields!CashOutflow.Value), "C2"), Format(Sum(Fields!NetCashFlow.Value), "C2"))</Value>
+                    <Value>=String.Format("Total Cash Inflow: {0} | Total Cash Outflow: {1} | Net Cash Flow: {2}", Format(Sum(Fields!CashInflow.Value), "N2"), Format(Sum(Fields!CashOutflow.Value), "N2"), Format(Sum(Fields!NetCashFlow.Value), "N2"))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>
@@ -642,7 +642,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Cash Flow Details: Sales Revenue: {0} | Purchase Payments: {1} | Expenses: {2} | Other Income: {3}", Format(Sum(Fields!SalesRevenue.Value), "C2"), Format(Sum(Fields!PurchasePayments.Value), "C2"), Format(Sum(Fields!Expenses.Value), "C2"), Format(Sum(Fields!OtherIncome.Value), "C2"))</Value>
+                    <Value>=String.Format("Cash Flow Details: Sales Revenue: {0} | Purchase Payments: {1} | Expenses: {2} | Other Income: {3}", Format(Sum(Fields!SalesRevenue.Value), "N2"), Format(Sum(Fields!PurchasePayments.Value), "N2"), Format(Sum(Fields!Expenses.Value), "N2"), Format(Sum(Fields!OtherIncome.Value), "N2"))</Value>
                     <Style>
                       <FontSize>9pt</FontSize>
                       <TextAlign>Center</TextAlign>

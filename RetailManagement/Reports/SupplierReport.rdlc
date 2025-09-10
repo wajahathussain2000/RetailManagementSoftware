@@ -594,7 +594,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalPurchases.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalPurchases.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -627,7 +627,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalPayments.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalPayments.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -660,7 +660,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!OutstandingAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!OutstandingAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -765,7 +765,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Suppliers: {0} | Total Purchases: {1} | Total Outstanding: {2} | Active Suppliers: {3}", Count(Fields!SupplierID.Value), Format(Sum(Fields!TotalPurchases.Value), "C2"), Format(Sum(Fields!OutstandingAmount.Value), "C2"), Count(IIf(Fields!Status.Value = "Active", Fields!SupplierID.Value, Nothing)))</Value>
+                    <Value>=String.Format("Total Suppliers: {0} | Total Purchases: {1} | Total Outstanding: {2} | Active Suppliers: {3}", Count(Fields!SupplierID.Value), Format(Sum(Fields!TotalPurchases.Value), "N2"), Format(Sum(Fields!OutstandingAmount.Value), "N2"), Count(IIf(Fields!Status.Value = "Active", Fields!SupplierID.Value, Nothing)))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

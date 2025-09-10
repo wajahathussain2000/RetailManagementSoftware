@@ -1,4 +1,4 @@
-ï»¿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -210,9 +210,9 @@ namespace RetailManagement.UserForms
 
             // Add columns for P&L statement
             dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "Description", HeaderText = "Description", Width = 300 });
-            dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "CurrentPeriod", HeaderText = "Current Period", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
-            dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "PreviousPeriod", HeaderText = "Previous Period", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
-            dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "Variance", HeaderText = "Variance", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "CurrentPeriod", HeaderText = "Current Period", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
+            dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "PreviousPeriod", HeaderText = "Previous Period", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
+            dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "Variance", HeaderText = "Variance", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
             dgvProfitLoss.Columns.Add(new DataGridViewTextBoxColumn { Name = "VariancePercent", HeaderText = "Variance %", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "P2" } });
 
             tab.Controls.Add(dgvProfitLoss);
@@ -234,12 +234,12 @@ namespace RetailManagement.UserForms
 
             // Add columns for detailed analysis
             dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "Category", HeaderText = "Category", Width = 200 });
-            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "Revenue", HeaderText = "Revenue", Width = 120, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
-            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "COGS", HeaderText = "COGS", Width = 120, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
-            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossProfit", HeaderText = "Gross Profit", Width = 120, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "Revenue", HeaderText = "Revenue", Width = 120, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
+            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "COGS", HeaderText = "COGS", Width = 120, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
+            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossProfit", HeaderText = "Gross Profit", Width = 120, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
             dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossMargin", HeaderText = "Gross Margin %", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "P2" } });
             dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "QuantitySold", HeaderText = "Qty Sold", Width = 80 });
-            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "AvgSellingPrice", HeaderText = "Avg Price", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "AvgSellingPrice", HeaderText = "Avg Price", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
             dgvDetailedAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "RevenuePercent", HeaderText = "Revenue %", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "P2" } });
 
             tab.Controls.Add(dgvDetailedAnalysis);
@@ -261,9 +261,9 @@ namespace RetailManagement.UserForms
 
             // Add columns for trend analysis
             dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "Period", HeaderText = "Period", Width = 100 });
-            dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "Revenue", HeaderText = "Revenue", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "C0" } });
-            dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "COGS", HeaderText = "COGS", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "C0" } });
-            dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "NetProfit", HeaderText = "Net Profit", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "C0" } });
+            dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "Revenue", HeaderText = "Revenue", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "N0" } });
+            dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "COGS", HeaderText = "COGS", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "N0" } });
+            dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "NetProfit", HeaderText = "Net Profit", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "N0" } });
             dgvTrendAnalysis.Columns.Add(new DataGridViewTextBoxColumn { Name = "NetMargin", HeaderText = "Net Margin %", Width = 100, DefaultCellStyle = new DataGridViewCellStyle { Format = "P1" } });
 
             tab.Controls.Add(dgvTrendAnalysis);
@@ -296,9 +296,9 @@ namespace RetailManagement.UserForms
                 BackColor = Color.LightGray
             };
 
-            Label legendRevenue = new Label { Text = "â–  Revenue", ForeColor = Color.Green, Location = new Point(10, 5), Size = new Size(80, 20) };
-            Label legendCOGS = new Label { Text = "â–  COGS", ForeColor = Color.Red, Location = new Point(100, 5), Size = new Size(80, 20) };
-            Label legendProfit = new Label { Text = "â–  Net Profit", ForeColor = Color.Blue, Location = new Point(190, 5), Size = new Size(80, 20) };
+            Label legendRevenue = new Label { Text = "¦ Revenue", ForeColor = Color.Green, Location = new Point(10, 5), Size = new Size(80, 20) };
+            Label legendCOGS = new Label { Text = "¦ COGS", ForeColor = Color.Red, Location = new Point(100, 5), Size = new Size(80, 20) };
+            Label legendProfit = new Label { Text = "¦ Net Profit", ForeColor = Color.Blue, Location = new Point(190, 5), Size = new Size(80, 20) };
 
             legendPanel.Controls.Add(legendRevenue);
             legendPanel.Controls.Add(legendCOGS);
@@ -349,8 +349,8 @@ namespace RetailManagement.UserForms
                 BackColor = Color.LightGray
             };
 
-            Label legendRevenue = new Label { Text = "â–  Revenue", ForeColor = Color.SteelBlue, Location = new Point(10, 5), Size = new Size(100, 20) };
-            Label legendProfit = new Label { Text = "â–  Gross Profit", ForeColor = Color.Orange, Location = new Point(120, 5), Size = new Size(100, 20) };
+            Label legendRevenue = new Label { Text = "¦ Revenue", ForeColor = Color.SteelBlue, Location = new Point(10, 5), Size = new Size(100, 20) };
+            Label legendProfit = new Label { Text = "¦ Gross Profit", ForeColor = Color.Orange, Location = new Point(120, 5), Size = new Size(100, 20) };
 
             legendPanel.Controls.Add(legendRevenue);
             legendPanel.Controls.Add(legendProfit);
@@ -371,8 +371,8 @@ namespace RetailManagement.UserForms
 
             // Add columns for category chart data
             dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "Category", HeaderText = "Category", Width = 200 });
-            dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "Revenue", HeaderText = "Revenue", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
-            dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossProfit", HeaderText = "Gross Profit", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "Revenue", HeaderText = "Revenue", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
+            dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossProfit", HeaderText = "Gross Profit", Width = 150, DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
             dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "GrossMargin", HeaderText = "Gross Margin %", Width = 120, DefaultCellStyle = new DataGridViewCellStyle { Format = "P2" } });
             dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "RevenueBar", HeaderText = "Revenue Visual", Width = 200 });
             dgvCategoryChart.Columns.Add(new DataGridViewTextBoxColumn { Name = "ProfitBar", HeaderText = "Profit Visual", Width = 200 });
@@ -581,11 +581,11 @@ namespace RetailManagement.UserForms
             // You can add labels to display these values
             string report = $"Profit & Loss Statement\n" +
                           $"Period: {dateTimePicker1.Value:dd/MM/yyyy} - {dateTimePicker2.Value:dd/MM/yyyy}\n\n" +
-                          $"Sales Revenue: ${salesRevenue:N2}\n" +
-                          $"Cost of Goods Sold: ${costOfGoodsSold:N2}\n" +
-                          $"Gross Profit: ${grossProfit:N2}\n" +
-                          $"Operating Expenses: ${operatingExpenses:N2}\n" +
-                          $"Net Profit: ${netProfit:N2}\n\n" +
+                          $"Sales Revenue: {salesRevenue:N2}\n" +
+                          $"Cost of Goods Sold: {costOfGoodsSold:N2}\n" +
+                          $"Gross Profit: {grossProfit:N2}\n" +
+                          $"Operating Expenses: {operatingExpenses:N2}\n" +
+                          $"Net Profit: {netProfit:N2}\n\n" +
                           $"Gross Profit Margin: {(grossProfit > 0 ? (grossProfit / salesRevenue * 100) : 0):N1}%\n" +
                           $"Net Profit Margin: {(netProfit > 0 ? (netProfit / salesRevenue * 100) : 0):N1}%";
 
@@ -928,8 +928,8 @@ namespace RetailManagement.UserForms
                         // Create visual bars using text characters
                         int revenueBarLength = maxRevenue != 0 ? (int)((revenue / maxRevenue) * 20) : 0;
                         int profitBarLength = maxRevenue != 0 ? (int)((grossProfit / maxRevenue) * 20) : 0;
-                        string revenueBar = new string('â–ˆ', revenueBarLength) + new string('â–‘', 20 - revenueBarLength);
-                        string profitBar = new string('â–ˆ', profitBarLength) + new string('â–‘', 20 - profitBarLength);
+                        string revenueBar = new string('¦', revenueBarLength) + new string('¦', 20 - revenueBarLength);
+                        string profitBar = new string('¦', profitBarLength) + new string('¦', 20 - profitBarLength);
 
                         dgvCategoryChart.Rows.Add(category, revenue, grossProfit, grossMargin, revenueBar, profitBar);
                     }

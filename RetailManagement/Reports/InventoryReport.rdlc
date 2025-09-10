@@ -574,7 +574,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!Price.Value, "C2")</Value>
+                                  <Value>=Format(Fields!Price.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -642,7 +642,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!StockValue.Value, "C2")</Value>
+                                  <Value>=Format(Fields!StockValue.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -747,7 +747,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Items: {0} | Total Stock Value: {1} | Low Stock Items: {2}", Count(Fields!ItemID.Value), Format(Sum(Fields!StockValue.Value), "C2"), Count(IIf(Fields!StockQuantity.Value <= 10, 1, Nothing)))</Value>
+                    <Value>=String.Format("Total Items: {0} | Total Stock Value: {1} | Low Stock Items: {2}", Count(Fields!ItemID.Value), Format(Sum(Fields!StockValue.Value), "N2"), Count(IIf(Fields!StockQuantity.Value <= 10, 1, Nothing)))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

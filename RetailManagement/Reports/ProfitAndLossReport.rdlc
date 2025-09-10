@@ -526,7 +526,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalSales.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalSales.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -561,7 +561,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalCOGS.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalCOGS.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -594,7 +594,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalExpenses.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalExpenses.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -627,7 +627,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!NetProfit.Value, "C2")</Value>
+                                  <Value>=Format(Fields!NetProfit.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -730,7 +730,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("📊 COMPREHENSIVE P&L ANALYSIS - {0} | Net Profit: {1} | Margin: {2} | Transactions: {3} | Customers: {4} | Top Category: {5}", Fields!Period.Value, Format(Fields!NetProfit.Value, "C2"), Format(Fields!NetProfitMargin.Value, "P2"), Fields!TotalTransactions.Value, Fields!UniqueCustomers.Value, Fields!TopCategory.Value)</Value>
+                    <Value>=String.Format("📊 COMPREHENSIVE P&L ANALYSIS - {0} | Net Profit: {1} | Margin: {2} | Transactions: {3} | Customers: {4} | Top Category: {5}", Fields!Period.Value, Format(Fields!NetProfit.Value, "N2"), Format(Fields!NetProfitMargin.Value, "P2"), Fields!TotalTransactions.Value, Fields!UniqueCustomers.Value, Fields!TopCategory.Value)</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

@@ -737,7 +737,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TaxableAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TaxableAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -770,7 +770,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!CGSTAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!CGSTAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -803,7 +803,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!SGSTAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!SGSTAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -836,7 +836,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!IGSTAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!IGSTAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -869,7 +869,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalGST.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalGST.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -903,7 +903,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -975,7 +975,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Taxable Amount: {0} | Total CGST: {1} | Total SGST: {2} | Total IGST: {3} | Total GST: {4} | Total Amount: {5}", Format(Sum(Fields!TaxableAmount.Value), "C2"), Format(Sum(Fields!CGSTAmount.Value), "C2"), Format(Sum(Fields!SGSTAmount.Value), "C2"), Format(Sum(Fields!IGSTAmount.Value), "C2"), Format(Sum(Fields!TotalGST.Value), "C2"), Format(Sum(Fields!TotalAmount.Value), "C2"))</Value>
+                    <Value>=String.Format("Total Taxable Amount: {0} | Total CGST: {1} | Total SGST: {2} | Total IGST: {3} | Total GST: {4} | Total Amount: {5}", Format(Sum(Fields!TaxableAmount.Value), "N2"), Format(Sum(Fields!CGSTAmount.Value), "N2"), Format(Sum(Fields!SGSTAmount.Value), "N2"), Format(Sum(Fields!IGSTAmount.Value), "N2"), Format(Sum(Fields!TotalGST.Value), "N2"), Format(Sum(Fields!TotalAmount.Value), "N2"))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

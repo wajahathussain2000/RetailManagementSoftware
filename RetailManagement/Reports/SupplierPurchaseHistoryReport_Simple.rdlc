@@ -646,7 +646,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!UnitPrice.Value, "C2")</Value>
+                              <Value>=Format(Fields!UnitPrice.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -681,7 +681,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!TotalAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!TotalAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -716,7 +716,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!TaxAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!TaxAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -1475,7 +1475,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!UnitPrice.Value, "C2")</Value>
+                              <Value>=Format(Fields!UnitPrice.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -1510,7 +1510,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!TotalAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!TotalAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -1545,7 +1545,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!TaxAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!TaxAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>

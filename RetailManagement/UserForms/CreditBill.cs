@@ -36,6 +36,9 @@ namespace RetailManagement.UserForms
         private Button btnViewBalance;
         private decimal customerCurrentBalance = 0;
         private decimal customerCreditLimit = 0;
+        
+        // Search functionality (like NewPurchase form)  
+        private DataTable allItemsData; // Store all items for filtering
 
         public CreditBill()
         {
@@ -66,6 +69,12 @@ namespace RetailManagement.UserForms
             
             // Add customer balance functionality
             InitializeCustomerBalance();
+            
+            // Load items for search functionality
+            LoadItems();
+            
+            // Adjust layout positions to prevent overlapping (like NewPurchase)
+            AdjustLayoutPositions();
         }
 
         private void SetupEventHandlers()
@@ -150,8 +159,13 @@ namespace RetailManagement.UserForms
                 // Setup columns
                 dataGridView1.AutoGenerateColumns = true;
                 dataGridView1.AllowUserToAddRows = false;
-                dataGridView1.ReadOnly = true;
+                dataGridView1.AllowUserToDeleteRows = true; // Enable row deletion
+                dataGridView1.ReadOnly = false; // Allow editing for deletion
                 dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                
+                // Add event handlers for keyboard deletion (like NewPurchase form)
+                dataGridView1.KeyDown += DataGridView1_KeyDown;
+                dataGridView1.UserDeletingRow += DataGridView1_UserDeletingRow;
 
                 // Load customers and items
                 LoadCustomers();
@@ -264,8 +278,31 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                string query = "SELECT ItemID, ItemName, Price FROM Items WHERE IsActive = 1 ORDER BY ItemName";
+                string stockColumnName = DatabaseConnection.GetStockColumnName();
+                
+                // Check if Barcode column exists
+                string barcodeColumn = "";
+                try
+                {
+                    string checkColumnQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name = 'Barcode'";
+                    int columnExists = Convert.ToInt32(DatabaseConnection.ExecuteScalar(checkColumnQuery));
+                    if (columnExists > 0)
+                    {
+                        barcodeColumn = ", ISNULL(Barcode, '') as Barcode";
+                    }
+                }
+                catch
+                {
+                    barcodeColumn = ", '' as Barcode"; // Default empty barcode if column doesn't exist
+                }
+                
+                string query = $"SELECT ItemID, ItemName, Price, MRP, {stockColumnName} as StockQuantity, Category{barcodeColumn} FROM Items WHERE IsActive = 1 ORDER BY ItemName";
                 DataTable dt = DatabaseConnection.ExecuteQuery(query);
+                
+                // Store all items data for filtering
+                allItemsData = dt.Copy();
+                
+                // Bind items to the listBoxItems control
                 listBoxItems.DataSource = dt;
                 listBoxItems.DisplayMember = "ItemName";
                 listBoxItems.ValueMember = "ItemID";
@@ -418,6 +455,19 @@ namespace RetailManagement.UserForms
             currentPackLooseMode = currentPackLooseMode == "P" ? "L" : "P";
             button14.Text = currentPackLooseMode;
             UpdateRateBasedOnMode();
+        }
+
+        private void btnNewItem_Click(object sender, EventArgs e)
+        {
+            Items items = new Items();
+            items.ShowDialog();
+            LoadItems(); // Reload items after adding new one
+        }
+
+        private void AdjustLayoutPositions()
+        {
+            // Adjust layout positions to prevent overlapping controls
+            // This method can be expanded as needed for layout adjustments
         }
 
         private void btnAddItem_Click(object sender, EventArgs e)
@@ -909,7 +959,7 @@ namespace RetailManagement.UserForms
                     decimal availableCredit = customerCreditLimit - customerCurrentBalance;
 
                     // Update UI
-                    lblCurrentBalance.Text = customerCurrentBalance.ToString("C2");
+                    lblCurrentBalance.Text = customerCurrentBalance.ToString("N2");
                     lblCreditLimit.Text = $"Credit Limit: {customerCreditLimit:C2}";
                     lblAvailableCredit.Text = $"Available: {availableCredit:C2}";
 
@@ -1100,6 +1150,326 @@ namespace RetailManagement.UserForms
             
             // Generate new bill number
             GenerateBillNumber();
+        }
+
+
+
+
+
+        private void SetupKeyboardNavigation()
+        {
+            try
+            {
+                // Enable keyboard navigation for the form
+                this.KeyPreview = true;
+                this.KeyDown += CreditBill_KeyDown;
+                
+                // Enable keyboard navigation for listBoxItems
+                if (listBoxItems != null)
+                {
+                    listBoxItems.KeyDown += ListBoxItems_KeyDown;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error setting up keyboard navigation: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void TxtSearchItems_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                string searchText = txtSearchItems.Text.Trim();
+                
+                // If it's the placeholder text or empty, show all items
+                if (string.IsNullOrEmpty(searchText) || 
+                    searchText == "Type to search items by name or scan barcode...")
+                {
+                    if (listBoxItems != null && allItemsData != null)
+                    {
+                        listBoxItems.DataSource = allItemsData;
+                        listBoxItems.DisplayMember = "ItemName";
+                        listBoxItems.ValueMember = "ItemID";
+                    }
+                    return;
+                }
+
+                // Filter items by name or barcode
+                if (allItemsData != null)
+                {
+                    DataTable filteredData = allItemsData.Clone();
+                    foreach (DataRow row in allItemsData.Rows)
+                    {
+                        string itemName = row["ItemName"].ToString().ToLower();
+                        string barcode = "";
+                        string category = "";
+                        
+                        // Check if Barcode column exists and has data
+                        if (allItemsData.Columns.Contains("Barcode") && row["Barcode"] != DBNull.Value)
+                        {
+                            barcode = row["Barcode"].ToString().ToLower();
+                        }
+                        
+                        // Check if Category column exists and has data
+                        if (allItemsData.Columns.Contains("Category") && row["Category"] != DBNull.Value)
+                        {
+                            category = row["Category"].ToString().ToLower();
+                        }
+                        
+                        if (itemName.Contains(searchText.ToLower()) || 
+                            barcode.Contains(searchText.ToLower()) ||
+                            category.Contains(searchText.ToLower()))
+                        {
+                            filteredData.ImportRow(row);
+                        }
+                    }
+
+                    listBoxItems.DataSource = filteredData;
+                    listBoxItems.DisplayMember = "ItemName";
+                    listBoxItems.ValueMember = "ItemID";
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Search error: {ex.Message}");
+            }
+        }
+
+        private void TxtSearchItems_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                // Handle arrow keys to navigate listbox from search box
+                if (e.KeyCode == Keys.Down && listBoxItems != null && listBoxItems.Items.Count > 0)
+                {
+                    listBoxItems.Focus();
+                    listBoxItems.SelectedIndex = 0;
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.Enter && listBoxItems != null && listBoxItems.Items.Count > 0)
+                {
+                    // Auto-select first item when Enter is pressed
+                    listBoxItems.SelectedIndex = 0;
+                    LoadSelectedItemDetails();
+                    txtSearchItems.Clear();
+                    TxtSearchItems_LostFocus(null, null); // Restore placeholder
+                    
+                    // Focus on quantity field for quick entry
+                    textBox4.Focus();
+                    textBox4.SelectAll();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error handling key press: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void TxtSearchItems_GotFocus(object sender, EventArgs e)
+        {
+            if (txtSearchItems.Text == "Type to search items by name or scan barcode...")
+            {
+                txtSearchItems.Text = "";
+                txtSearchItems.ForeColor = Color.Black;
+            }
+        }
+
+        private void TxtSearchItems_LostFocus(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearchItems.Text))
+            {
+                txtSearchItems.Text = "Type to search items by name or scan barcode...";
+                txtSearchItems.ForeColor = Color.Gray;
+            }
+        }
+
+        private void ListBoxItems_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (e.KeyCode == Keys.Enter && listBoxItems.SelectedIndex >= 0)
+                {
+                    LoadSelectedItemDetails();
+                    textBox4.Focus();
+                    textBox4.SelectAll();
+                }
+                else if (e.KeyCode == Keys.Escape)
+                {
+                    txtSearchItems.Focus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error handling list box key press: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CreditBill_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                // Global keyboard shortcuts
+                if (e.Control && e.KeyCode == Keys.F)
+                {
+                    txtSearchItems.Focus();
+                    txtSearchItems.SelectAll();
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.F3)
+                {
+                    txtSearchItems.Focus();
+                    txtSearchItems.SelectAll();
+                    e.Handled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error handling global key press: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadSelectedItemDetails()
+        {
+            try
+            {
+                if (listBoxItems != null && listBoxItems.SelectedValue != null)
+                {
+                    selectedItemID = Convert.ToInt32(listBoxItems.SelectedValue);
+                    string query = @"SELECT ItemID, ItemName, Price, MRP, PackSize, 
+                                    ISNULL(PackSize, '1') as PackSizeValue
+                                    FROM Items WHERE ItemID = @ItemID";
+                    SqlParameter[] parameters = { new SqlParameter("@ItemID", selectedItemID) };
+                    DataTable dt = DatabaseConnection.ExecuteQuery(query, parameters);
+                    
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow row = dt.Rows[0];
+                        
+                        // 1. Item name appears in textbox1 (Item Name field)
+                        textBox1.Text = row["ItemName"].ToString();
+                        
+                        // Store base rate and pack size - use MRP for sales
+                        baseRate = Convert.ToDecimal(row["MRP"]);
+                        
+                        // Parse pack size - handle both numeric and text values
+                        string packSizeStr = row["PackSizeValue"].ToString();
+                        if (!int.TryParse(packSizeStr, out packSize))
+                        {
+                            // If pack size is text like "10x10", extract first number
+                            string[] parts = packSizeStr.Split('x', 'X', '*');
+                            if (parts.Length > 0 && int.TryParse(parts[0], out int firstPart))
+                            {
+                                packSize = firstPart;
+                            }
+                            else
+                            {
+                                packSize = 1; // Default if can't parse
+                            }
+                        }
+                        
+                        // 2. Default to P (Pack) mode
+                        currentPackLooseMode = "P";
+                        textBox2.Text = "P";
+                        button14.Text = "P";
+                        
+                        // 3. Set rate based on P/L mode
+                        UpdateRateBasedOnMode();
+                        
+                        // Set default expiry date (2 years from today)
+                        if (dtpExpiry != null)
+                        {
+                            dtpExpiry.Value = DateTime.Now.AddYears(2);
+                        }
+                        
+                        // Clear other fields
+                        textBox4.Text = ""; // Qty
+                        textBox5.Text = "0"; // Bonus
+                        textBox6.Text = "0"; // Dis1
+                        textBox7.Text = "0"; // Dis2
+                        textBox8.Text = "0"; // Tax
+                        textBox10.Text = "0.00"; // Total
+                        
+                        // Focus on quantity field
+                        textBox4.Focus();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading item details: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+
+        // Keyboard deletion functionality (same as NewPurchase and NewBill forms)
+        private void DataGridView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                DeleteSelectedRow();
+                e.Handled = true;
+            }
+        }
+
+        private void DataGridView1_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            string itemName = e.Row.Cells["ItemName"].Value?.ToString() ?? "Unknown Item";
+            
+            if (MessageBox.Show($"Are you sure you want to delete '{itemName}' from this credit bill?", 
+                "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            {
+                e.Cancel = true;
+            }
+            else
+            {
+                // Recalculate totals after row is deleted
+                this.BeginInvoke(new Action(() => CalculateOverallTotals()));
+            }
+        }
+
+        private void DeleteSelectedRow()
+        {
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
+                {
+                    DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                    string itemName = selectedRow.Cells["ItemName"].Value?.ToString() ?? "Unknown Item";
+                    
+                    if (MessageBox.Show($"Are you sure you want to delete '{itemName}' from this credit bill?", 
+                        "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        // Remove from DataTable (this will automatically update the DataGridView)
+                        DataRowView rowView = selectedRow.DataBoundItem as DataRowView;
+                        if (rowView != null)
+                        {
+                            rowView.Row.Delete();
+                        }
+                        
+                        // Recalculate totals
+                        CalculateOverallTotals();
+                        
+                        MessageBox.Show("Item removed from credit bill successfully.", "Item Removed", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a row to delete.", "No Selection", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting row: {ex.Message}", "Delete Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

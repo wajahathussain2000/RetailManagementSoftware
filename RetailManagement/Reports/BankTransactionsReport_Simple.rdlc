@@ -642,7 +642,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!DebitAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!DebitAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -677,7 +677,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!CreditAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!CreditAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -712,7 +712,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!RunningBalance.Value, "C2")</Value>
+                              <Value>=Format(Fields!RunningBalance.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -1467,7 +1467,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!DebitAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!DebitAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -1502,7 +1502,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!CreditAmount.Value, "C2")</Value>
+                              <Value>=Format(Fields!CreditAmount.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -1537,7 +1537,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!RunningBalance.Value, "C2")</Value>
+                              <Value>=Format(Fields!RunningBalance.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>

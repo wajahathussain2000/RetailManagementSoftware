@@ -491,7 +491,7 @@ namespace RetailManagement.UserForms
                 {
                     if (dgvSupplierBalance.Columns.Contains(colName))
                     {
-                        dgvSupplierBalance.Columns[colName].DefaultCellStyle.Format = "C2";
+                        dgvSupplierBalance.Columns[colName].DefaultCellStyle.Format = "N2";
                         dgvSupplierBalance.Columns[colName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                     }
                 }
@@ -604,7 +604,7 @@ namespace RetailManagement.UserForms
                 {
                     if (dgvDetailedAnalysis.Columns.Contains(colName))
                     {
-                        dgvDetailedAnalysis.Columns[colName].DefaultCellStyle.Format = "C2";
+                        dgvDetailedAnalysis.Columns[colName].DefaultCellStyle.Format = "N2";
                         dgvDetailedAnalysis.Columns[colName].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                     }
                 }
@@ -704,7 +704,7 @@ namespace RetailManagement.UserForms
                 {
                     if (col.Name != "Supplier")
                     {
-                        col.DefaultCellStyle.Format = "C2";
+                        col.DefaultCellStyle.Format = "N2";
                         col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                     }
                 }

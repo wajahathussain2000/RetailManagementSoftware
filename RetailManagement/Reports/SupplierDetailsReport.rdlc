@@ -585,7 +585,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>=Format(Fields!TotalPurchaseAmount.Value, "C")</Value>
+                                      <Value>=Format(Fields!TotalPurchaseAmount.Value, "N2")</Value>
                                       <Style>
                                         <FontFamily>Arial</FontFamily>
                                         <FontSize>8pt</FontSize>
@@ -620,7 +620,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>=Format(Fields!OutstandingAmount.Value, "C")</Value>
+                                      <Value>=Format(Fields!OutstandingAmount.Value, "N2")</Value>
                                       <Style>
                                         <FontFamily>Arial</FontFamily>
                                         <FontSize>8pt</FontSize>

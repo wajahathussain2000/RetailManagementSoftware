@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -87,7 +87,7 @@ namespace RetailManagement.UserForms
                 Size = new Size(200, 20),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            comboBox2.Items.AddRange(new object[] { "All Items", "Low Stock (≤10)", "Out of Stock", "By Value (High to Low)" });
+            comboBox2.Items.AddRange(new object[] { "All Items", "Low Stock (=10)", "Out of Stock", "By Value (High to Low)" });
 
             // Create search textbox with placeholder
             textBox1 = new TextBox
@@ -129,7 +129,7 @@ namespace RetailManagement.UserForms
 
             radioButton2 = new RadioButton
             {
-                Text = "Low Stock (≤10)",
+                Text = "Low Stock (=10)",
                 Location = new Point(350, 40),
                 Size = new Size(120, 20),
                 Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold)
@@ -442,8 +442,8 @@ namespace RetailManagement.UserForms
 
             string summary = $"Stock Summary:\n" +
                            $"Total Items: {totalItems}\n" +
-                           $"Total Stock Value: ${totalStockValue:N2}\n" +
-                           $"Low Stock Items (≤10): {lowStockItems}\n" +
+                           $"Total Stock Value: {totalStockValue:N2}\n" +
+                           $"Low Stock Items (=10): {lowStockItems}\n" +
                            $"Out of Stock Items: {outOfStockItems}";
 
             MessageBox.Show(summary, "Stock Report Summary", MessageBoxButtons.OK, MessageBoxIcon.Information);

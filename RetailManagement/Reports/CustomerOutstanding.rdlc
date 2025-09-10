@@ -587,7 +587,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalSales.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalSales.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -620,7 +620,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalPayments.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalPayments.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -653,7 +653,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!OutstandingAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!OutstandingAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -825,7 +825,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Outstanding Customers: {0} | Total Outstanding Amount: {1}", Count(Fields!CustomerID.Value), Format(Sum(Fields!OutstandingAmount.Value), "C2"))</Value>
+                    <Value>=String.Format("Total Outstanding Customers: {0} | Total Outstanding Amount: {1}", Count(Fields!CustomerID.Value), Format(Sum(Fields!OutstandingAmount.Value), "N2"))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

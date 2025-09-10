@@ -652,6 +652,18 @@
     <Content Include="Reports\SupplierBalanceReport.rdlc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Reports\BankTransactionsReport_Simple.rdlc" />
+    <None Include="Reports\CustomerSalesReport.rdlc" />
+    <None Include="Reports\DailyPurchaseReport.rdlc" />
+    <None Include="Reports\DailySalesPurchaseReport_Simple.rdlc" />
+    <None Include="Reports\ExpenseReport_Enhanced.rdlc" />
+    <None Include="Reports\ProfitLossReport_Simple.rdlc" />
+    <None Include="Reports\SalesReturnReport_Simple.rdlc" />
+    <None Include="Reports\SalesSummaryReport.rdlc" />
+    <None Include="Reports\SupplierDetailsReport.rdlc" />
+    <None Include="Reports\SupplierLedgerReport_Simple.rdlc" />
+    <None Include="Reports\SupplierPurchaseHistoryReport_Simple.rdlc" />
+    <None Include="Reports\TrialBalanceReport_Simple.rdlc" />
     <None Include="Resources\office-building.png" />
   </ItemGroup>
   <ItemGroup>

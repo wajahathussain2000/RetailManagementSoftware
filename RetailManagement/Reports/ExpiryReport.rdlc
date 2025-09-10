@@ -724,7 +724,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!StockValue.Value, "C2")</Value>
+                                  <Value>=Format(Fields!StockValue.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -896,7 +896,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Items: {0} | Total Value: {1} | Expired Items: {2} | Expiring Soon: {3}", Count(Fields!ItemID.Value), Format(Sum(Fields!StockValue.Value), "C2"), Count(IIf(Fields!Status.Value = "Expired", 1, Nothing)), Count(IIf(Fields!Status.Value = "Expiring Soon", 1, Nothing)))</Value>
+                    <Value>=String.Format("Total Items: {0} | Total Value: {1} | Expired Items: {2} | Expiring Soon: {3}", Count(Fields!ItemID.Value), Format(Sum(Fields!StockValue.Value), "N2"), Count(IIf(Fields!Status.Value = "Expired", 1, Nothing)), Count(IIf(Fields!Status.Value = "Expiring Soon", 1, Nothing)))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

@@ -757,7 +757,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!RefundAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!RefundAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -895,7 +895,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Returns: {0} | Total Refund Amount: {1} | Average Return Value: {2}", Count(Fields!ReturnID.Value), Format(Sum(Fields!RefundAmount.Value), "C2"), Format(Avg(Fields!RefundAmount.Value), "C2"))</Value>
+                    <Value>=String.Format("Total Returns: {0} | Total Refund Amount: {1} | Average Return Value: {2}", Count(Fields!ReturnID.Value), Format(Sum(Fields!RefundAmount.Value), "N2"), Format(Avg(Fields!RefundAmount.Value), "N2"))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

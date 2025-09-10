@@ -295,13 +295,13 @@ namespace RetailManagement.UserForms
                 // Format currency columns
                 if (dgvCustomers.Columns["CreditLimit"] != null)
                 {
-                    dgvCustomers.Columns["CreditLimit"].DefaultCellStyle.Format = "C2";
+                    dgvCustomers.Columns["CreditLimit"].DefaultCellStyle.Format = "N2";
                     dgvCustomers.Columns["CreditLimit"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                 }
                 
                 if (dgvCustomers.Columns["CurrentBalance"] != null)
                 {
-                    dgvCustomers.Columns["CurrentBalance"].DefaultCellStyle.Format = "C2";
+                    dgvCustomers.Columns["CurrentBalance"].DefaultCellStyle.Format = "N2";
                     dgvCustomers.Columns["CurrentBalance"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                 }
                 

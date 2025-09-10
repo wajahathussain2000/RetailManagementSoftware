@@ -489,7 +489,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalSales.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalSales.Value, "N2")</Value>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -519,7 +519,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalPayments.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalPayments.Value, "N2")</Value>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -549,7 +549,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!OutstandingAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!OutstandingAmount.Value, "N2")</Value>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -662,7 +662,7 @@
                     </Style>
                   </TextRun>
                   <TextRun>
-                    <Value>=Format(Sum(Fields!OutstandingAmount.Value), "C2")</Value>
+                    <Value>=Format(Sum(Fields!OutstandingAmount.Value), "N2")</Value>
                     <Style>
                       <FontWeight>Bold</FontWeight>
                     </Style>

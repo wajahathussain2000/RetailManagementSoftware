@@ -611,7 +611,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!UnitPrice.Value, "C2")</Value>
+                                  <Value>=Format(Fields!UnitPrice.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -644,7 +644,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalAmount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!TotalAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -747,7 +747,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Purchases: {0} | Total Amount: {1}", Count(Fields!PurchaseID.Value), Format(Sum(Fields!TotalAmount.Value), "C2"))</Value>
+                    <Value>=String.Format("Total Purchases: {0} | Total Amount: {1}", Count(Fields!PurchaseID.Value), Format(Sum(Fields!TotalAmount.Value), "N2"))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

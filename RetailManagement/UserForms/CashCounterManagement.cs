@@ -229,7 +229,7 @@ namespace RetailManagement.UserForms
             dgvTransactions.Columns["UserName"].Width = 120;
 
             // Formatting
-            dgvTransactions.Columns["Amount"].DefaultCellStyle.Format = "C2";
+            dgvTransactions.Columns["Amount"].DefaultCellStyle.Format = "N2";
             dgvTransactions.Columns["Amount"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
         }
 
@@ -299,9 +299,9 @@ namespace RetailManagement.UserForms
                 
                 if (result.Rows.Count > 0)
                 {
-                    txtCashSales.Text = SafeDataHelper.SafeToDecimal(result.Rows[0]["CashSales"]).ToString("C2");
-                    txtCardSales.Text = SafeDataHelper.SafeToDecimal(result.Rows[0]["CardSales"]).ToString("C2");
-                    txtUPISales.Text = SafeDataHelper.SafeToDecimal(result.Rows[0]["UPISales"]).ToString("C2");
+                    txtCashSales.Text = SafeDataHelper.SafeToDecimal(result.Rows[0]["CashSales"]).ToString("N2");
+                    txtCardSales.Text = SafeDataHelper.SafeToDecimal(result.Rows[0]["CardSales"]).ToString("N2");
+                    txtUPISales.Text = SafeDataHelper.SafeToDecimal(result.Rows[0]["UPISales"]).ToString("N2");
                 }
 
                 // Load expenses
@@ -311,7 +311,7 @@ namespace RetailManagement.UserForms
                 
                 if (expenseResult.Rows.Count > 0)
                 {
-                    txtExpenses.Text = SafeDataHelper.SafeToDecimal(expenseResult.Rows[0]["TotalExpenses"]).ToString("C2");
+                    txtExpenses.Text = SafeDataHelper.SafeToDecimal(expenseResult.Rows[0]["TotalExpenses"]).ToString("N2");
                 }
             }
             catch (Exception ex)

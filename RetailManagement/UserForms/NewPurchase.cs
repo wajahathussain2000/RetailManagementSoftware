@@ -1758,8 +1758,8 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                // Move barcode slightly to the right to avoid button overlap
-                pictureBoxBarcode.Location = new Point(1020, 80); // Moved slightly right
+                // Move barcode slightly to the right and up to avoid button overlap
+                pictureBoxBarcode.Location = new Point(1020, 30); // Moved up from 80 to 50
                 pictureBoxBarcode.Size = new Size(160, 50); // Slightly smaller
                 
                 // Move QR code down and make it smaller to avoid list overlap

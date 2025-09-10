@@ -319,11 +319,11 @@ namespace RetailManagement.UserForms
             
             // Format currency columns
             if (dgv.Columns["TotalAmount"] != null)
-                dgv.Columns["TotalAmount"].DefaultCellStyle.Format = "C2";
+                dgv.Columns["TotalAmount"].DefaultCellStyle.Format = "N2";
             if (dgv.Columns["Discount"] != null)
-                dgv.Columns["Discount"].DefaultCellStyle.Format = "C2";
+                dgv.Columns["Discount"].DefaultCellStyle.Format = "N2";
             if (dgv.Columns["NetAmount"] != null)
-                dgv.Columns["NetAmount"].DefaultCellStyle.Format = "C2";
+                dgv.Columns["NetAmount"].DefaultCellStyle.Format = "N2";
                 
             // Make columns more readable
             foreach (DataGridViewColumn column in dgv.Columns)
@@ -362,9 +362,9 @@ namespace RetailManagement.UserForms
 
             string summary = $"Report Summary:\n" +
                            $"Total Transactions: {totalTransactions}\n" +
-                           $"Total Sales: ${totalSales:N2}\n" +
-                           $"Total Discount: ${totalDiscount:N2}\n" +
-                           $"Net Amount: ${totalNetAmount:N2}";
+                           $"Total Sales: {totalSales:N2}\n" +
+                           $"Total Discount: {totalDiscount:N2}\n" +
+                           $"Net Amount: {totalNetAmount:N2}";
 
             MessageBox.Show(summary, "Sales Report Summary", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

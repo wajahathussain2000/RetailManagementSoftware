@@ -1,4 +1,4 @@
-﻿namespace RetailManagement.UserForms
+namespace RetailManagement.UserForms
 {
     partial class Companies
     {

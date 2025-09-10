@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -220,9 +220,9 @@ ORDER BY TransactionDate";
             dgv.Columns["Balance"].DataPropertyName = "Balance";
 
             // Format currency columns
-            dgv.Columns["Debit"].DefaultCellStyle.Format = "C2";
-            dgv.Columns["Credit"].DefaultCellStyle.Format = "C2";
-            dgv.Columns["Balance"].DefaultCellStyle.Format = "C2";
+            dgv.Columns["Debit"].DefaultCellStyle.Format = "N2";
+            dgv.Columns["Credit"].DefaultCellStyle.Format = "N2";
+            dgv.Columns["Balance"].DefaultCellStyle.Format = "N2";
             dgv.Columns["TransactionDate"].DefaultCellStyle.Format = "dd/MM/yyyy";
 
             dgv.DataSource = ledgerData;

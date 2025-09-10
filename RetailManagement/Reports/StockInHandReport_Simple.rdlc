@@ -460,7 +460,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!Price.Value, "C")</Value>
+                              <Value>=Format(Fields!Price.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>
@@ -532,7 +532,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Format(Fields!StockValue.Value, "C")</Value>
+                              <Value>=Format(Fields!StockValue.Value, "N2")</Value>
                               <Style>
                                 <FontFamily>Arial</FontFamily>
                                 <FontSize>8pt</FontSize>

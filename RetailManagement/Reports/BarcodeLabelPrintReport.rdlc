@@ -542,7 +542,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!Price.Value, "C2")</Value>
+                                  <Value>=Format(Fields!Price.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -675,7 +675,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Items: {0} | Total Stock Value: {1} | Print Date: {2}", Count(Fields!ItemID.Value), Format(Sum(Fields!Price.Value * Fields!StockQuantity.Value), "C2"), Format(Now(), "dd/MM/yyyy"))</Value>
+                    <Value>=String.Format("Total Items: {0} | Total Stock Value: {1} | Print Date: {2}", Count(Fields!ItemID.Value), Format(Sum(Fields!Price.Value * Fields!StockQuantity.Value), "N2"), Format(Now(), "dd/MM/yyyy"))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

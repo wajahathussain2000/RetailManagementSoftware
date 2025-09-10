@@ -532,7 +532,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!Amount.Value, "C2")</Value>
+                                  <Value>=Format(Fields!Amount.Value, "N2")</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -667,7 +667,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=String.Format("Total Expenses: {0} | Total Amount: {1}", Count(Fields!ExpenseID.Value), Format(Sum(Fields!Amount.Value), "C2"))</Value>
+                    <Value>=String.Format("Total Expenses: {0} | Total Amount: {1}", Count(Fields!ExpenseID.Value), Format(Sum(Fields!Amount.Value), "N2"))</Value>
                     <Style>
                       <FontSize>10pt</FontSize>
                       <FontWeight>Bold</FontWeight>

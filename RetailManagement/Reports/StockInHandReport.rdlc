@@ -406,7 +406,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!Price.Value, "C2")</Value>
+                                  <Value>=Format(Fields!Price.Value, "N2")</Value>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -466,7 +466,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!StockValue.Value, "C2")</Value>
+                                  <Value>=Format(Fields!StockValue.Value, "N2")</Value>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -561,7 +561,7 @@
               <Paragraph>
                 <TextRuns>
                   <TextRun>
-                    <Value>=IIF(CountRows() > 0, "Total Items: " & CountRows() & " | Total Stock Value: " & Format(Sum(Fields!StockValue.Value), "C2"), "No items found")</Value>
+                    <Value>=IIF(CountRows() > 0, "Total Items: " & CountRows() & " | Total Stock Value: " & Format(Sum(Fields!StockValue.Value), "N2"), "No items found")</Value>
                     <Style>
                       <FontWeight>Bold</FontWeight>
                     </Style>

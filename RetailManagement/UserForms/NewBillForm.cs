@@ -39,7 +39,9 @@ namespace RetailManagement.UserForms
             CreateExpiryDatePicker();
             SetupEventHandlers();
             
-            // Search functionality can be added here in the future
+            // Create search functionality
+            CreateSearchControls();
+            SetupKeyboardNavigation();
             
             // Wire up button events
             button1.Click += btnAddItem_Click;
@@ -78,40 +80,52 @@ namespace RetailManagement.UserForms
             textBox8.TextChanged += CalculateTotal; // Tax
         }
 
-        // Search and Keyboard Navigation Methods (like NewPurchase)
+        // Search and Keyboard Navigation Methods (aligned like NewPurchase form)
         private void CreateSearchControls()
         {
             try
             {
-                // Create search label
+                // First, find the listBoxItems control
+                Control listBox = this.Controls.Find("listBoxItems", true).FirstOrDefault();
+                if (listBox == null)
+                {
+                    MessageBox.Show("ListBox control not found!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Create search label with fixed coordinates (like NewPurchase)
                 lblSearchItems = new Label();
                 lblSearchItems.Text = "🔍 Search Items (Name/Barcode):";
                 lblSearchItems.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Bold);
-                lblSearchItems.Location = new Point(780, 170);
+                lblSearchItems.Location = new Point(780, 170); // Same as NewPurchase
                 lblSearchItems.Size = new Size(180, 15);
                 lblSearchItems.ForeColor = Color.DarkBlue;
                 this.Controls.Add(lblSearchItems);
 
-                // Create search textbox
+                // Create search textbox with fixed coordinates (like NewPurchase)
                 txtSearchItems = new TextBox();
-                txtSearchItems.Location = new Point(780, 180);
-                txtSearchItems.Size = new Size(280, 20);
+                txtSearchItems.Location = new Point(780, 180); // Same as NewPurchase - 10px below label
+                txtSearchItems.Size = new Size(280, 20); // Same width as NewPurchase
                 txtSearchItems.Font = new Font("Microsoft Sans Serif", 9F);
-                txtSearchItems.ForeColor = Color.Gray;
-                txtSearchItems.Text = "Type to search items by name or scan barcode...";
                 txtSearchItems.TabIndex = 0; // Make it first in tab order
+                
+                // Custom placeholder implementation for older .NET Framework
+                txtSearchItems.ForeColor = Color.Gray;
+                txtSearchItems.Text = "Type to search items...";
+                
+                // Add focus handlers for custom placeholder
+                txtSearchItems.GotFocus += TxtSearchItems_GotFocus;
+                txtSearchItems.LostFocus += TxtSearchItems_LostFocus;
                 
                 // Add event handlers
                 txtSearchItems.TextChanged += TxtSearchItems_TextChanged;
                 txtSearchItems.KeyDown += TxtSearchItems_KeyDown;
-                txtSearchItems.GotFocus += TxtSearchItems_GotFocus;
-                txtSearchItems.LostFocus += TxtSearchItems_LostFocus;
                 
                 this.Controls.Add(txtSearchItems);
 
-                // Keep listBoxItems in original position
-                listBoxItems.Location = new Point(720, 198);
-                listBoxItems.Size = new Size(280, 318);
+                // Position listbox like NewPurchase form (60px left, 18px below search)
+                listBox.Location = new Point(720, 198); // Same as NewPurchase
+                listBox.Size = new Size(280, 318); // Same size as NewPurchase
             }
             catch (Exception ex)
             {
@@ -144,11 +158,12 @@ namespace RetailManagement.UserForms
             {
                 string searchText = txtSearchItems.Text.Trim();
                 
-                // If it's the placeholder text or empty, show all items
-                if (string.IsNullOrEmpty(searchText) || 
-                    searchText == "Type to search items by name or scan barcode...")
+                // If empty or placeholder text, show all items
+                if (string.IsNullOrEmpty(searchText) || searchText == "Type to search items...")
                 {
                     listBoxItems.DataSource = allItemsData;
+                    listBoxItems.DisplayMember = "ItemName";
+                    listBoxItems.ValueMember = "ItemID";
                     return;
                 }
 
@@ -157,7 +172,13 @@ namespace RetailManagement.UserForms
                 foreach (DataRow row in allItemsData.Rows)
                 {
                     string itemName = row["ItemName"].ToString().ToLower();
-                    string barcode = row["Barcode"].ToString().ToLower();
+                    string barcode = "";
+                    
+                    // Check if Barcode column exists and has data
+                    if (allItemsData.Columns.Contains("Barcode") && row["Barcode"] != DBNull.Value)
+                    {
+                        barcode = row["Barcode"].ToString().ToLower();
+                    }
                     
                     if (itemName.Contains(searchText.ToLower()) || barcode.Contains(searchText.ToLower()))
                     {
@@ -186,17 +207,21 @@ namespace RetailManagement.UserForms
                     listBoxItems.SelectedIndex = 0;
                     LoadSelectedItemDetails();
                     txtSearchItems.Clear();
-                    TxtSearchItems_LostFocus(null, null); // Restore placeholder
                     
                     // Focus on quantity field for quick entry
-                    textBox3.Focus();
-                    textBox3.SelectAll();
+                    textBox4.Focus(); // textBox4 is the quantity field
+                    textBox4.SelectAll();
                 }
                 else if (e.KeyCode == Keys.Down && listBoxItems.Items.Count > 0)
                 {
                     // Navigate to list box
                     listBoxItems.Focus();
                     if (listBoxItems.SelectedIndex < 0) listBoxItems.SelectedIndex = 0;
+                }
+                else if (e.KeyCode == Keys.Escape)
+                {
+                    // Clear search text
+                    txtSearchItems.Clear();
                 }
             }
             catch (Exception ex)
@@ -208,7 +233,7 @@ namespace RetailManagement.UserForms
 
         private void TxtSearchItems_GotFocus(object sender, EventArgs e)
         {
-            if (txtSearchItems.Text == "Type to search items by name or scan barcode...")
+            if (txtSearchItems.Text == "Type to search items...")
             {
                 txtSearchItems.Text = "";
                 txtSearchItems.ForeColor = Color.Black;
@@ -219,7 +244,7 @@ namespace RetailManagement.UserForms
         {
             if (string.IsNullOrWhiteSpace(txtSearchItems.Text))
             {
-                txtSearchItems.Text = "Type to search items by name or scan barcode...";
+                txtSearchItems.Text = "Type to search items...";
                 txtSearchItems.ForeColor = Color.Gray;
             }
         }
@@ -364,13 +389,17 @@ namespace RetailManagement.UserForms
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = true;
             dataGridView1.MultiSelect = false;
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.CellSelect;
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
             // Add event handlers for editing
             dataGridView1.CellDoubleClick += DataGridView1_CellDoubleClick;
             dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
             dataGridView1.CellEndEdit += DataGridView1_CellEndEdit;
             dataGridView1.CellClick += DataGridView1_CellClick;
+            
+            // Add event handlers for keyboard deletion (like NewPurchase form)
+            dataGridView1.KeyDown += DataGridView1_KeyDown;
+            dataGridView1.UserDeletingRow += DataGridView1_UserDeletingRow;
 
             // Bind the DataTable to the DataGridView
             dataGridView1.DataSource = billItems;
@@ -1560,6 +1589,71 @@ namespace RetailManagement.UserForms
             catch (Exception ex)
             {
                 throw new Exception($"Failed to load thermal receipt report: {ex.Message}");
+            }
+        }
+
+        // Keyboard deletion functionality (same as NewPurchase form)
+        private void DataGridView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                DeleteSelectedRow();
+                e.Handled = true;
+            }
+        }
+
+        private void DataGridView1_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            string itemName = e.Row.Cells["ItemName"].Value?.ToString() ?? "Unknown Item";
+            
+            if (MessageBox.Show($"Are you sure you want to delete '{itemName}' from this bill?", 
+                "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            {
+                e.Cancel = true;
+            }
+            else
+            {
+                // Recalculate totals after row is deleted
+                this.BeginInvoke(new Action(() => CalculateTotals()));
+            }
+        }
+
+        private void DeleteSelectedRow()
+        {
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
+                {
+                    DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                    string itemName = selectedRow.Cells["ItemName"].Value?.ToString() ?? "Unknown Item";
+                    
+                    if (MessageBox.Show($"Are you sure you want to delete '{itemName}' from this bill?", 
+                        "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        // Remove from DataTable (this will automatically update the DataGridView)
+                        DataRowView rowView = selectedRow.DataBoundItem as DataRowView;
+                        if (rowView != null)
+                        {
+                            rowView.Row.Delete();
+                        }
+                        
+                        // Recalculate totals
+                        CalculateTotals();
+                        
+                        MessageBox.Show("Item removed from bill successfully.", "Item Removed", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a row to delete.", "No Selection", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting row: {ex.Message}", "Delete Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

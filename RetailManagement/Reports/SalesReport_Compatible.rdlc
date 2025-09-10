@@ -394,7 +394,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!TotalAmount.Value, "C")</Value>
+                                  <Value>=Format(Fields!TotalAmount.Value, "N2")</Value>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -423,7 +423,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!Discount.Value, "C")</Value>
+                                  <Value>=Format(Fields!Discount.Value, "N2")</Value>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -452,7 +452,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Format(Fields!NetAmount.Value, "C")</Value>
+                                  <Value>=Format(Fields!NetAmount.Value, "N2")</Value>
                                   <Style>
                                     <FontWeight>Bold</FontWeight>
                                   </Style>

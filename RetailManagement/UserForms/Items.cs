@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -209,7 +209,7 @@ namespace RetailManagement.UserForms
                 HeaderText = "Price",
                 DataPropertyName = "Price",
                 Width = 100,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" }
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" }
             };
 
             DataGridViewTextBoxColumn colStockQuantity = new DataGridViewTextBoxColumn
