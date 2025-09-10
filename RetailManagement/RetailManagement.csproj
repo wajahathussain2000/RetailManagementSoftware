@@ -153,6 +153,9 @@
     <Compile Include="UserForms\EditBillTypeSelector.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UserForms\EditBillTypeSelector.Designer.cs">
+      <DependentUpon>EditBillTypeSelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserForms\Items.cs">
       <SubType>Form</SubType>
     </Compile>

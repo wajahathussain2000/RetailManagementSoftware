@@ -35,6 +35,12 @@ namespace RetailManagement.UserForms
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lblSalesTax = new System.Windows.Forms.Label();
+            this.txtSalesTax = new System.Windows.Forms.TextBox();
+            this.lblDisc2 = new System.Windows.Forms.Label();
+            this.txtDisc2 = new System.Windows.Forms.TextBox();
+            this.lblDisc1 = new System.Windows.Forms.Label();
+            this.txtDisc1 = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label9 = new System.Windows.Forms.Label();
@@ -57,12 +63,13 @@ namespace RetailManagement.UserForms
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.gridViewProducts = new System.Windows.Forms.DataGridView();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.btnExit = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
+            this.btnSaveNew = new System.Windows.Forms.Button();
             this.btnPrint = new System.Windows.Forms.Button();
             this.btnAdd = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
+            this.btnExit = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewProducts)).BeginInit();
             this.panel2.SuspendLayout();
@@ -73,6 +80,12 @@ namespace RetailManagement.UserForms
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel1.BackColor = System.Drawing.Color.SeaGreen;
+            this.panel1.Controls.Add(this.lblSalesTax);
+            this.panel1.Controls.Add(this.txtSalesTax);
+            this.panel1.Controls.Add(this.lblDisc2);
+            this.panel1.Controls.Add(this.txtDisc2);
+            this.panel1.Controls.Add(this.lblDisc1);
+            this.panel1.Controls.Add(this.txtDisc1);
             this.panel1.Controls.Add(this.label12);
             this.panel1.Controls.Add(this.checkBox1);
             this.panel1.Controls.Add(this.label9);
@@ -99,6 +112,69 @@ namespace RetailManagement.UserForms
             this.panel1.Size = new System.Drawing.Size(880, 531);
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            // 
+            // lblSalesTax
+            // 
+            this.lblSalesTax.AutoSize = true;
+            this.lblSalesTax.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSalesTax.ForeColor = System.Drawing.Color.White;
+            this.lblSalesTax.Location = new System.Drawing.Point(450, 178);
+            this.lblSalesTax.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblSalesTax.Name = "lblSalesTax";
+            this.lblSalesTax.Size = new System.Drawing.Size(92, 20);
+            this.lblSalesTax.TabIndex = 31;
+            this.lblSalesTax.Text = "Sales Tax";
+            // 
+            // txtSalesTax
+            // 
+            this.txtSalesTax.BackColor = System.Drawing.Color.LightYellow;
+            this.txtSalesTax.Location = new System.Drawing.Point(450, 198);
+            this.txtSalesTax.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtSalesTax.Name = "txtSalesTax";
+            this.txtSalesTax.Size = new System.Drawing.Size(100, 26);
+            this.txtSalesTax.TabIndex = 30;
+            // 
+            // lblDisc2
+            // 
+            this.lblDisc2.AutoSize = true;
+            this.lblDisc2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDisc2.ForeColor = System.Drawing.Color.White;
+            this.lblDisc2.Location = new System.Drawing.Point(450, 128);
+            this.lblDisc2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblDisc2.Name = "lblDisc2";
+            this.lblDisc2.Size = new System.Drawing.Size(64, 20);
+            this.lblDisc2.TabIndex = 29;
+            this.lblDisc2.Text = "Disc 2";
+            // 
+            // txtDisc2
+            // 
+            this.txtDisc2.BackColor = System.Drawing.Color.LightYellow;
+            this.txtDisc2.Location = new System.Drawing.Point(450, 148);
+            this.txtDisc2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtDisc2.Name = "txtDisc2";
+            this.txtDisc2.Size = new System.Drawing.Size(100, 26);
+            this.txtDisc2.TabIndex = 28;
+            // 
+            // lblDisc1
+            // 
+            this.lblDisc1.AutoSize = true;
+            this.lblDisc1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDisc1.ForeColor = System.Drawing.Color.White;
+            this.lblDisc1.Location = new System.Drawing.Point(450, 78);
+            this.lblDisc1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblDisc1.Name = "lblDisc1";
+            this.lblDisc1.Size = new System.Drawing.Size(64, 20);
+            this.lblDisc1.TabIndex = 27;
+            this.lblDisc1.Text = "Disc 1";
+            // 
+            // txtDisc1
+            // 
+            this.txtDisc1.BackColor = System.Drawing.Color.LightYellow;
+            this.txtDisc1.Location = new System.Drawing.Point(450, 98);
+            this.txtDisc1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtDisc1.Name = "txtDisc1";
+            this.txtDisc1.Size = new System.Drawing.Size(100, 26);
+            this.txtDisc1.TabIndex = 26;
             // 
             // label12
             // 
@@ -335,31 +411,20 @@ namespace RetailManagement.UserForms
             this.panel2.Controls.Add(this.btnExit);
             this.panel2.Controls.Add(this.btnCancel);
             this.panel2.Controls.Add(this.btnSave);
+            this.panel2.Controls.Add(this.btnSaveNew);
             this.panel2.Controls.Add(this.btnPrint);
             this.panel2.Controls.Add(this.btnAdd);
             this.panel2.Location = new System.Drawing.Point(18, 558);
             this.panel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(879, 154);
+            this.panel2.Size = new System.Drawing.Size(880, 154);
             this.panel2.TabIndex = 1;
-            // 
-            // btnExit
-            // 
-            this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExit.Location = new System.Drawing.Point(494, 49);
-            this.btnExit.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(112, 55);
-            this.btnExit.TabIndex = 4;
-            this.btnExit.Text = "Exit";
-            this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // btnCancel
             // 
             this.btnCancel.Enabled = false;
             this.btnCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCancel.Location = new System.Drawing.Point(372, 49);
+            this.btnCancel.Location = new System.Drawing.Point(490, 49);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(112, 55);
@@ -376,8 +441,20 @@ namespace RetailManagement.UserForms
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(112, 55);
             this.btnSave.TabIndex = 2;
-            this.btnSave.Text = "Save";
+            this.btnSave.Text = "Update";
             this.btnSave.UseVisualStyleBackColor = true;
+            // 
+            // btnSaveNew
+            // 
+            this.btnSaveNew.Enabled = false;
+            this.btnSaveNew.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSaveNew.Location = new System.Drawing.Point(370, 49);
+            this.btnSaveNew.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnSaveNew.Name = "btnSaveNew";
+            this.btnSaveNew.Size = new System.Drawing.Size(112, 55);
+            this.btnSaveNew.TabIndex = 3;
+            this.btnSaveNew.Text = "Save";
+            this.btnSaveNew.UseVisualStyleBackColor = true;
             // 
             // btnPrint
             // 
@@ -411,6 +488,18 @@ namespace RetailManagement.UserForms
             this.txtSearch.Size = new System.Drawing.Size(458, 36);
             this.txtSearch.TabIndex = 3;
             // 
+            // btnExit
+            // 
+            this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnExit.Location = new System.Drawing.Point(610, 49);
+            this.btnExit.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(112, 55);
+            this.btnExit.TabIndex = 4;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
             // Items
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -441,9 +530,9 @@ namespace RetailManagement.UserForms
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.Button btnPrint;
-        private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnSaveNew;
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboBox1;
@@ -465,5 +554,12 @@ namespace RetailManagement.UserForms
         private System.Windows.Forms.TextBox textBox8;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox txtDisc1;
+        private System.Windows.Forms.TextBox txtDisc2;
+        private System.Windows.Forms.TextBox txtSalesTax;
+        private System.Windows.Forms.Label lblDisc1;
+        private System.Windows.Forms.Label lblDisc2;
+        private System.Windows.Forms.Label lblSalesTax;
+        private System.Windows.Forms.Button btnExit;
     }
 }

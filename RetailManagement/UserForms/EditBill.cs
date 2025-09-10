@@ -49,7 +49,10 @@ namespace RetailManagement.UserForms
                 {
                     currentBillType = selector.SelectedBillType;
                     currentInvoiceNumber = selector.InvoiceNumber;
-                    return true;
+                    
+                    // Open the appropriate form based on bill type
+                    OpenAppropriateForm(selector.SelectedInvoiceID);
+                    return false; // Don't continue with EditBill form
                 }
                 return false;
             }
@@ -58,6 +61,35 @@ namespace RetailManagement.UserForms
                 MessageBox.Show($"Error opening bill type selector: {ex.Message}", "Error", 
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
+            }
+        }
+
+        private void OpenAppropriateForm(int invoiceID)
+        {
+            try
+            {
+                if (currentBillType == "Sales")
+                {
+                    // Open NewBillForm with the selected invoice
+                    NewBillForm salesForm = new NewBillForm();
+                    salesForm.LoadInvoice(invoiceID);
+                    salesForm.Show();
+                }
+                else if (currentBillType == "Purchase")
+                {
+                    // Open NewPurchase form with the selected invoice
+                    NewPurchase purchaseForm = new NewPurchase();
+                    purchaseForm.LoadInvoice(invoiceID);
+                    purchaseForm.Show();
+                }
+                
+                // Don't close EditBill form immediately - let it close naturally
+                // this.Close(); // Removed to prevent disposed object error
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening form: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -344,7 +376,10 @@ namespace RetailManagement.UserForms
                 }
 
                 // Load sale items (for reference only, not editable in this simplified form)
-                string itemsQuery = @"SELECT si.*, i.ItemName 
+                string itemsQuery = @"SELECT si.SaleItemID, si.SaleID, si.ItemID, si.Quantity, si.Rate, si.Bonus, si.Discount1, si.Discount2, si.Tax, si.TotalAmount,
+                                    ISNULL(si.PackLoose, 'P') as PackLoose,
+                                    ISNULL(si.ExpiryDate, DATEADD(YEAR, 2, GETDATE())) as ExpiryDate,
+                                    i.ItemName 
                                     FROM SaleItems si
                                     INNER JOIN Items i ON si.ItemID = i.ItemID
                                     WHERE si.SaleID = @SaleID";

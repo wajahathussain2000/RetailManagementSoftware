@@ -592,7 +592,11 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                string query = @"SELECT ItemName, Barcode, PurchasePrice, SalePrice, MRP, GST_Rate 
+                string query = @"SELECT ItemName, ISNULL(Barcode, '') as Barcode, 
+                               ISNULL(PurchasePrice, 0) as PurchasePrice, 
+                               ISNULL(SalePrice, 0) as SalePrice, 
+                               ISNULL(MRP, 0) as MRP, 
+                               ISNULL(GST_Rate, 0) as GST_Rate 
                                FROM Items WHERE ItemID = @ItemID";
                 SqlParameter[] parameters = { new SqlParameter("@ItemID", itemID) };
                 DataTable result = DatabaseConnection.ExecuteQuery(query, parameters);

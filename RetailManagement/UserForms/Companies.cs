@@ -16,6 +16,7 @@ namespace RetailManagement.UserForms
     {
         private bool isEditMode = false;
         private int selectedCompanyID = 0;
+        private DataTable originalData;
 
         public Companies()
         {
@@ -43,8 +44,8 @@ namespace RetailManagement.UserForms
             try
             {
                 string query = "SELECT CompanyID, CompanyName FROM Companies WHERE IsActive = 1";
-                DataTable dt = DatabaseConnection.ExecuteQuery(query);
-                gridViewCompanies.DataSource = dt;
+                originalData = DatabaseConnection.ExecuteQuery(query);
+                gridViewCompanies.DataSource = originalData;
             }
             catch (Exception ex)
             {
@@ -157,6 +158,9 @@ namespace RetailManagement.UserForms
             {
                 cmbCompanies.SelectedIndex = -1;
             }
+            
+            // Clear search box
+            txtSearch.Clear();
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -254,28 +258,64 @@ namespace RetailManagement.UserForms
         {
             if (selectedCompanyID > 0)
             {
-                if (MessageBox.Show("Are you sure you want to delete this computer?", "Confirm Delete", 
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                // Get company name for confirmation
+                string companyName = txtComputerName.Text;
+                
+                if (MessageBox.Show($"Are you sure you want to delete '{companyName}'?\n\nThis action cannot be undone.", 
+                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     try
                     {
+                        // Check if company is being used in other tables
+                        string checkQuery = @"
+                            SELECT COUNT(*) FROM Sales WHERE CustomerID = @CompanyID
+                            UNION ALL
+                            SELECT COUNT(*) FROM Purchases WHERE CompanyID = @CompanyID";
+                        
+                        SqlParameter[] checkParams = { new SqlParameter("@CompanyID", selectedCompanyID) };
+                        DataTable checkResult = DatabaseConnection.ExecuteQuery(checkQuery, checkParams);
+                        
+                        bool hasReferences = false;
+                        foreach (DataRow row in checkResult.Rows)
+                        {
+                            if (Convert.ToInt32(row[0]) > 0)
+                            {
+                                hasReferences = true;
+                                break;
+                            }
+                        }
+                        
+                        if (hasReferences)
+                        {
+                            MessageBox.Show($"Cannot delete '{companyName}' because it is being used in transactions.\n\nPlease contact administrator for assistance.", 
+                                "Cannot Delete", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                        
+                        // Soft delete by setting IsActive = 0
                         string query = "UPDATE Companies SET IsActive = 0 WHERE CompanyID = @CompanyID";
                         SqlParameter[] parameters = { new SqlParameter("@CompanyID", selectedCompanyID) };
                         DatabaseConnection.ExecuteNonQuery(query, parameters);
+                        
                         LoadCompanies();
                         LoadCompaniesDropdown(); // Refresh dropdown
                         ClearForm();
-                        MessageBox.Show("Computer deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        txtSearch.Clear(); // Clear search box
+                        
+                        MessageBox.Show($"'{companyName}' has been deleted successfully!", "Success", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error deleting computer: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Error deleting company: " + ex.Message, "Error", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
             else
             {
-                MessageBox.Show("Please select a computer to delete.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Please select a company to delete.\n\nClick on a row in the list to select it.", 
+                    "No Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -296,6 +336,52 @@ namespace RetailManagement.UserForms
         private void btnExit_Click(object sender, EventArgs e)
         {
             this.Dispose();
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            if (originalData != null)
+            {
+                string searchText = txtSearch.Text.Trim().ToLower();
+                
+                if (string.IsNullOrEmpty(searchText))
+                {
+                    // Show all data if search is empty
+                    gridViewCompanies.DataSource = originalData;
+                }
+                else
+                {
+                    // Filter data based on search text
+                    DataTable filteredData = originalData.Clone();
+                    
+                    foreach (DataRow row in originalData.Rows)
+                    {
+                        string companyName = row["CompanyName"].ToString().ToLower();
+                        string companyID = row["CompanyID"].ToString().ToLower();
+                        
+                        if (companyName.Contains(searchText) || companyID.Contains(searchText))
+                        {
+                            filteredData.ImportRow(row);
+                        }
+                    }
+                    
+                    gridViewCompanies.DataSource = filteredData;
+                }
+            }
+        }
+
+        private void txtComputerName_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Allow Enter key to add new line
+            if (e.KeyCode == Keys.Enter)
+            {
+                // Move cursor to end and add new line
+                TextBox textBox = sender as TextBox;
+                int selectionStart = textBox.SelectionStart;
+                textBox.Text = textBox.Text.Insert(selectionStart, Environment.NewLine);
+                textBox.SelectionStart = selectionStart + Environment.NewLine.Length;
+                e.Handled = true;
+            }
         }
     }
 }

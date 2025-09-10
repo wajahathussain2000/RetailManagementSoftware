@@ -39,6 +39,9 @@ namespace RetailManagement.UserForms
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.txtSearch = new System.Windows.Forms.TextBox();
+            this.lblSearch = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewCompanies)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -72,7 +75,7 @@ namespace RetailManagement.UserForms
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.txtComputerID);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Location = new System.Drawing.Point(12, 58);
+            this.groupBox1.Location = new System.Drawing.Point(12, 70);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(424, 245);
             this.groupBox1.TabIndex = 2;
@@ -94,7 +97,8 @@ namespace RetailManagement.UserForms
             this.txtComputerID.Location = new System.Drawing.Point(105, 57);
             this.txtComputerID.Multiline = true;
             this.txtComputerID.Name = "txtComputerID";
-            this.txtComputerID.Size = new System.Drawing.Size(100, 26);
+            this.txtComputerID.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtComputerID.Size = new System.Drawing.Size(150, 60);
             this.txtComputerID.TabIndex = 1;
             // 
             // txtComputerName
@@ -105,8 +109,10 @@ namespace RetailManagement.UserForms
             this.txtComputerName.Location = new System.Drawing.Point(130, 119);
             this.txtComputerName.Multiline = true;
             this.txtComputerName.Name = "txtComputerName";
-            this.txtComputerName.Size = new System.Drawing.Size(288, 26);
+            this.txtComputerName.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtComputerName.Size = new System.Drawing.Size(288, 60);
             this.txtComputerName.TabIndex = 3;
+            this.txtComputerName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtComputerName_KeyDown);
             // 
             // label3
             // 
@@ -164,12 +170,45 @@ namespace RetailManagement.UserForms
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // btnDelete
+            // 
+            this.btnDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDelete.Location = new System.Drawing.Point(360, 322);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(75, 31);
+            this.btnDelete.TabIndex = 7;
+            this.btnDelete.Text = "Delete";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            // 
+            // txtSearch
+            // 
+            this.txtSearch.Location = new System.Drawing.Point(12, 35);
+            this.txtSearch.Name = "txtSearch";
+            this.txtSearch.Size = new System.Drawing.Size(200, 20);
+            this.txtSearch.TabIndex = 8;
+            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
+            // 
+            // lblSearch
+            // 
+            this.lblSearch.AutoSize = true;
+            this.lblSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSearch.ForeColor = System.Drawing.Color.White;
+            this.lblSearch.Location = new System.Drawing.Point(12, 15);
+            this.lblSearch.Name = "lblSearch";
+            this.lblSearch.Size = new System.Drawing.Size(47, 15);
+            this.lblSearch.TabIndex = 9;
+            this.lblSearch.Text = "Search:";
+            // 
             // Companies
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.SeaGreen;
             this.ClientSize = new System.Drawing.Size(694, 365);
+            this.Controls.Add(this.lblSearch);
+            this.Controls.Add(this.txtSearch);
+            this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSave);
@@ -202,5 +241,8 @@ namespace RetailManagement.UserForms
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.TextBox txtSearch;
+        private System.Windows.Forms.Label lblSearch;
     }
 }

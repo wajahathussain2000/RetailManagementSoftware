@@ -27,6 +27,7 @@ namespace RetailManagement.UserForms
         private TextBox txtSearchItems;
         private Label lblSearchItems;
         private DataTable allItemsData; // Store all items for filtering
+        private int selectedRowIndex = -1; // Track selected row for editing
 
         public NewBillForm()
         {
@@ -62,6 +63,203 @@ namespace RetailManagement.UserForms
             AdjustLayoutPositions();
         }
 
+        public void LoadInvoice(int saleID)
+        {
+            try
+            {
+                // Load sale header with all necessary fields
+                string saleQuery = @"SELECT s.*, c.CustomerName, c.CustomerID
+                                   FROM Sales s
+                                   INNER JOIN Customers c ON s.CustomerID = c.CustomerID
+                                   WHERE s.SaleID = @SaleID";
+
+                SqlParameter[] saleParams = { new SqlParameter("@SaleID", saleID) };
+                DataTable saleDt = DatabaseConnection.ExecuteQuery(saleQuery, saleParams);
+
+                if (saleDt.Rows.Count > 0)
+                {
+                    DataRow saleRow = saleDt.Rows[0];
+                    
+                    // Populate ALL header fields dynamically with safe NULL handling
+                    textBox11.Text = saleRow["BillNumber"]?.ToString() ?? ""; // Bill Number
+                    dateTimePicker1.Value = SafeDataHelper.SafeToDateTime(saleRow["SaleDate"], DateTime.Now); // Sale Date
+                    
+                    // Set customer in combo box properly
+                    int customerID = SafeDataHelper.SafeToInt32(saleRow["CustomerID"]);
+                    comboBox1.SelectedValue = customerID;
+                    comboBox1.Text = saleRow["CustomerName"]?.ToString() ?? "";
+                    
+                    // Set all summary fields
+                    decimal netAmount = SafeDataHelper.SafeToDecimal(saleRow["NetAmount"], 0);
+                    label15.Text = netAmount.ToString("N2"); // Net Amount
+                    textBox12.Text = "0.00"; // Discount (will be calculated from items)
+                    textBox13.Text = "0.00"; // Sales Tax (will be calculated from items)
+                    textBox14.Text = "0.00"; // Other Charges (not used)
+                    
+                    // Load sale items first
+                    LoadSaleItems(saleID);
+                    
+                    // Recalculate totals after loading items
+                    CalculateTotals();
+                    
+                    // Update form title to indicate editing
+                    this.Text = $"Edit Sales Invoice - {saleRow["BillNumber"]}";
+                    
+                    // Clear any existing item entry fields
+                    ClearItemEntryFields();
+                    
+                    MessageBox.Show($"Sales invoice {saleRow["BillNumber"]} loaded successfully!\n\n" +
+                                  $"Customer: {saleRow["CustomerName"]}\n" +
+                                  $"Date: {Convert.ToDateTime(saleRow["SaleDate"]):dd/MM/yyyy}\n" +
+                                  $"Total: {netAmount:N2}\n\n" +
+                                  "You can now edit items, quantities, and prices.", 
+                                  "Invoice Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Invoice not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading invoice: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ClearItemEntryFields()
+        {
+            // Clear item entry fields for new item entry
+            textBox1.Text = ""; // Item Name
+            textBox2.Text = "P"; // P/L
+            textBox3.Text = ""; // Rate
+            textBox4.Text = ""; // Qty
+            textBox5.Text = "0"; // Bonus
+            textBox6.Text = "0"; // Dis1
+            textBox7.Text = "0"; // Dis2
+            textBox8.Text = "0"; // Tax
+            textBox10.Text = "0.00"; // Total
+            dtpExpiry.Value = DateTime.Now.AddYears(2); // Expiry Date
+        }
+
+        private void EnsureRateColumnExists()
+        {
+            try
+            {
+                // Check if Rate column exists in SaleItems table
+                string checkQuery = @"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                                    WHERE TABLE_NAME = 'SaleItems' AND COLUMN_NAME = 'Rate'";
+                
+                DataTable result = DatabaseConnection.ExecuteQuery(checkQuery, null);
+                int columnExists = Convert.ToInt32(result.Rows[0][0]);
+                
+                if (columnExists == 0)
+                {
+                    // Rate column doesn't exist, add it
+                    string addColumnQuery = @"ALTER TABLE SaleItems ADD Rate DECIMAL(18,2) NOT NULL DEFAULT 0";
+                    DatabaseConnection.ExecuteNonQuery(addColumnQuery, null);
+                    
+                    System.Diagnostics.Debug.WriteLine("Rate column added to SaleItems table");
+                    
+                    // Also add to PurchaseItems table
+                    string checkPurchaseQuery = @"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                                               WHERE TABLE_NAME = 'PurchaseItems' AND COLUMN_NAME = 'Rate'";
+                    DataTable purchaseResult = DatabaseConnection.ExecuteQuery(checkPurchaseQuery, null);
+                    int purchaseColumnExists = Convert.ToInt32(purchaseResult.Rows[0][0]);
+                    
+                    if (purchaseColumnExists == 0)
+                    {
+                        string addPurchaseColumnQuery = @"ALTER TABLE PurchaseItems ADD Rate DECIMAL(18,2) NOT NULL DEFAULT 0";
+                        DatabaseConnection.ExecuteNonQuery(addPurchaseColumnQuery, null);
+                        System.Diagnostics.Debug.WriteLine("Rate column added to PurchaseItems table");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error ensuring Rate column exists: {ex.Message}");
+                // Don't throw exception, just log it
+            }
+        }
+
+
+        private void LoadSaleItems(int saleID)
+        {
+            try
+            {
+                // First, ensure the Rate column exists in SaleItems table
+                EnsureRateColumnExists();
+                
+                // Enhanced query with better NULL handling and debugging
+                string itemsQuery = @"SELECT si.SaleItemID, si.SaleID, si.ItemID, si.Quantity, 
+                                    ISNULL(si.Rate, 0) as Rate, 
+                                    ISNULL(si.Bonus, 0) as Bonus, 
+                                    ISNULL(si.Discount1, 0) as Discount1, 
+                                    ISNULL(si.Discount2, 0) as Discount2, 
+                                    ISNULL(si.Tax, 0) as Tax, 
+                                    ISNULL(si.TotalAmount, 0) as TotalAmount,
+                                    ISNULL(si.PackLoose, 'P') as PackLoose,
+                                    ISNULL(si.ExpiryDate, DATEADD(YEAR, 2, GETDATE())) as ExpiryDate,
+                                    i.ItemName,
+                                    i.Price as ItemPrice  -- Get the item's base price as fallback
+                                    FROM SaleItems si
+                                    INNER JOIN Items i ON si.ItemID = i.ItemID
+                                    WHERE si.SaleID = @SaleID";
+
+                SqlParameter[] itemsParams = { new SqlParameter("@SaleID", saleID) };
+                DataTable itemsDt = DatabaseConnection.ExecuteQuery(itemsQuery, itemsParams);
+                
+                // Debug: Show what we got from the database
+                System.Diagnostics.Debug.WriteLine($"Loaded {itemsDt.Rows.Count} items for SaleID {saleID}");
+                foreach (DataRow row in itemsDt.Rows)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Item: {row["ItemName"]}, Rate: {row["Rate"]}, ItemPrice: {row["ItemPrice"]}");
+                }
+                
+                // Clear existing items
+                billItems.Rows.Clear();
+                
+                // Add items to the grid with safe NULL handling
+                foreach (DataRow row in itemsDt.Rows)
+                {
+                    DataRow newRow = billItems.NewRow();
+                    
+                    // Populate all fields with safe NULL handling
+                    newRow["ItemID"] = SafeDataHelper.SafeToInt32(row["ItemID"]);
+                    newRow["ItemName"] = row["ItemName"]?.ToString() ?? "";
+                    newRow["ExpiryDate"] = SafeDataHelper.SafeToDateTime(row["ExpiryDate"], DateTime.Now.AddYears(2));
+                    newRow["PackLoose"] = row["PackLoose"]?.ToString() ?? "P";
+                    newRow["Quantity"] = SafeDataHelper.SafeToDecimal(row["Quantity"], 0);
+                    
+                    // Use ItemPrice as fallback if Rate is 0 or NULL
+                    decimal rate = SafeDataHelper.SafeToDecimal(row["Rate"], 0);
+                    decimal itemPrice = SafeDataHelper.SafeToDecimal(row["ItemPrice"], 0);
+                    
+                    if (rate == 0 && itemPrice > 0)
+                    {
+                        rate = itemPrice; // Use item's base price as fallback
+                        System.Diagnostics.Debug.WriteLine($"Using ItemPrice {itemPrice} as fallback for Rate for item {row["ItemName"]}");
+                    }
+                    
+                    newRow["Rate"] = rate;
+                    newRow["Bonus"] = SafeDataHelper.SafeToDecimal(row["Bonus"], 0);
+                    newRow["Discount1"] = SafeDataHelper.SafeToDecimal(row["Discount1"], 0);
+                    newRow["Discount2"] = SafeDataHelper.SafeToDecimal(row["Discount2"], 0);
+                    newRow["Tax"] = SafeDataHelper.SafeToDecimal(row["Tax"], 0);
+                    newRow["TotalAmount"] = SafeDataHelper.SafeToDecimal(row["TotalAmount"], 0);
+                    
+                    billItems.Rows.Add(newRow);
+                }
+                
+            // Refresh the grid
+            dataGridView1.DataSource = billItems;
+            CalculateTotals();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading sale items: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void SetupEventHandlers()
         {
             // Add event handler for customer selection
@@ -70,14 +268,27 @@ namespace RetailManagement.UserForms
             // Add P/L toggle functionality
             textBox2.DoubleClick += TextBox2_DoubleClick;
             textBox2.Text = "P"; // Default to Pack
+            textBox2.ReadOnly = true; // Make it read-only so user can't type, only double-click
+            textBox2.BackColor = Color.LightBlue; // Visual indicator that it's clickable
             
-            // Add automatic calculation handlers
-            textBox4.TextChanged += CalculateTotal; // Qty
-            textBox3.TextChanged += CalculateTotal; // Rate
-            textBox5.TextChanged += CalculateTotal; // Bonus
-            textBox6.TextChanged += CalculateTotal; // Dis1
-            textBox7.TextChanged += CalculateTotal; // Dis2
-            textBox8.TextChanged += CalculateTotal; // Tax
+            // Add tooltips for input fields
+            ToolTip toolTip = new ToolTip();
+            toolTip.SetToolTip(textBox2, "Double-click to toggle between Pack (P) and Loose (L) mode");
+            toolTip.SetToolTip(textBox5, "Enter bonus quantity in units (e.g., 10 for 10 extra units)");
+            toolTip.SetToolTip(textBox6, "Enter discount amount in rupees (e.g., 50 for ₹50 discount)");
+            toolTip.SetToolTip(textBox7, "Enter discount amount in rupees (e.g., 25 for ₹25 discount)");
+            toolTip.SetToolTip(textBox8, "Enter sales tax as percentage (e.g., 17 for 17% tax)");
+            
+            // Add automatic calculation handlers for real-time calculation
+            textBox4.TextChanged += CalculateItemTotal; // Qty
+            textBox3.TextChanged += CalculateItemTotal; // Rate
+            textBox5.TextChanged += CalculateItemTotal; // Bonus
+            textBox6.TextChanged += CalculateItemTotal; // Dis1
+            textBox7.TextChanged += CalculateItemTotal; // Dis2
+            textBox8.TextChanged += CalculateItemTotal; // Tax
+            
+            // Add bill number change handler to update barcode
+            textBox11.TextChanged += TextBox11_TextChanged;
         }
 
         // Search and Keyboard Navigation Methods (aligned like NewPurchase form)
@@ -420,14 +631,62 @@ namespace RetailManagement.UserForms
         {
             try
             {
-                string query = "SELECT ISNULL(MAX(CAST(SUBSTRING(BillNumber, 5, LEN(BillNumber)) AS INT)), 0) + 1 FROM Sales";
+                // First ensure BillNumber column exists
+                EnsureBillNumberColumnExists();
+                
+                // Try to get the next bill number from existing sales
+                string query = @"SELECT ISNULL(MAX(CAST(SUBSTRING(BillNumber, 5, LEN(BillNumber)) AS INT)), 0) + 1 
+                                FROM Sales 
+                                WHERE BillNumber IS NOT NULL AND BillNumber LIKE 'BILL%'";
                 object result = DatabaseConnection.ExecuteScalar(query);
                 int nextNumber = Convert.ToInt32(result);
+                
+                // If no existing bills, start from 1
+                if (nextNumber == 1)
+                {
+                    nextNumber = 1;
+                }
+                
                 textBox11.Text = $"BILL{nextNumber:D6}";
+                
+                // Generate barcode immediately after setting bill number
+                GenerateBarcode(textBox11.Text.Trim());
+                
+                System.Diagnostics.Debug.WriteLine($"Generated bill number: {textBox11.Text}");
             }
             catch (Exception ex)
             {
-                textBox11.Text = $"BILL{DateTime.Now:yyyyMMdd}001";
+                // Fallback to timestamp-based number
+                textBox11.Text = $"BILL{DateTime.Now:yyyyMMddHHmmss}";
+                GenerateBarcode(textBox11.Text.Trim());
+                System.Diagnostics.Debug.WriteLine($"Fallback bill number generated: {textBox11.Text}, Error: {ex.Message}");
+            }
+        }
+
+        private void EnsureBillNumberColumnExists()
+        {
+            try
+            {
+                // Check if BillNumber column exists in Sales table
+                string checkQuery = @"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                                    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'BillNumber'";
+                
+                DataTable result = DatabaseConnection.ExecuteQuery(checkQuery, null);
+                int columnExists = Convert.ToInt32(result.Rows[0][0]);
+                
+                if (columnExists == 0)
+                {
+                    // BillNumber column doesn't exist, add it
+                    string addColumnQuery = @"ALTER TABLE Sales ADD BillNumber VARCHAR(50) NULL";
+                    DatabaseConnection.ExecuteNonQuery(addColumnQuery, null);
+                    
+                    System.Diagnostics.Debug.WriteLine("BillNumber column added to Sales table");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error ensuring BillNumber column exists: {ex.Message}");
+                // Don't throw exception, just log it
             }
         }
 
@@ -469,7 +728,7 @@ namespace RetailManagement.UserForms
                     barcodeColumn = ", '' as Barcode"; // Default empty barcode if column doesn't exist
                 }
                 
-                string query = $"SELECT ItemID, ItemName, Price, MRP, {stockColumnName} as StockQuantity{barcodeColumn} FROM Items WHERE IsActive = 1 ORDER BY ItemName";
+                string query = $"SELECT ItemID, ItemName, ISNULL(Price, 0) as Price, ISNULL(MRP, 0) as MRP, {stockColumnName} as StockQuantity{barcodeColumn} FROM Items WHERE IsActive = 1 ORDER BY ItemName";
                 DataTable dt = DatabaseConnection.ExecuteQuery(query);
                 
                 // Store all items data for filtering
@@ -546,6 +805,8 @@ namespace RetailManagement.UserForms
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 string columnName = dataGridView1.Columns[e.ColumnIndex].Name;
+                
+                // Handle ExpiryDate column editing
                 if (columnName == "ExpiryDate")
                 {
                     // Create a temporary DateTimePicker for grid editing
@@ -587,6 +848,50 @@ namespace RetailManagement.UserForms
                     
                     gridDatePicker.Focus();
                 }
+                else
+                {
+                    // Handle item selection for editing (any other column click)
+                    try
+                    {
+                        DataGridViewRow selectedRow = dataGridView1.Rows[e.RowIndex];
+                        
+                        // Populate item entry fields with selected item data
+                        textBox1.Text = selectedRow.Cells["ItemName"].Value?.ToString() ?? ""; // Item Name
+                        textBox2.Text = selectedRow.Cells["PackLoose"].Value?.ToString() ?? "P"; // P/L
+                        textBox3.Text = selectedRow.Cells["Rate"].Value?.ToString() ?? ""; // Rate
+                        textBox4.Text = selectedRow.Cells["Quantity"].Value?.ToString() ?? ""; // Qty
+                        textBox5.Text = selectedRow.Cells["Bonus"].Value?.ToString() ?? "0"; // Bonus
+                        textBox6.Text = selectedRow.Cells["Discount1"].Value?.ToString() ?? "0"; // Dis1
+                        textBox7.Text = selectedRow.Cells["Discount2"].Value?.ToString() ?? "0"; // Dis2
+                        textBox8.Text = selectedRow.Cells["Tax"].Value?.ToString() ?? "0"; // Tax
+                        textBox10.Text = selectedRow.Cells["TotalAmount"].Value?.ToString() ?? "0.00"; // Total
+                        
+                        // Set expiry date
+                        if (selectedRow.Cells["ExpiryDate"].Value != null && selectedRow.Cells["ExpiryDate"].Value != DBNull.Value)
+                        {
+                            dtpExpiry.Value = Convert.ToDateTime(selectedRow.Cells["ExpiryDate"].Value);
+                        }
+                        else
+                        {
+                            dtpExpiry.Value = DateTime.Now.AddYears(2);
+                        }
+                        
+                        // Store the selected row index for updating
+                        selectedRowIndex = e.RowIndex;
+                        
+                        // Show user feedback
+                        MessageBox.Show($"Item '{textBox1.Text}' selected for editing.\n\n" +
+                                      $"Rate: {textBox3.Text}\n" +
+                                      $"Quantity: {textBox4.Text}\n" +
+                                      $"Total: {textBox10.Text}\n\n" +
+                                      "You can now edit the values and click 'Add Item' to save changes.", 
+                                      "Item Selected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error selecting item: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
         }
         
@@ -601,20 +906,63 @@ namespace RetailManagement.UserForms
                 return;
             }
             
+            // Debug information
+            System.Diagnostics.Debug.WriteLine($"P/L Toggle: Current mode = {currentPackLooseMode}, BaseRate = {baseRate}, PackSize = {packSize}");
+            
             // Toggle between P and L
             if (currentPackLooseMode == "P")
             {
                 currentPackLooseMode = "L";
                 textBox2.Text = "L";
+                System.Diagnostics.Debug.WriteLine("Switched to Loose mode");
             }
             else
             {
                 currentPackLooseMode = "P";
                 textBox2.Text = "P";
+                System.Diagnostics.Debug.WriteLine("Switched to Pack mode");
             }
             
             // Update rate based on new mode
             UpdateRateBasedOnMode();
+            
+            // Show user what happened
+            string rateText = textBox3.Text;
+            string modeText = currentPackLooseMode == "P" ? "Pack" : "Loose";
+            
+            // If pack size is 1, offer to set a proper pack size for testing
+            if (packSize == 1)
+            {
+                DialogResult result = MessageBox.Show($"Switched to {modeText} mode\nRate: {rateText}\nBase Rate: {baseRate}\nPack Size: {packSize}\n\nPack Size is 1, so loose rate = pack rate.\n\nWould you like to set Pack Size to 10 for testing?", 
+                              "P/L Toggle", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                
+                if (result == DialogResult.Yes)
+                {
+                    // Update pack size to 10 for this item
+                    try
+                    {
+                        string updateQuery = "UPDATE Items SET PackSize = '10' WHERE ItemID = @ItemID";
+                        SqlParameter[] updateParams = { new SqlParameter("@ItemID", selectedItemID) };
+                        DatabaseConnection.ExecuteNonQuery(updateQuery, updateParams);
+                        
+                        // Reload the item details
+                        LoadSelectedItemDetails();
+                        
+                        MessageBox.Show("Pack Size updated to 10. Try toggling P/L again!", 
+                                      "Pack Size Updated", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error updating pack size: " + ex.Message, 
+                                      "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Switched to {modeText} mode\nRate: {rateText}\nBase Rate: {baseRate}\nPack Size: {packSize}", 
+                              "P/L Toggle", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             
             // Recalculate total
             CalculateTotal(null, null);
@@ -625,16 +973,29 @@ namespace RetailManagement.UserForms
         /// </summary>
         private void UpdateRateBasedOnMode()
         {
+            System.Diagnostics.Debug.WriteLine($"UpdateRateBasedOnMode: Mode = {currentPackLooseMode}, BaseRate = {baseRate}, PackSize = {packSize}");
+            
             if (currentPackLooseMode == "P")
             {
                 // Pack mode - use base rate (MRP for sales)
                 textBox3.Text = baseRate.ToString("F2");
+                System.Diagnostics.Debug.WriteLine($"Pack mode: Rate set to {baseRate.ToString("F2")}");
             }
             else
             {
                 // Loose mode - divide by pack size
-                decimal looseRate = packSize > 0 ? baseRate / packSize : baseRate;
-                textBox3.Text = looseRate.ToString("F4"); // More decimal places for loose rate
+                if (packSize > 0)
+                {
+                    decimal looseRate = baseRate / packSize;
+                    textBox3.Text = looseRate.ToString("F2"); // Use same decimal places as pack mode
+                    System.Diagnostics.Debug.WriteLine($"Loose mode: Rate set to {looseRate.ToString("F2")} (BaseRate {baseRate} ÷ PackSize {packSize})");
+                }
+                else
+                {
+                    // If pack size is 0 or invalid, use base rate
+                    textBox3.Text = baseRate.ToString("F2");
+                    System.Diagnostics.Debug.WriteLine($"Loose mode: PackSize is 0, using BaseRate {baseRate.ToString("F2")}");
+                }
             }
         }
         
@@ -712,8 +1073,7 @@ namespace RetailManagement.UserForms
                 decimal dis2 = row.Cells["Discount2"].Value == null ? 0 : Convert.ToDecimal(row.Cells["Discount2"].Value);
                 decimal tax = row.Cells["Tax"].Value == null ? 0 : Convert.ToDecimal(row.Cells["Tax"].Value);
                 
-                decimal totalQty = qty + bonus;
-                decimal subtotal = totalQty * rate;
+                decimal subtotal = qty * rate;  // Only quantity, not quantity + bonus
                 decimal afterDiscounts = subtotal - dis1 - dis2;
                 decimal finalTotal = afterDiscounts + tax;
                 
@@ -748,8 +1108,11 @@ namespace RetailManagement.UserForms
                 if (listBoxItems.SelectedValue != null)
                 {
                     selectedItemID = Convert.ToInt32(listBoxItems.SelectedValue);
-                    string query = @"SELECT ItemID, ItemName, Price, MRP, PackSize, 
-                                    ISNULL(PackSize, '1') as PackSizeValue
+                    string query = @"SELECT ItemID, ItemName, 
+                                    ISNULL(Price, 0) as Price,
+                                    ISNULL(MRP, 0) as MRP, 
+                                    PackSize, 
+                                    ISNULL(PackSize, '10') as PackSizeValue
                                     FROM Items WHERE ItemID = @ItemID";
                     SqlParameter[] parameters = { new SqlParameter("@ItemID", selectedItemID) };
                     DataTable dt = DatabaseConnection.ExecuteQuery(query, parameters);
@@ -763,9 +1126,27 @@ namespace RetailManagement.UserForms
                         
                         // Store base rate and pack size - use MRP for sales
                         baseRate = Convert.ToDecimal(row["MRP"]);
+                        decimal priceValue = Convert.ToDecimal(row["Price"]);
+                        System.Diagnostics.Debug.WriteLine($"LoadSelectedItemDetails: MRP = {baseRate}, Price = {priceValue}");
+                        
+                        // If MRP is 0, use Price as fallback
+                        if (baseRate == 0 && priceValue > 0)
+                        {
+                            baseRate = priceValue;
+                            System.Diagnostics.Debug.WriteLine($"LoadSelectedItemDetails: MRP was 0, using Price = {baseRate}");
+                        }
+                        else if (baseRate == 0 && priceValue == 0)
+                        {
+                            // If both MRP and Price are 0, set a default rate for testing
+                            baseRate = 100; // Default rate for testing
+                            System.Diagnostics.Debug.WriteLine($"LoadSelectedItemDetails: Both MRP and Price are 0, using default rate = {baseRate}");
+                        }
                         
                         // Parse pack size - handle both numeric and text values
                         string packSizeStr = row["PackSizeValue"].ToString();
+                        string originalPackSize = row["PackSize"].ToString();
+                        System.Diagnostics.Debug.WriteLine($"LoadSelectedItemDetails: Original PackSize = '{originalPackSize}', PackSizeValue = '{packSizeStr}'");
+                        
                         if (!int.TryParse(packSizeStr, out packSize))
                         {
                             // If pack size is text like "10x10", extract first number
@@ -776,16 +1157,30 @@ namespace RetailManagement.UserForms
                             }
                             else
                             {
-                                packSize = 1; // Default if can't parse
+                                packSize = 10; // Default to 10 if can't parse (better for loose calculation)
                             }
                         }
+                        
+                        // Ensure pack size is at least 1 to avoid division by zero
+                        if (packSize <= 0)
+                        {
+                            packSize = 10; // Default to 10 for better loose calculation
+                        }
+                        
+                        System.Diagnostics.Debug.WriteLine($"LoadSelectedItemDetails: PackSize set to {packSize}");
                         
                         // 2. Default to P (Pack) mode
                         currentPackLooseMode = "P";
                         textBox2.Text = "P";
                         
                         // 3. Set rate based on P/L mode
+                        System.Diagnostics.Debug.WriteLine($"About to call UpdateRateBasedOnMode: BaseRate = {baseRate}, PackSize = {packSize}, Mode = {currentPackLooseMode}");
                         UpdateRateBasedOnMode();
+                        System.Diagnostics.Debug.WriteLine($"After UpdateRateBasedOnMode: Rate field = {textBox3.Text}");
+                        
+                        // Show user what was loaded
+                        MessageBox.Show($"Item loaded successfully!\nItem: {textBox1.Text}\nMRP: {baseRate}\nPrice: {priceValue}\nPack Size: {packSize}\nRate: {textBox3.Text}", 
+                                      "Item Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         
                         // Set default expiry date (2 years from today)
                         dtpExpiry.Value = DateTime.Now.AddYears(2);
@@ -813,9 +1208,121 @@ namespace RetailManagement.UserForms
         {
             if (ValidateItemInput())
             {
-                AddItemToBill();
+                if (selectedRowIndex >= 0)
+                {
+                    // Update existing item
+                    UpdateSelectedItem();
+                    selectedRowIndex = -1; // Reset selection
+                }
+                else
+                {
+                    // Add new item
+                    AddItemToBill();
+                }
                 CalculateTotals();
                 ClearItemInputs();
+            }
+        }
+
+        private void UpdateSelectedItem()
+        {
+            try
+            {
+                if (selectedRowIndex >= 0 && selectedRowIndex < dataGridView1.Rows.Count)
+                {
+                    DataGridViewRow row = dataGridView1.Rows[selectedRowIndex];
+                    
+                    // Update the row with new values
+                    row.Cells["ItemName"].Value = textBox1.Text;
+                    row.Cells["PackLoose"].Value = textBox2.Text;
+                    row.Cells["Rate"].Value = decimal.Parse(textBox3.Text);
+                    row.Cells["Quantity"].Value = decimal.Parse(textBox4.Text);
+                    row.Cells["Bonus"].Value = decimal.Parse(textBox5.Text);
+                    row.Cells["Discount1"].Value = decimal.Parse(textBox6.Text);
+                    row.Cells["Discount2"].Value = decimal.Parse(textBox7.Text);
+                    row.Cells["Tax"].Value = decimal.Parse(textBox8.Text);
+                    row.Cells["ExpiryDate"].Value = dtpExpiry.Value;
+                    
+                    // Calculate new total amount - bonus does NOT affect billing amount
+                    decimal quantity = decimal.Parse(textBox4.Text);
+                    decimal rate = decimal.Parse(textBox3.Text);
+                    decimal bonus = decimal.Parse(textBox5.Text);
+                    decimal discount1 = decimal.Parse(textBox6.Text);
+                    decimal discount2 = decimal.Parse(textBox7.Text);
+                    decimal tax = decimal.Parse(textBox8.Text);
+                    
+                    decimal subtotal = quantity * rate;  // Only quantity, not quantity + bonus
+                    decimal discountAmount = discount1 + discount2;
+                    decimal taxableAmount = subtotal - discountAmount;
+                    decimal taxAmount = taxableAmount * (tax / 100);
+                    decimal totalAmount = taxableAmount + taxAmount;
+                    
+                    row.Cells["TotalAmount"].Value = totalAmount;
+                    textBox10.Text = totalAmount.ToString("F2");
+                    
+                    // Refresh the grid
+                    dataGridView1.Refresh();
+                    
+                    MessageBox.Show($"Item '{textBox1.Text}' updated successfully!\n\n" +
+                                  $"New Total: {totalAmount:N2}", 
+                                  "Item Updated", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating item: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CalculateItemTotal(object sender, EventArgs e)
+        {
+            try
+            {
+                // Only calculate if we have valid numeric inputs
+                if (decimal.TryParse(textBox3.Text, out decimal rate) && 
+                    decimal.TryParse(textBox4.Text, out decimal quantity) &&
+                    decimal.TryParse(textBox5.Text, out decimal bonus) &&
+                    decimal.TryParse(textBox6.Text, out decimal discount1) &&
+                    decimal.TryParse(textBox7.Text, out decimal discount2) &&
+                    decimal.TryParse(textBox8.Text, out decimal tax))
+                {
+                    // Calculate total amount - bonus does NOT affect billing amount
+                    decimal subtotal = quantity * rate;  // Only quantity, not quantity + bonus
+                    decimal discountAmount = discount1 + discount2;
+                    decimal taxableAmount = subtotal - discountAmount;
+                    decimal taxAmount = taxableAmount * (tax / 100);
+                    decimal totalAmount = taxableAmount + taxAmount;
+                    
+                    // Update total field
+                    textBox10.Text = totalAmount.ToString("F2");
+                }
+                else
+                {
+                    // If parsing fails, set total to 0
+                    textBox10.Text = "0.00";
+                }
+            }
+            catch (Exception ex)
+            {
+                // If calculation fails, set total to 0
+                textBox10.Text = "0.00";
+            }
+        }
+
+        private void TextBox11_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // Update barcode when bill number changes
+                if (!string.IsNullOrWhiteSpace(textBox11.Text))
+                {
+                    GenerateBarcode(textBox11.Text.Trim());
+                    System.Diagnostics.Debug.WriteLine($"Barcode updated for bill number: {textBox11.Text}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating barcode: {ex.Message}");
             }
         }
 
@@ -919,18 +1426,53 @@ namespace RetailManagement.UserForms
 
         private void CalculateTotals()
         {
-            totalAmount = 0;
+            decimal grossTotal = 0;
+            decimal totalDiscounts = 0;
+            decimal totalTax = 0;
+            decimal taxableAmount = 0;
+            
             foreach (DataRow row in billItems.Rows)
             {
-                totalAmount += Convert.ToDecimal(row["TotalAmount"]);
+                // Get item values
+                decimal quantity = Convert.ToDecimal(row["Quantity"]);
+                decimal rate = Convert.ToDecimal(row["Rate"]);
+                decimal bonus = Convert.ToDecimal(row["Bonus"]);
+                decimal discount1 = Convert.ToDecimal(row["Discount1"]);
+                decimal discount2 = Convert.ToDecimal(row["Discount2"]);
+                decimal tax = Convert.ToDecimal(row["Tax"]);
+                
+                // Calculate item totals - bonus does NOT affect billing amount
+                decimal itemSubtotal = quantity * rate;  // Only quantity, not quantity + bonus
+                decimal itemDiscounts = discount1 + discount2;
+                decimal itemTaxableAmount = itemSubtotal - itemDiscounts;
+                decimal itemTaxAmount = itemTaxableAmount * (tax / 100);
+                decimal itemTotal = itemTaxableAmount + itemTaxAmount;
+                
+                // Add to totals
+                grossTotal += itemSubtotal;
+                totalDiscounts += itemDiscounts;
+                totalTax += itemTaxAmount;
+                taxableAmount += itemTaxableAmount;
+                
+                // Update the row's total amount
+                row["TotalAmount"] = itemTotal;
             }
-
+            
+            // Calculate final totals
+            decimal netTotal = taxableAmount + totalTax;
+            
             // Update all total fields
-            textBox12.Text = totalAmount.ToString("N2"); // Gross Total
-            textBox13.Text = "0.00"; // Discount
-            textBox14.Text = "0.00"; // Sales Tax
-            label15.Text = totalAmount.ToString("N2"); // Gross Total (display)
-            label20.Text = totalAmount.ToString("N2"); // Net Total
+            textBox12.Text = totalDiscounts.ToString("N2"); // Discount field
+            textBox13.Text = totalTax.ToString("N2"); // Sales Tax field
+            textBox14.Text = "0.00"; // Other Charges (not used)
+            label15.Text = grossTotal.ToString("N2"); // Gross Total (display)
+            label20.Text = netTotal.ToString("N2"); // Net Total
+            
+            // Store the net total for saving
+            totalAmount = netTotal;
+            
+            // Refresh the DataGridView to show updated totals
+            dataGridView1.Refresh();
         }
 
         private void ClearItemInputs()
@@ -963,11 +1505,14 @@ namespace RetailManagement.UserForms
                 try
                 {
                     SaveBill();
-                    MessageBox.Show("Bill saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Bill saved successfully!\n\nClick Print to generate receipt.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     
                     // Show print button after successful save
                     btnPrint.Visible = true;
                     btnPrint.Enabled = true;
+                    
+                    // Focus on print button for user convenience
+                    btnPrint.Focus();
                 }
                 catch (Exception ex)
                 {
@@ -1043,12 +1588,16 @@ namespace RetailManagement.UserForms
                 decimal bonus = Convert.ToDecimal(row["Bonus"]);
                 decimal dis1 = Convert.ToDecimal(row["Discount1"]);
                 decimal dis2 = Convert.ToDecimal(row["Discount2"]);
-                decimal tax = Convert.ToDecimal(row["Tax"]);
+                decimal taxPercent = Convert.ToDecimal(row["Tax"]);
                 
-                decimal itemGross = (qty + bonus) * rate;
+                decimal itemGross = qty * rate;  // Only quantity, not quantity + bonus
+                decimal itemDiscounts = dis1 + dis2;
+                decimal itemTaxableAmount = itemGross - itemDiscounts;
+                decimal itemTaxAmount = itemTaxableAmount * (taxPercent / 100);
+                
                 grossAmount += itemGross;
-                totalDiscount += dis1 + dis2;
-                totalTax += tax;
+                totalDiscount += itemDiscounts;
+                totalTax += itemTaxAmount;
             }
             
             decimal netAmount = grossAmount - totalDiscount + totalTax;
@@ -1211,6 +1760,55 @@ namespace RetailManagement.UserForms
             GenerateInitialQRAndBarcode();
             
             MessageBox.Show("Form cleared successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ResetFormForNewBill()
+        {
+            try
+            {
+                // Clear header fields
+                comboBox1.SelectedIndex = -1;
+                dateTimePicker1.Value = DateTime.Now;
+                
+                // Clear bill items
+                billItems.Clear();
+                dataGridView1.DataSource = null;
+                dataGridView1.DataSource = billItems; // Rebind empty table
+                
+                // Clear item input fields
+                ClearItemInputs();
+                
+                // Clear totals
+                textBox12.Text = "0.00";
+                textBox13.Text = "0.00";
+                textBox14.Text = "0.00";
+                label15.Text = "0.00";
+                label20.Text = "0.00";
+                totalAmount = 0;
+                
+                // Reset selected row index
+                selectedRowIndex = -1;
+                
+                // Clear QR code and barcode
+                ClearAllCodes();
+                
+                // Generate new bill number
+                GenerateBillNumber();
+                
+                // Generate new QR and barcode for the new bill
+                GenerateInitialQRAndBarcode();
+                
+                // Hide print button until next save
+                btnPrint.Visible = false;
+                btnPrint.Enabled = false;
+                
+                // Focus on customer selection for new bill
+                comboBox1.Focus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error resetting form: {ex.Message}", "Reset Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -1383,6 +1981,22 @@ namespace RetailManagement.UserForms
             try
             {
                 GenerateThermalReceipt();
+                
+                // Ask user if they want to reset form for new bill
+                DialogResult result = MessageBox.Show("Receipt generated successfully!\n\nDo you want to reset the form for a new bill?", 
+                    "Print Success", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                
+                if (result == DialogResult.Yes)
+                {
+                    // Reset form for new bill
+                    ResetFormForNewBill();
+                }
+                else
+                {
+                    // Hide print button but keep form as is
+                    btnPrint.Visible = false;
+                    btnPrint.Enabled = false;
+                }
             }
             catch (Exception ex)
             {
@@ -1403,8 +2017,9 @@ namespace RetailManagement.UserForms
                 billHeaderTable.Columns.Add("BillNumber", typeof(string));
                 billHeaderTable.Columns.Add("CustomerName", typeof(string));
                 billHeaderTable.Columns.Add("BillDate", typeof(DateTime));
-                billHeaderTable.Columns.Add("TotalAmount", typeof(decimal));
-                billHeaderTable.Columns.Add("Discount", typeof(decimal));
+                billHeaderTable.Columns.Add("GrossTotal", typeof(decimal));
+                billHeaderTable.Columns.Add("TotalDiscount", typeof(decimal));
+                billHeaderTable.Columns.Add("SalesTax", typeof(decimal));
                 billHeaderTable.Columns.Add("NetAmount", typeof(decimal));
                 billHeaderTable.Columns.Add("QRCodeData", typeof(string));
                 billHeaderTable.Columns.Add("BarcodeData", typeof(string));
@@ -1416,9 +2031,10 @@ namespace RetailManagement.UserForms
                 headerRow["BillNumber"] = textBox11.Text.Trim();
                 headerRow["CustomerName"] = comboBox1.Text;
                 headerRow["BillDate"] = dateTimePicker1.Value;
-                headerRow["TotalAmount"] = totalAmount;
-                headerRow["Discount"] = decimal.Parse(textBox12.Text);
-                headerRow["NetAmount"] = decimal.Parse(label20.Text);
+                headerRow["GrossTotal"] = decimal.Parse(label15.Text); // Gross Total
+                headerRow["TotalDiscount"] = decimal.Parse(textBox12.Text); // Total Discounts
+                headerRow["SalesTax"] = decimal.Parse(textBox13.Text); // Sales Tax
+                headerRow["NetAmount"] = decimal.Parse(label20.Text); // Net Total
                 
                 string customerName = comboBox1.Text;
                 string qrData = $"BILL#{textBox11.Text.Trim()}|CUSTOMER:{customerName}|TOTAL:{decimal.Parse(label20.Text):F2}|DATE:{dateTimePicker1.Value:yyyy-MM-dd HH:mm:ss}|SHOP:Retail Management System";
@@ -1433,18 +2049,52 @@ namespace RetailManagement.UserForms
                 // Create Bill Items table
                 DataTable billItemsTable = new DataTable("BillItems");
                 billItemsTable.Columns.Add("ItemName", typeof(string));
-                billItemsTable.Columns.Add("Quantity", typeof(int));
-                billItemsTable.Columns.Add("Price", typeof(decimal));
+                billItemsTable.Columns.Add("Quantity", typeof(decimal));
+                billItemsTable.Columns.Add("Bonus", typeof(decimal));
+                billItemsTable.Columns.Add("Price", typeof(decimal)); // Changed from "Rate" to "Price" to match report
+                billItemsTable.Columns.Add("Subtotal", typeof(decimal));
+                billItemsTable.Columns.Add("Discount1", typeof(decimal));
+                billItemsTable.Columns.Add("Discount2", typeof(decimal));
+                billItemsTable.Columns.Add("TotalDiscount", typeof(decimal));
+                billItemsTable.Columns.Add("TaxableAmount", typeof(decimal));
+                billItemsTable.Columns.Add("TaxPercent", typeof(decimal));
+                billItemsTable.Columns.Add("TaxAmount", typeof(decimal));
                 billItemsTable.Columns.Add("TotalAmount", typeof(decimal));
                 
                 // Add bill items data
                 foreach (DataRow row in billItems.Rows)
                 {
                     DataRow itemRow = billItemsTable.NewRow();
+                    
+                    // Get item values
+                    decimal quantity = Convert.ToDecimal(row["Quantity"]);
+                    decimal bonus = Convert.ToDecimal(row["Bonus"]);
+                    decimal rate = Convert.ToDecimal(row["Rate"]);
+                    decimal discount1 = Convert.ToDecimal(row["Discount1"]);
+                    decimal discount2 = Convert.ToDecimal(row["Discount2"]);
+                    decimal tax = Convert.ToDecimal(row["Tax"]);
+                    decimal totalAmount = Convert.ToDecimal(row["TotalAmount"]);
+                    
+                    // Calculate detailed amounts
+                    decimal subtotal = quantity * rate; // Only quantity, not quantity + bonus
+                    decimal totalDiscount = discount1 + discount2;
+                    decimal taxableAmount = subtotal - totalDiscount;
+                    decimal taxAmount = taxableAmount * (tax / 100);
+                    
+                    // Populate item row
                     itemRow["ItemName"] = row["ItemName"];
-                    itemRow["Quantity"] = Convert.ToInt32(row["Quantity"]);
-                    itemRow["Price"] = Convert.ToDecimal(row["Rate"]);
-                    itemRow["TotalAmount"] = Convert.ToDecimal(row["TotalAmount"]);
+                    itemRow["Quantity"] = quantity;
+                    itemRow["Bonus"] = bonus;
+                    itemRow["Price"] = rate; // Changed from "Rate" to "Price" to match report
+                    itemRow["Subtotal"] = subtotal;
+                    itemRow["Discount1"] = discount1;
+                    itemRow["Discount2"] = discount2;
+                    itemRow["TotalDiscount"] = totalDiscount;
+                    itemRow["TaxableAmount"] = taxableAmount;
+                    itemRow["TaxPercent"] = tax;
+                    itemRow["TaxAmount"] = taxAmount;
+                    itemRow["TotalAmount"] = totalAmount;
+                    
                     billItemsTable.Rows.Add(itemRow);
                 }
                 
@@ -1658,3 +2308,4 @@ namespace RetailManagement.UserForms
         }
     }
 }
+

@@ -870,7 +870,7 @@ namespace RetailManagement.UserForms
             {
                 try
                 {
-                    string query = "SELECT Price, MRP, PurchasePrice, Barcode FROM Items WHERE ItemID = @ItemID";
+                    string query = "SELECT ISNULL(Price, 0) as Price, ISNULL(MRP, 0) as MRP, ISNULL(PurchasePrice, 0) as PurchasePrice, ISNULL(Barcode, '') as Barcode FROM Items WHERE ItemID = @ItemID";
                     SqlParameter[] parameters = { new SqlParameter("@ItemID", cmbItem.SelectedValue) };
                     DataTable result = DatabaseConnection.ExecuteQuery(query, parameters);
 

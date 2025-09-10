@@ -64,6 +64,89 @@ namespace RetailManagement.UserForms
 
             // Add missing controls
             AddMissingControls();
+            
+            // Try to add new columns if they don't exist
+            AddNewColumnsIfNotExist();
+        }
+
+        private void AddNewColumnsIfNotExist()
+        {
+            try
+            {
+                // Check if discount columns exist
+                string checkDiscountQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name IN ('Disc1', 'Disc2', 'SalesTax')";
+                int discountColumnCount = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkDiscountQuery));
+                
+                if (discountColumnCount < 3)
+                {
+                    // Add missing discount columns
+                    if (discountColumnCount == 0)
+                    {
+                        DatabaseConnection.ExecuteNonQuery("ALTER TABLE Items ADD Disc1 DECIMAL(5,2) DEFAULT 0");
+                        DatabaseConnection.ExecuteNonQuery("ALTER TABLE Items ADD Disc2 DECIMAL(5,2) DEFAULT 0");
+                        DatabaseConnection.ExecuteNonQuery("ALTER TABLE Items ADD SalesTax DECIMAL(5,2) DEFAULT 0");
+                    }
+                    else
+                    {
+                        // Add individual discount columns that are missing
+                        string[] discountColumns = { "Disc1", "Disc2", "SalesTax" };
+                        foreach (string column in discountColumns)
+                        {
+                            string checkColumnQuery = $"SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name = '{column}'";
+                            int exists = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkColumnQuery));
+                            if (exists == 0)
+                            {
+                                DatabaseConnection.ExecuteNonQuery($"ALTER TABLE Items ADD {column} DECIMAL(5,2) DEFAULT 0");
+                            }
+                        }
+                    }
+                }
+
+                // Check if item detail columns exist
+                string checkItemDetailQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name IN ('Packing', 'PurchasePrice', 'ReorderLevel')";
+                int itemDetailColumnCount = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkItemDetailQuery));
+                
+                if (itemDetailColumnCount < 3)
+                {
+                    // Add missing item detail columns
+                    if (itemDetailColumnCount == 0)
+                    {
+                        DatabaseConnection.ExecuteNonQuery("ALTER TABLE Items ADD Packing NVARCHAR(100) DEFAULT ''");
+                        DatabaseConnection.ExecuteNonQuery("ALTER TABLE Items ADD PurchasePrice DECIMAL(10,2) DEFAULT 0");
+                        DatabaseConnection.ExecuteNonQuery("ALTER TABLE Items ADD ReorderLevel INT DEFAULT 0");
+                    }
+                    else
+                    {
+                        // Add individual item detail columns that are missing
+                        string[] itemDetailColumns = { "Packing", "PurchasePrice", "ReorderLevel" };
+                        foreach (string column in itemDetailColumns)
+                        {
+                            string checkColumnQuery = $"SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name = '{column}'";
+                            int exists = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkColumnQuery));
+                            if (exists == 0)
+                            {
+                                if (column == "Packing")
+                                {
+                                    DatabaseConnection.ExecuteNonQuery($"ALTER TABLE Items ADD {column} NVARCHAR(100) DEFAULT ''");
+                                }
+                                else if (column == "PurchasePrice")
+                                {
+                                    DatabaseConnection.ExecuteNonQuery($"ALTER TABLE Items ADD {column} DECIMAL(10,2) DEFAULT 0");
+                                }
+                                else if (column == "ReorderLevel")
+                                {
+                                    DatabaseConnection.ExecuteNonQuery($"ALTER TABLE Items ADD {column} INT DEFAULT 0");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't show to user - columns might already exist
+                System.Diagnostics.Debug.WriteLine($"Error adding columns: {ex.Message}");
+            }
         }
 
         private void AddMissingControls()
@@ -167,8 +250,10 @@ namespace RetailManagement.UserForms
         {
             // Add missing event handlers
             btnSave.Click += btnSave_Click;
+            btnSaveNew.Click += btnSaveNew_Click;
             btnCancel.Click += btnCancel_Click;
             btnPrint.Click += btnPrint_Click;
+            btnAdd.Click += btnAdd_Click;
             gridViewProducts.CellClick += gridViewProducts_CellClick;
         }
 
@@ -284,8 +369,24 @@ namespace RetailManagement.UserForms
                     barcodeColumn = "";
                 }
 
+                // Check if new discount and tax columns exist
+                bool hasDiscountColumns = false;
+                try
+                {
+                    string checkDiscountQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name IN ('Disc1', 'Disc2', 'SalesTax')";
+                    int discountColumnsExist = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkDiscountQuery));
+                    hasDiscountColumns = discountColumnsExist >= 3; // All 3 columns must exist
+                }
+                catch
+                {
+                    hasDiscountColumns = false;
+                }
+
+                string discountColumns = hasDiscountColumns ? ", i.Disc1, i.Disc2, i.SalesTax" : ", 0 as Disc1, 0 as Disc2, 0 as SalesTax";
+                
                 string query = $@"SELECT i.ItemID, i.ItemName, i.Description, i.Price, i.{stockColumnName} as StockQuantity, 
-                               i.Category{barcodeColumn}, i.CreatedDate, ISNULL(c.CompanyName, 'No Company') as CompanyName, i.CompanyID
+                               i.Category{barcodeColumn}, i.CreatedDate, ISNULL(c.CompanyName, 'No Company') as CompanyName, i.CompanyID{discountColumns},
+                               i.Packing, i.PurchasePrice, i.ReorderLevel
                                FROM Items i 
                                LEFT JOIN Companies c ON i.CompanyID = c.CompanyID
                                WHERE i.IsActive = 1 
@@ -366,6 +467,11 @@ namespace RetailManagement.UserForms
                 comboBox1.DisplayMember = "CompanyName";
                 comboBox1.SelectedIndex = 0;
                 
+                // Make ComboBox searchable
+                comboBox1.DropDownStyle = ComboBoxStyle.DropDown;
+                comboBox1.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                comboBox1.AutoCompleteSource = AutoCompleteSource.ListItems;
+                
                 // Add selection changed event
                 comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
             }
@@ -416,8 +522,24 @@ namespace RetailManagement.UserForms
                             barcodeColumn = "";
                         }
 
+                        // Check if new discount and tax columns exist
+                        bool hasDiscountColumns = false;
+                        try
+                        {
+                            string checkDiscountQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name IN ('Disc1', 'Disc2', 'SalesTax')";
+                            int discountColumnsExist = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkDiscountQuery));
+                            hasDiscountColumns = discountColumnsExist >= 3; // All 3 columns must exist
+                        }
+                        catch
+                        {
+                            hasDiscountColumns = false;
+                        }
+
+                        string discountColumns = hasDiscountColumns ? ", i.Disc1, i.Disc2, i.SalesTax" : ", 0 as Disc1, 0 as Disc2, 0 as SalesTax";
+                        
                         string query = $@"SELECT i.ItemID, i.ItemName, i.Description, i.Price, i.{stockColumnName} as StockQuantity, 
-                                       i.Category{barcodeColumn}, i.CreatedDate, c.CompanyName 
+                                       i.Category{barcodeColumn}, i.CreatedDate, c.CompanyName, i.CompanyID{discountColumns},
+                                       i.Packing, i.PurchasePrice, i.ReorderLevel
                                        FROM Items i 
                                        LEFT JOIN Companies c ON i.CompanyID = c.CompanyID
                                        WHERE i.IsActive = 1 AND i.CompanyID = @CompanyID
@@ -710,6 +832,9 @@ namespace RetailManagement.UserForms
             textBox6.Text = ""; // Pack Size
             textBox7.Text = ""; // Re-Order Level
             textBox8.Text = ""; // Generic Name
+            txtDisc1.Text = ""; // Discount 1
+            txtDisc2.Text = ""; // Discount 2
+            txtSalesTax.Text = ""; // Sales Tax
            
            
             
@@ -722,18 +847,6 @@ namespace RetailManagement.UserForms
             
             // Reset company selection to "All Companies"
             comboBox1.SelectedIndex = 0;
-            
-            // Update button states
-            btnSave.Text = "Save";
-            btnSave.Enabled = false;
-            btnCancel.Enabled = false;
-            
-            // Find and update delete button
-            Button btnDelete = panel2.Controls.OfType<Button>().FirstOrDefault(b => b.Text == "Delete");
-            if (btnDelete != null)
-            {
-                btnDelete.Enabled = false;
-            }
             
             // Clear selection in grid
             gridViewProducts.ClearSelection();
@@ -783,7 +896,7 @@ namespace RetailManagement.UserForms
         private void btnAdd_Click(object sender, EventArgs e)
         {
             ClearForm();
-            btnSave.Enabled = true;
+            btnSaveNew.Enabled = true;
             btnCancel.Enabled = true;
             textBox1.Focus();
             
@@ -800,30 +913,55 @@ namespace RetailManagement.UserForms
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            // This button is now only for updating existing items
             if (ValidateForm())
             {
                 try
                 {
-                    if (isEditMode)
-                    {
-                        UpdateItem();
-                    }
-                    else
-                    {
-                        InsertItem();
-                    }
+                    UpdateItem();
                     LoadItems();
                     ClearForm();
+                    
+                    // Reset form state after successful update
+                    isEditMode = false;
+                    selectedItemID = 0;
+                    btnSave.Enabled = false;
+                    btnCancel.Enabled = false;
+                    
+                    // Disable delete button
+                    var btnDelete = panel2.Controls.OfType<Button>().FirstOrDefault(b => b.Name == "btnDelete");
+                    if (btnDelete != null) btnDelete.Enabled = false;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error saving item: " + ex.Message, "Error", 
+                    MessageBox.Show("Error updating item: " + ex.Message, "Error", 
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-
+        private void btnSaveNew_Click(object sender, EventArgs e)
+        {
+            // This button is for adding new items
+            if (ValidateForm())
+            {
+                try
+                {
+                    InsertItem();
+                    LoadItems();
+                    ClearForm();
+                    
+                    // Reset form state after successful save
+                    btnSaveNew.Enabled = false;
+                    btnCancel.Enabled = false;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error adding item: " + ex.Message, "Error", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
 
         private void InsertItem()
         {
@@ -840,6 +978,19 @@ namespace RetailManagement.UserForms
             catch
             {
                 hasBarcodeColumn = false;
+            }
+
+            // Check if new discount and tax columns exist
+            bool hasDiscountColumns = false;
+            try
+            {
+                string checkDiscountQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name IN ('Disc1', 'Disc2', 'SalesTax')";
+                int discountColumnsExist = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkDiscountQuery));
+                hasDiscountColumns = discountColumnsExist >= 3; // All 3 columns must exist
+            }
+            catch
+            {
+                hasDiscountColumns = false;
             }
 
             // Get selected company ID (0 means no company selected)
@@ -873,8 +1024,11 @@ namespace RetailManagement.UserForms
                 barcodeValue = ", @Barcode";
             }
 
-            string query = $@"INSERT INTO Items (ItemName, Description, Price, {stockColumnName}, Category, CompanyID{barcodeColumn}, CreatedDate, IsActive) 
-                           VALUES (@ItemName, @Description, @Price, @StockQuantity, @Category, @CompanyID{barcodeValue}, @CreatedDate, 1)";
+            string discountColumns = hasDiscountColumns ? ", Disc1, Disc2, SalesTax" : "";
+            string discountValues = hasDiscountColumns ? ", @Disc1, @Disc2, @SalesTax" : "";
+            
+            string query = $@"INSERT INTO Items (ItemName, Description, Price, {stockColumnName}, Category, CompanyID{barcodeColumn}{discountColumns}, Packing, PurchasePrice, ReorderLevel, CreatedDate, IsActive) 
+                           VALUES (@ItemName, @Description, @Price, @StockQuantity, @Category, @CompanyID{barcodeValue}{discountValues}, @Packing, @PurchasePrice, @ReorderLevel, @CreatedDate, 1)";
 
             var parameterList = new List<SqlParameter>
             {
@@ -884,8 +1038,18 @@ namespace RetailManagement.UserForms
                 new SqlParameter("@StockQuantity", string.IsNullOrEmpty(textBox6.Text) ? 0 : int.Parse(textBox6.Text)),
                 new SqlParameter("@Category", textBox3.Text.Trim()),
                 new SqlParameter("@CompanyID", companyIDValue),
+                new SqlParameter("@Packing", textBox2.Text.Trim()),
+                new SqlParameter("@PurchasePrice", string.IsNullOrEmpty(textBox5.Text) ? 0 : decimal.Parse(textBox5.Text)),
+                new SqlParameter("@ReorderLevel", string.IsNullOrEmpty(textBox7.Text) ? 0 : int.Parse(textBox7.Text)),
                 new SqlParameter("@CreatedDate", DateTime.Now)
             };
+
+            if (hasDiscountColumns)
+            {
+                parameterList.Add(new SqlParameter("@Disc1", string.IsNullOrEmpty(txtDisc1.Text) ? 0 : decimal.Parse(txtDisc1.Text)));
+                parameterList.Add(new SqlParameter("@Disc2", string.IsNullOrEmpty(txtDisc2.Text) ? 0 : decimal.Parse(txtDisc2.Text)));
+                parameterList.Add(new SqlParameter("@SalesTax", string.IsNullOrEmpty(txtSalesTax.Text) ? 0 : decimal.Parse(txtSalesTax.Text)));
+            }
 
             if (hasBarcodeColumn)
             {
@@ -917,6 +1081,19 @@ namespace RetailManagement.UserForms
                 hasBarcodeColumn = false;
             }
 
+            // Check if new discount and tax columns exist
+            bool hasDiscountColumns = false;
+            try
+            {
+                string checkDiscountQuery = "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Items]') AND name IN ('Disc1', 'Disc2', 'SalesTax')";
+                int discountColumnsExist = SafeDataHelper.SafeToInt32(DatabaseConnection.ExecuteScalar(checkDiscountQuery));
+                hasDiscountColumns = discountColumnsExist >= 3; // All 3 columns must exist
+            }
+            catch
+            {
+                hasDiscountColumns = false;
+            }
+
             // Get selected company ID (0 means no company selected)
             int selectedCompanyID = Convert.ToInt32(comboBox1.SelectedValue);
             object companyIDValue = selectedCompanyID == 0 ? (object)DBNull.Value : selectedCompanyID;
@@ -941,8 +1118,11 @@ namespace RetailManagement.UserForms
                 barcodeUpdate = ", Barcode = @Barcode";
             }
 
+            string discountUpdate = hasDiscountColumns ? ", Disc1 = @Disc1, Disc2 = @Disc2, SalesTax = @SalesTax" : "";
+            
             string query = $@"UPDATE Items SET ItemName = @ItemName, Description = @Description, 
-                           Price = @Price, {stockColumnName} = @StockQuantity, Category = @Category, CompanyID = @CompanyID{barcodeUpdate}
+                           Price = @Price, {stockColumnName} = @StockQuantity, Category = @Category, CompanyID = @CompanyID{barcodeUpdate}{discountUpdate},
+                           Packing = @Packing, PurchasePrice = @PurchasePrice, ReorderLevel = @ReorderLevel
                            WHERE ItemID = @ItemID";
 
             var parameterList = new List<SqlParameter>
@@ -953,8 +1133,18 @@ namespace RetailManagement.UserForms
                 new SqlParameter("@Price", decimal.Parse(textBox4.Text)),
                 new SqlParameter("@StockQuantity", string.IsNullOrEmpty(textBox6.Text) ? 0 : int.Parse(textBox6.Text)),
                 new SqlParameter("@Category", textBox3.Text.Trim()),
-                new SqlParameter("@CompanyID", companyIDValue)
+                new SqlParameter("@CompanyID", companyIDValue),
+                new SqlParameter("@Packing", textBox2.Text.Trim()),
+                new SqlParameter("@PurchasePrice", string.IsNullOrEmpty(textBox5.Text) ? 0 : decimal.Parse(textBox5.Text)),
+                new SqlParameter("@ReorderLevel", string.IsNullOrEmpty(textBox7.Text) ? 0 : int.Parse(textBox7.Text))
             };
+
+            if (hasDiscountColumns)
+            {
+                parameterList.Add(new SqlParameter("@Disc1", string.IsNullOrEmpty(txtDisc1.Text) ? 0 : decimal.Parse(txtDisc1.Text)));
+                parameterList.Add(new SqlParameter("@Disc2", string.IsNullOrEmpty(txtDisc2.Text) ? 0 : decimal.Parse(txtDisc2.Text)));
+                parameterList.Add(new SqlParameter("@SalesTax", string.IsNullOrEmpty(txtSalesTax.Text) ? 0 : decimal.Parse(txtSalesTax.Text)));
+            }
 
             if (hasBarcodeColumn)
             {
@@ -1115,6 +1305,15 @@ namespace RetailManagement.UserForms
         private void btnCancel_Click(object sender, EventArgs e)
         {
             ClearForm();
+            
+            // Disable buttons after cancel
+            btnSave.Enabled = false;
+            btnSaveNew.Enabled = false;
+            btnCancel.Enabled = false;
+            
+            // Disable delete button
+            var btnDelete = panel2.Controls.OfType<Button>().FirstOrDefault(b => b.Name == "btnDelete");
+            if (btnDelete != null) btnDelete.Enabled = false;
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -1144,6 +1343,16 @@ namespace RetailManagement.UserForms
                         
                         LoadItems();
                         ClearForm();
+                        
+                        // Disable buttons after delete
+                        btnSave.Enabled = false;
+                        btnSaveNew.Enabled = false;
+                        btnCancel.Enabled = false;
+                        
+                        // Disable delete button
+                        var btnDelete = panel2.Controls.OfType<Button>().FirstOrDefault(b => b.Name == "btnDelete");
+                        if (btnDelete != null) btnDelete.Enabled = false;
+                        
                         MessageBox.Show("Item deleted successfully!", "Success", 
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -1197,10 +1406,16 @@ namespace RetailManagement.UserForms
                 // Safely handle conversions using centralized SafeDataHelper
                 selectedItemID = SafeDataHelper.SafeGetCellInt32(row, "ItemID");
                 textBox1.Text = SafeDataHelper.SafeGetCellString(row, "ItemName");
-                textBox8.Text = SafeDataHelper.SafeGetCellString(row, "Description");
-                textBox4.Text = SafeDataHelper.SafeGetCellDecimal(row, "Price").ToString("F2");
-                textBox6.Text = SafeDataHelper.SafeGetCellString(row, "StockQuantity");
+                textBox2.Text = SafeDataHelper.SafeGetCellString(row, "Packing");
                 textBox3.Text = SafeDataHelper.SafeGetCellString(row, "Category");
+                textBox4.Text = SafeDataHelper.SafeGetCellDecimal(row, "Price").ToString("F2");
+                textBox5.Text = SafeDataHelper.SafeGetCellDecimal(row, "PurchasePrice").ToString("F2");
+                textBox6.Text = SafeDataHelper.SafeGetCellString(row, "StockQuantity");
+                textBox7.Text = SafeDataHelper.SafeGetCellString(row, "ReorderLevel");
+                textBox8.Text = SafeDataHelper.SafeGetCellString(row, "Description");
+                txtDisc1.Text = SafeDataHelper.SafeGetCellDecimal(row, "Disc1").ToString("F2");
+                txtDisc2.Text = SafeDataHelper.SafeGetCellDecimal(row, "Disc2").ToString("F2");
+                txtSalesTax.Text = SafeDataHelper.SafeGetCellDecimal(row, "SalesTax").ToString("F2");
                 
                 // Auto-generate and display barcode automatically
                 string existingBarcode = SafeDataHelper.SafeGetCellString(row, "Barcode");
